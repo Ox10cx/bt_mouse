@@ -1,0 +1,160 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/bt_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/layout_size_10"
+            android:gravity="center"
+            android:text="@string/speed"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_20"></TextView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.uascent.android.pethunting.myviews.VerticalSeekBar
+                android:id="@+id/ver_sb"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:layout_marginBottom="@dimen/default_margin"
+                android:layout_marginTop="@dimen/default_margin"
+                android:focusable="true"
+                android:max="100"
+                android:progress="0"
+                android:progressDrawable="@drawable/po_seekbar" />
+
+            <TextView
+                android:id="@+id/ver_sb_per"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/layout_size_5"
+                android:layout_marginTop="@dimen/default_margin"
+                android:layout_toLeftOf="@+id/ver_sb"
+                android:text="@string/sb_per"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_18" />
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/play_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="@dimen/layout_size_20"
+            android:layout_marginRight="@dimen/layout_size_20"
+            android:layout_marginTop="@dimen/layout_size_5"
+            android:background="@drawable/title_button_shape"
+            android:gravity="center"
+            android:text="@string/play_title"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_20"></Button>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/layout_size_20"
+            android:layout_marginTop="@dimen/layout_size_5"
+            android:text="@string/direction"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_18" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/layout_size_20"
+            android:layout_marginRight="@dimen/layout_size_20"
+            android:layout_marginTop="@dimen/layout_size_5"
+            android:layout_weight="1"
+            android:background="@color/white">
+
+            <TextView
+                android:id="@+id/tv_empty"
+                android:layout_width="@dimen/layout_size_100"
+                android:layout_height="@dimen/layout_size_100"
+                android:layout_centerInParent="true" />
+
+            <ImageView
+                android:id="@+id/iv_top_dir"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/tv_empty"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/top_dir" />
+
+            <ImageView
+                android:id="@+id/iv_below_dir"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_empty"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/below_dir" />
+
+            <ImageView
+                android:id="@+id/iv_left_dir"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/tv_empty"
+                android:background="@drawable/left_dir" />
+
+            <ImageView
+                android:id="@+id/iv_right_dir"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/tv_empty"
+                android:background="@drawable/right_dir" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_size_10"
+            android:layout_marginBottom="@dimen/layout_size_10">
+
+            <ImageView
+                android:id="@+id/iv_play_guide"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="@dimen/layout_size_20"
+                android:background="@drawable/play_guide" />
+
+            <ImageView
+                android:id="@+id/iv_play_home"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="@dimen/layout_size_20"
+                android:background="@drawable/play_home" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
