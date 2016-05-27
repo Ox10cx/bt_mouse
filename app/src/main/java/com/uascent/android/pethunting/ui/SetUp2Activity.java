@@ -69,6 +69,26 @@ public class SetUp2Activity extends BaseActivity implements View.OnClickListener
 
                 } else {
                     showShortToast(getResources().getString(R.string.bluetooth_switch_has_opened));
+//                    final ComReminderDialog dialog = new ComReminderDialog(this, getResources().getString(R.string.open_bluetooth_switch)
+//                            , getResources().getString(R.string.no), getResources().getString(R.string.yes));
+//                    dialog.show();
+//                    dialog.setCanceledOnTouchOutside(false);
+//                    dialog.dialog_cancel.setOnClickListener(new View.OnClickListener() {
+//
+//                        @Override
+//                        public void onClick(View v) {
+//                            dialog.cancel();
+//                        }
+//                    });
+//                    dialog.dialog_submit.setOnClickListener(new View.OnClickListener() {
+//
+//                        @Override
+//                        public void onClick(View v) {
+//                            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//                            startActivityForResult(enableIntent, REQUEST_ENABLE_CODE);
+//                            dialog.cancel();
+//                        }
+//                    });
                 }
                 break;
             default:
