@@ -21,6 +21,11 @@
     <string name="direction">DIRECTION</string>
     <string name="sb_per">0%</string>
     <string name="play_title">Play:Remote Control</string>
+    <string name="bluetooth_switch_has_opened">蓝牙已打开</string>
+    <string name="bluetooth_switch_not_opened">蓝牙未打开</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="open_bluetooth_switch">Turn on Bluetooth?</string>
 
 
 </resources>

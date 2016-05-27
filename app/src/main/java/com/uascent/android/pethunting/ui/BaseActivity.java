@@ -3,6 +3,7 @@ package com.uascent.android.pethunting.ui;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.widget.Toast;
 
 import com.uascent.android.pethunting.R;
 import com.uascent.android.pethunting.tools.StatusBarUtil;
@@ -31,15 +32,16 @@ public class BaseActivity extends FragmentActivity {
         StatusBarUtil.setColor(this, getResources().getColor(R.color.colorPrimary));
     }
 
-	/*public void showLongToast(String text) {
+    public void showLongToast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
-	}
+    }
 
-	public void showShortToast(String text) {
-		Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
-	}
+    public void showShortToast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+    }
 
-	public void showLoadingDialog() {
+    /*
+    public void showLoadingDialog() {
 		dialog = DialogUtil.createLoadingDialog(this, "正在加载中..");
 		dialog.setCancelable(true);
 		dialog.show();
