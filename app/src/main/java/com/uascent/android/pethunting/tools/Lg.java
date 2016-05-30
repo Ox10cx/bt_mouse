@@ -6,6 +6,23 @@ public class Lg {
     private static boolean debug = true;
     private final static String TAG = "PetHunting";
 
+    /**
+     * 在项目中打印log
+     *
+     * @param msg
+     */
+    public static void i(String msg) {
+        if (debug) {
+            Log.i(TAG, msg);
+        }
+    }
+
+    /**
+     * 在单个文件中打印log
+     *
+     * @param tag
+     * @param msg
+     */
     public static void i(String tag, String msg) {
         if (debug) {
             if (tag == null) {

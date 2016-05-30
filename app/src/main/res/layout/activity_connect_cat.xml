@@ -1,0 +1,52 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/bt_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="@dimen/layout_size_20"
+        android:layout_marginRight="@dimen/layout_size_20"
+        android:layout_marginTop="@dimen/layout_size_5"
+        android:background="@drawable/title_button_shape"
+        android:gravity="center"
+        android:text="@string/connect_the_toy"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_20"></Button>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/layout_size_5"
+        android:background="@color/gray_bg">
+
+        <!--            android:cacheColorHint="@color/list_cacheColor"
+        android:divider="@drawable/listview_divider_shape"
+         android:listSelector="@drawable/listview_item_bg"
+        -->
+
+        <ListView
+            android:id="@+id/lv_device"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:cacheColorHint="@android:color/transparent"
+            android:divider="@drawable/listview_divider_shape"
+            android:scrollbars="none"></ListView>
+
+
+        <ImageView
+            android:id="@+id/iv_load_null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/load_empty"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+
+</LinearLayout>

@@ -22,7 +22,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
         <activity
@@ -51,6 +50,14 @@
         <activity
             android:name=".ui.PlayActivity"
             android:screenOrientation="landscape"></activity>
+        <activity
+            android:name=".ui.ConnectCatActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <service
+            android:name="com.uascent.android.pethunting.service.BleComService"
+            android:enabled="true"
+            android:exported="false"></service>
     </application>
 
 </manifest>

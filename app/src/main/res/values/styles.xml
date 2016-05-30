@@ -12,6 +12,7 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
+    <!--自定义提示对话框-->
     <style name="CustomProgressDialog" parent="@style/CustomDialog">
         <item name="android:windowBackground">@drawable/comm_dialog_bg_shape</item>
         <item name="android:windowNoTitle">true</item>
@@ -23,6 +24,15 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
         <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+    </style>
+
+    <!-- 自定义loading dialog -->
+    <style name="loading_dialog" parent="android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
 </resources>

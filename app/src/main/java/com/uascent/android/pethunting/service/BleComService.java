@@ -11,11 +11,11 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
-import android.util.Log;
 
 import com.uascent.android.pethunting.devices.BluetoothAntiLostDevice;
 import com.uascent.android.pethunting.devices.BluetoothLeClass;
 import com.uascent.android.pethunting.model.BtDevice;
+import com.uascent.android.pethunting.tools.Lg;
 import com.uascent.android.pethunting.tools.PreventAntiLostCore;
 import com.uascent.android.pethunting.tools.Utils;
 import com.uascent.android.pethunting.ui.ICallback;
@@ -31,7 +31,7 @@ import java.util.UUID;
  * Created by Administrator on 16-3-15.
  */
 public class BleComService extends Service {
-    private static final String  TAG = "hjq";
+    private static final String  TAG = "BleComService";
     private static final int SCAN_PERIOD = 10000;
     private static final long LIVE_PERIOD = 1000 * 7;       //点击开始扫描后的10秒停止扫描
 
@@ -51,7 +51,7 @@ public class BleComService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d(TAG, "onBind");
+        Lg.i(TAG, "onBind");
         return mBinder;
     }
 
@@ -59,11 +59,12 @@ public class BleComService extends Service {
     public void onDestroy() {
         mCallbacks.kill();
         super.onDestroy();
+        Lg.i(TAG,"onDestroy");
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-
+        Lg.i(TAG,"onUnbind");
         return super.onUnbind(intent);
     }
 
@@ -113,7 +114,7 @@ public class BleComService extends Service {
         if (device != null) {
             device.turnOnImmediateAlert();
         } else {
-            Log.e("hjq", "the device is null?");
+            Lg.i("hjq", "the device is null?");
         }
     }
 
@@ -122,15 +123,14 @@ public class BleComService extends Service {
         if (device != null) {
             device.turnOffImmediateAlert();
         } else {
-            Log.e("hjq", "the device is null?");
+            Lg.i("hjq", "the device is null?");
         }
     }
 
     // 15秒获取一次连接的rssi值并进行判断，是否掉线了。
     void setBleAntiLost(boolean enable) {
 
-        Log.d("hjq", "set antilost enable = " + enable);
-
+        Lg.i("hjq", "set antilost enable = " + enable);
         if (antiLostEnabled == enable) {
             return;
         }
@@ -161,7 +161,7 @@ public class BleComService extends Service {
                             }
                         }
 
-                        Log.d("hjq", "ble status = " + bleok);
+                        Lg.i("hjq", "ble status = " + bleok);
                         if (!bleok) {
                             try {
                                 Thread.sleep(6000);
@@ -197,7 +197,7 @@ public class BleComService extends Service {
                             int rssi = rssidata.get(key).intValue();
                             int pos;
 
-                            Log.d("hjq", "rssi = " + rssi);
+                            Lg.i("hjq", "rssi = " + rssi);
                             if (rssi < -100) {
                                 pos = BtDevice.LOST;
                             } else {
@@ -219,7 +219,7 @@ public class BleComService extends Service {
                                         mCallbacks.getBroadcastItem(i).onSignalChanged(key, rssi);
                                     }
                                 } catch (RemoteException e) {
-                                    Log.e(TAG, "remote call exception", e);
+                                    Lg.i(TAG, "remote call exception->>>"+ e);
                                 }
                                 mCallbacks.finishBroadcast();
                             }
@@ -253,7 +253,7 @@ public class BleComService extends Service {
 
         BluetoothAntiLostDevice d = mActiveDevices.get(address);
         if (d != null) {
-            Log.e("hjq", "warning the address: " + address + " is not disconnected");
+            Lg.i("hjq", "warning the address: " + address + " is not disconnected");
             d.disconnect();
             d.close();
             mActiveDevices.remove(address);
@@ -272,9 +272,9 @@ public class BleComService extends Service {
 
         ret = device.connect(address);
         if (ret)  {
-            Log.d(TAG, "connect to " + address + " success");
+            Lg.i(TAG, "connect to " + address + " success");
         } else {
-            Log.d(TAG, "connect to " + address + " failed");
+            Lg.i(TAG, "connect to " + address + " failed");
         }
 
         return true;
@@ -302,7 +302,7 @@ public class BleComService extends Service {
             if (leDevice != null) {
                 mActiveDevices.remove(device.getAddress());
             } else {
-                Log.e("hjq", "remove address = " + device.getAddress() + " is null");
+                Lg.i("hjq", "remove address = " + device.getAddress() + " is null");
             }
 
             synchronized (mCallbacks) {
@@ -313,7 +313,7 @@ public class BleComService extends Service {
                         mCallbacks.getBroadcastItem(i).onDisconnect(gatt.getDevice().getAddress());
                     }
                 } catch (RemoteException e) {
-                    Log.e(TAG, "remote call exception", e);
+                    Lg.i(TAG, "remote call exception->>>"+ e);
                 }
                 mCallbacks.finishBroadcast();
             }
@@ -324,7 +324,7 @@ public class BleComService extends Service {
         @Override
         public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
             BluetoothDevice device = gatt.getDevice();
-            Log.d("hjq", "read remote " + device.getAddress() + " rssi = " + rssi + " status = " + status);
+            Lg.i("hjq", "read remote " + device.getAddress() + " rssi = " + rssi + " status = " + status);
             synchronized (mScaningRssi) {
                 mScaningRssi.put(gatt.getDevice().getAddress(), rssi);
                 mScaningRssi.notify();
@@ -343,7 +343,7 @@ public class BleComService extends Service {
                         mCallbacks.getBroadcastItem(i).onConnect(gatt.getDevice().getAddress());
                     }
                 } catch (RemoteException e) {
-                    Log.e(TAG, "remote call exception", e);
+                    Lg.i(TAG, "remote call exception->>>"+ e);
                 }
                 mCallbacks.finishBroadcast();
             }
@@ -371,12 +371,12 @@ public class BleComService extends Service {
                             mCallbacks.getBroadcastItem(i).onAlertServiceDiscovery(device.getAddress(), alertSupport);
                         }
                     } catch (RemoteException e) {
-                        Log.e(TAG, "remote call exception", e);
+                        Lg.i(TAG, "remote call exception->>>"+ e);
                     }
                     mCallbacks.finishBroadcast();
                 }
             } else {
-                Log.e("hjq", "address = " + device.getAddress() + " is null");
+                Lg.i("hjq", "address = " + device.getAddress() + " is null");
             }
         }
     };
@@ -388,7 +388,7 @@ public class BleComService extends Service {
 
         for (BluetoothGattService gattService : gattServices) {
             final UUID serviceUUID = gattService.getUuid();
-            Log.e(TAG,"-->service uuid:" + gattService.getUuid());
+            Lg.i(TAG,"-->service uuid:" + gattService.getUuid());
 
             if (!serviceUUID.equals(BluetoothAntiLostDevice.ALERT_SERVICE_UUID)) {
                 continue;
@@ -396,9 +396,9 @@ public class BleComService extends Service {
 
             List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
             for (final BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
-                Log.e(TAG, "---->char uuid:" + gattCharacteristic.getUuid());
+                Lg.i(TAG, "---->char uuid:" + gattCharacteristic.getUuid());
                 if (gattCharacteristic.getUuid().equals(BluetoothAntiLostDevice.ALERT_FUNC_UUID)) {
-                    Log.e(TAG, "support alert service");
+                    Lg.i(TAG, "support alert service");
                     return true;
                 }
             }
@@ -418,7 +418,7 @@ public class BleComService extends Service {
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.e(TAG, "onCharRead " + gatt.getDevice().getName()
+                Lg.i(TAG, "onCharRead " + gatt.getDevice().getName()
                         + " read "
                         + characteristic.getUuid().toString()
                         + " -> "
@@ -432,7 +432,7 @@ public class BleComService extends Service {
                             mCallbacks.getBroadcastItem(i).onRead(gatt.getDevice().getAddress(), characteristic.getValue());
                         }
                     } catch (RemoteException e) {
-                        Log.e(TAG, "remote call exception", e);
+                        Lg.i(TAG, "remote call exception->>>"+ e);
                     }
                     mCallbacks.finishBroadcast();
                 }
@@ -447,7 +447,7 @@ public class BleComService extends Service {
                                           BluetoothGattCharacteristic characteristic) {
             byte[] value = characteristic.getValue();
 
-            Log.e(TAG, "onCharWrite " + gatt.getDevice().getName()
+            Lg.i(TAG, "onCharWrite " + gatt.getDevice().getName()
                     + " write "
                     + characteristic.getUuid().toString()
                     + " -> "
@@ -461,7 +461,7 @@ public class BleComService extends Service {
                         mCallbacks.getBroadcastItem(i).onWrite(gatt.getDevice().getAddress(), characteristic.getValue());
                     }
                 } catch (RemoteException e) {
-                    Log.e(TAG, "remote call exception", e);
+                    Lg.i(TAG, "remote call exception->>"+e);
                 }
                 mCallbacks.finishBroadcast();
             }
@@ -477,36 +477,36 @@ public class BleComService extends Service {
             //-----Service的字段信息-----//
             int type = gattService.getType();
             final UUID serviceUUID = gattService.getUuid();
-            Log.e(TAG,"-->service type:"+Utils.getServiceType(type));
-            Log.e(TAG,"-->includedServices size:"+gattService.getIncludedServices().size());
-            Log.e(TAG,"-->service uuid:"+gattService.getUuid());
+            Lg.i(TAG,"-->service type:"+Utils.getServiceType(type));
+            Lg.i(TAG,"-->includedServices size:"+gattService.getIncludedServices().size());
+            Lg.i(TAG,"-->service uuid:"+gattService.getUuid());
 
             //-----Characteristics的字段信息-----//
             List<BluetoothGattCharacteristic> gattCharacteristics =gattService.getCharacteristics();
             for (final BluetoothGattCharacteristic  gattCharacteristic: gattCharacteristics) {
-                Log.e(TAG,"---->char uuid:"+gattCharacteristic.getUuid());
+                Lg.i(TAG,"---->char uuid:"+gattCharacteristic.getUuid());
 
                 int permission = gattCharacteristic.getPermissions();
-                Log.e(TAG,"---->char permission:"+Utils.getCharPermission(permission));
+                Lg.i(TAG,"---->char permission:"+Utils.getCharPermission(permission));
 
                 int property = gattCharacteristic.getProperties();
-                Log.e(TAG,"---->char property:"+Utils.getCharPropertie(property));
+                Lg.i(TAG,"---->char property:"+Utils.getCharPropertie(property));
 
                 byte[] data = gattCharacteristic.getValue();
                 if (data != null && data.length > 0) {
-                    Log.e(TAG,"---->char value:"+new String(data));
+                    Lg.i(TAG,"---->char value:"+new String(data));
                 }
 
                 //-----Descriptors的字段信息-----//
                 List<BluetoothGattDescriptor> gattDescriptors = gattCharacteristic.getDescriptors();
                 for (BluetoothGattDescriptor gattDescriptor : gattDescriptors) {
-                    Log.e(TAG, "-------->desc uuid:" + gattDescriptor.getUuid());
+                    Lg.i(TAG, "-------->desc uuid:" + gattDescriptor.getUuid());
                     int descPermission = gattDescriptor.getPermissions();
-                    Log.e(TAG,"-------->desc permission:"+ Utils.getDescPermission(descPermission));
+                    Lg.i(TAG,"-------->desc permission:"+ Utils.getDescPermission(descPermission));
 
                     byte[] desData = gattDescriptor.getValue();
                     if (desData != null && desData.length > 0) {
-                        Log.e(TAG, "-------->desc value:"+ new String(desData));
+                        Lg.i(TAG, "-------->desc value:"+ new String(desData));
                     }
                 }
             }

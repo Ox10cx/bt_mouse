@@ -37,9 +37,10 @@ public class SetUp2Activity extends BaseActivity implements View.OnClickListener
 
     @Override
     public void onClick(View v) {
+        Intent intent = null;
         switch (v.getId()) {
             case R.id.bt_menu:
-                Intent intent = new Intent(this, MainActivity.class);
+                intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
                 break;
             case R.id.iv_blue_switch:
@@ -69,26 +70,8 @@ public class SetUp2Activity extends BaseActivity implements View.OnClickListener
 
                 } else {
                     showShortToast(getResources().getString(R.string.bluetooth_switch_has_opened));
-//                    final ComReminderDialog dialog = new ComReminderDialog(this, getResources().getString(R.string.open_bluetooth_switch)
-//                            , getResources().getString(R.string.no), getResources().getString(R.string.yes));
-//                    dialog.show();
-//                    dialog.setCanceledOnTouchOutside(false);
-//                    dialog.dialog_cancel.setOnClickListener(new View.OnClickListener() {
-//
-//                        @Override
-//                        public void onClick(View v) {
-//                            dialog.cancel();
-//                        }
-//                    });
-//                    dialog.dialog_submit.setOnClickListener(new View.OnClickListener() {
-//
-//                        @Override
-//                        public void onClick(View v) {
-//                            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//                            startActivityForResult(enableIntent, REQUEST_ENABLE_CODE);
-//                            dialog.cancel();
-//                        }
-//                    });
+                    intent = new Intent(this, ConnectCatActivity.class);
+                    startActivity(intent);
                 }
                 break;
             default:
@@ -101,6 +84,8 @@ public class SetUp2Activity extends BaseActivity implements View.OnClickListener
             case REQUEST_ENABLE_CODE: {
                 if (resultCode == Activity.RESULT_OK) {
                     showShortToast(getResources().getString(R.string.bluetooth_switch_has_opened));
+                    Intent intent = new Intent(this, ConnectCatActivity.class);
+                    startActivity(intent);
                 } else {
                     showShortToast(getResources().getString(R.string.bluetooth_switch_not_opened));
                 }

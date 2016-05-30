@@ -9,7 +9,7 @@ import java.io.Serializable;
  * Created by Administrator on 16-3-7.
  */
 public class BtDevice implements Serializable {
-   // private String name;
+    // private String name;
     private String thumbnail;
 
     public BtDevice copy() {
@@ -162,7 +162,7 @@ public class BtDevice implements Serializable {
     private int alertDistance;
 
     public final static int ALERT_DISTANCE_NEAR = 1;
-    public final static int ALERT_DISTANCE_MIDDLE = 2 ;
+    public final static int ALERT_DISTANCE_MIDDLE = 2;
     public final static int ALERT_DISTANCE_FAR = 3;
 
     private int alertVolume;
@@ -172,6 +172,9 @@ public class BtDevice implements Serializable {
     private boolean findAlertSwitch;
     private int findAlertVolume;
     private int findAlertRingtone;
+    /**
+     * 信号强度
+     */
     private int rssi;
 
     public int getPosition() {
@@ -184,11 +187,11 @@ public class BtDevice implements Serializable {
 
     private int position;
 
-    static public final int  LOST = 0;
-    static public final int  FAR = 1;
-    static public final int  MIDDLE = 2;
-    static public final int  NEAR = 3;
-    static public final int  OK = 4;
+    static public final int LOST = 0;
+    static public final int FAR = 1;
+    static public final int MIDDLE = 2;
+    static public final int NEAR = 3;
+    static public final int OK = 4;
 
     public boolean isLostAlert() {
         return lostAlert;
@@ -213,10 +216,22 @@ public class BtDevice implements Serializable {
     public int getRssi() {
         return rssi;
     }
-    public void setThumbnail(String image) { thumbnail = image;}
-    public String getName() { return name; }
-    public String getThumbnail() { return thumbnail; }
-    public void setRssi(int s) { rssi = s; }
+
+    public void setThumbnail(String image) {
+        thumbnail = image;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setRssi(int s) {
+        rssi = s;
+    }
 
     private boolean alertService;       // 是否支持报警服务
     private boolean reportAlert;        // 是否主动由防丢器发起的报警
@@ -241,7 +256,9 @@ public class BtDevice implements Serializable {
                 '}';
     }
 
-    public String getId() { return address; }
+    public String getId() {
+        return address;
+    }
 
     public BtDevice(String thumbnail, String name, String address, boolean antiLostSwitch,
                     boolean lostAlertSwitch, int alertDistance, int alertVolume,
@@ -269,7 +286,7 @@ public class BtDevice implements Serializable {
             this.name = "unkown";
         }
 
-        if (this.findAlertRingtone == 0){
+        if (this.findAlertRingtone == 0) {
             this.findAlertRingtone = R.raw.alarm;
         }
         if (this.alertRingtone == 0) {
@@ -277,8 +294,7 @@ public class BtDevice implements Serializable {
         }
     }
 
-    public BtDevice()
-    {
+    public BtDevice() {
         thumbnail = "";
         name = "";
         address = "";

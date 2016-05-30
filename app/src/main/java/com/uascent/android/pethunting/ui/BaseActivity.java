@@ -1,14 +1,18 @@
 package com.uascent.android.pethunting.ui;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.uascent.android.pethunting.R;
+import com.uascent.android.pethunting.myviews.LoadDialog;
 import com.uascent.android.pethunting.tools.StatusBarUtil;
 
 public class BaseActivity extends FragmentActivity {
+    private final static String TAG="BaseActivity";
     private Dialog dialog;
 
     @Override
@@ -40,15 +44,14 @@ public class BaseActivity extends FragmentActivity {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 
-    /*
     public void showLoadingDialog() {
-		dialog = DialogUtil.createLoadingDialog(this, "正在加载中..");
+		dialog = LoadDialog.createLoadingDialog(this, "正在加载中..");
 		dialog.setCancelable(true);
 		dialog.show();
 	}
 
 	public void showLoadingDialog(String msg) {
-		dialog = DialogUtil.createLoadingDialog(this, msg);
+		dialog = LoadDialog.createLoadingDialog(this, msg);
 		dialog.setCancelable(true);
 		dialog.show();
 
@@ -74,7 +77,7 @@ public class BaseActivity extends FragmentActivity {
 			return false;
 		}
 	}
-*/
+
 
 
 	/*public void toActivity(Context packageContext, Class<?> cls, Shop shop){

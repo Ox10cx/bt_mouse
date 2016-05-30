@@ -26,6 +26,12 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="open_bluetooth_switch">Turn on Bluetooth?</string>
+    <string name="connect_the_toy">Connect The Toy</string>
+
+    <string name="cmd_sending">请稍后...</string>
+    <string name="data_loading">数据加载中...</string>
+    <string name="search_device_empty">搜索的设备为空</string>
+    <string name="search_device_over">搜索设备完成</string>
 
 
 </resources>
