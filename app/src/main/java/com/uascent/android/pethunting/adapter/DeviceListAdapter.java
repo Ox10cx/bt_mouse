@@ -50,11 +50,17 @@ public class DeviceListAdapter extends BaseAdapter {
                     R.layout.item_device, null);
             holderView.iv_device = (ImageView) convertView.findViewById(R.id.iv_device);
             holderView.device_name = (TextView) convertView.findViewById(R.id.device_name);
+            holderView.iv_device_check = (ImageView) convertView.findViewById(R.id.iv_device_check);
             convertView.setTag(holderView);
         } else {
             holderView = (ViewHolder) convertView.getTag();
         }
         holderView.device_name.setText(data.get(position).getName());
+        if (!data.get(position).isChecked()) {
+            holderView.iv_device_check.setImageResource(R.drawable.device_not_checked);
+        } else {
+            holderView.iv_device_check.setImageResource(R.drawable.device_checked);
+        }
         return convertView;
     }
 
@@ -62,6 +68,7 @@ public class DeviceListAdapter extends BaseAdapter {
     private final static class ViewHolder {
         public ImageView iv_device;
         public TextView device_name;
+        public ImageView iv_device_check;
     }
 
 

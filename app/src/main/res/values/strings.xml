@@ -27,11 +27,14 @@
     <string name="no">No</string>
     <string name="open_bluetooth_switch">Turn on Bluetooth?</string>
     <string name="connect_the_toy">Connect The Toy</string>
+    <string name="match">Match</string>
 
     <string name="cmd_sending">请稍后...</string>
     <string name="data_loading">数据加载中...</string>
     <string name="search_device_empty">搜索的设备为空</string>
     <string name="search_device_over">搜索设备完成</string>
-
+    <string name="match_device_ok">连接设备成功</string>
+    <string name="match_device_fail">连接设备失败</string>
+    <string name="device_is_empty_not_match">设备为空，无法连接,请您重新搜索设备！</string>
 
 </resources>

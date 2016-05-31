@@ -3,5 +3,5 @@
     <!--单击时的背景颜色  -->
     <item android:drawable="@color/colorPrimary" android:state_pressed="true" />
     <!-- 没有焦点时的背景颜色 -->
-    <item android:drawable="@color/white" android:state_pressed="false" />
+    <item android:drawable="@color/gray_bg" android:state_pressed="false" />
 </selector>

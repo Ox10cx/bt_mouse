@@ -329,4 +329,14 @@ public class BtDevice implements Serializable {
     public void setReportAlert(boolean reportAlert) {
         this.reportAlert = reportAlert;
     }
+
+    private boolean isChecked;
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
+    }
 }

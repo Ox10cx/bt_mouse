@@ -12,6 +12,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -26,15 +28,21 @@ import java.util.ArrayList;
 /**
  * Created by lenovo001 on 2016/5/28.
  */
-public class ConnectCatActivity extends BaseActivity {
+public class ConnectCatActivity extends BaseActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
     private static final String TAG = "ConnectCatActivity";
+
     private ArrayList<BtDevice> mListData = new ArrayList<BtDevice>();
     private IService mService;
     private Handler mHandler;
     boolean mScanningStopped;
     private ImageView iv_load_null;
+    private Button bt_match;
     private ListView lv_device;
     private DeviceListAdapter adpater;
+
+    private int index_checked = 0;
+    private int count_device = 0;
+    private BtDevice device;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +57,11 @@ public class ConnectCatActivity extends BaseActivity {
     }
 
     private void initViews() {
+        bt_match = (Button) findViewById(R.id.bt_match);
+        bt_match.setOnClickListener(this);
         iv_load_null = (ImageView) findViewById(R.id.iv_load_null);
         lv_device = (ListView) findViewById(R.id.lv_device);
+        lv_device.setOnItemClickListener(this);
         adpater = new DeviceListAdapter(this, mListData);
         lv_device.setAdapter(adpater);
     }
@@ -223,11 +234,91 @@ public class ConnectCatActivity extends BaseActivity {
                 device.setName(name);
                 device.setAddress(address);
                 device.setRssi(rssi);
+                if (count_device == 0) {
+                    device.setChecked(true);
+                }
                 mListData.add(device);
+                count_device = count_device + 1;
                 Lg.i(TAG, "add_device_ok");
                 adpater.notifyDataSetChanged();
             }
         });
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        mListData.get(index_checked).setChecked(false);
+        mListData.get(position).setChecked(true);
+        index_checked = position;
+        adpater.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onClick(View v) {
+        Intent intent = null;
+        switch (v.getId()) {
+            case R.id.bt_match:
+                if (mListData == null || mListData.size() == 0) {
+                    showShortToast(getResources().getString(R.string.device_is_empty_not_match));
+                    return;
+                }
+                if (connectBLE(index_checked)) {
+                    showShortToast(getResources().getString(R.string.match_device_ok));
+                    intent = new Intent(this, PlayActivity.class);
+                    intent.putExtra("device", device);
+                    startActivity(intent);
+                } else {
+                    showShortToast(getResources().getString(R.string.match_device_fail));
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+//    public void goConnectDevice(int index) {
+//        BtDevice device = mListData.get(index);
+//        int status = device.getStatus();
+//        Lg.i(TAG, "device_status = " + status);
+//        switch (status) {
+//            case BluetoothLeClass.BLE_STATE_CONNECTED: {
+////                turnOnImmediateAlert(device.getAddress());
+////                device.setStatus(BluetoothLeClass.BLE_STATE_ALERTING);
+//                break;
+//            }
+//
+//            case BluetoothLeClass.BLE_STATE_ALERTING: {
+////                turnOffImmediateAlert(device.getAddress());
+////                device.setStatus(BluetoothLeClass.BLE_STATE_CONNECTED);
+//                break;
+//            }
+//            case BluetoothLeClass.BLE_STATE_CONNECTING: {
+//                break;
+//            }
+//            default:
+//            case BluetoothLeClass.BLE_STATE_INIT: {
+//                synchronized (mListData) {
+//                    if (connectBLE(device.getAddress())) {
+//                        device.setStatus(BluetoothLeClass.BLE_STATE_CONNECTING);
+//                    }
+//                }
+//                break;
+//            }
+//        }
+//    }
+
+    public boolean connectBLE(int index) {
+        boolean ret = false;
+        device = mListData.get(index);
+        int status = device.getStatus();
+        Lg.i(TAG, "device_status = " + status);
+        try {
+            ret = mService.connect(device.getAddress());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            return ret;
+        }
+        return ret;
     }
 
 }
