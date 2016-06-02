@@ -35,6 +35,6 @@
     <string name="search_device_over">搜索设备完成</string>
     <string name="match_device_ok">连接设备成功</string>
     <string name="match_device_fail">连接设备失败</string>
-    <string name="device_is_empty_not_match">设备为空，无法连接,请您重新搜索设备！</string>
+    <string name="device_is_empty_not_match">设备为空,无法连接,请您重新搜索设备！</string>
 
 </resources>
