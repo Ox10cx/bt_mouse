@@ -13,7 +13,6 @@ public class FristFlashActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_frist);
@@ -25,7 +24,7 @@ public class FristFlashActivity extends BaseActivity {
                 finish();
             }
         }, 800);
+        super.onCreate(savedInstanceState);
     }
-
 
 }

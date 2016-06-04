@@ -10,6 +10,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:name=".MyApplication"
         android:theme="@style/MyAppTheme">
 
         <activity
@@ -31,24 +32,30 @@
 
         <activity
             android:name=".ui.SetUp2Activity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ui.UserGuide4Activity"
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ui.UserGuide5Activity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ui.UserGuide6Activity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ui.UserGuide7Activity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ui.UserGuide8Activity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ui.PlayActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="landscape"></activity>
         <activity
             android:name=".ui.ConnectCatActivity"

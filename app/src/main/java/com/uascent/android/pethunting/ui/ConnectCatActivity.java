@@ -46,8 +46,8 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect_cat);
+        super.onCreate(savedInstanceState);
         initViews();
         mHandler = new Handler();
         showLoadingDialog();
@@ -127,7 +127,6 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 
                 }
             }, 10 * 1000);
-
             mBluetoothAdapter.startLeScan(mLeScanCallback);
             mScanningStopped = false;
         } else {

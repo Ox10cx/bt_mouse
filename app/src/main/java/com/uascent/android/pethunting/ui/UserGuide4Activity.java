@@ -15,9 +15,9 @@ public class UserGuide4Activity extends BaseActivity implements View.OnClickList
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userguide4);
         initViews();
+        super.onCreate(savedInstanceState);
     }
 
     private void initViews() {

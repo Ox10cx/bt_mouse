@@ -36,5 +36,7 @@
     <string name="match_device_ok">连接设备成功</string>
     <string name="match_device_fail">连接设备失败</string>
     <string name="device_is_empty_not_match">设备为空,无法连接,请您重新搜索设备！</string>
+    <string name="exit_app_remind">您是否确定退出Pets Hunting应用</string>
+    <string name="crash_reminder">抱歉,程序异常,即将重启</string>
 
 </resources>

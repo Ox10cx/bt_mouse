@@ -23,9 +23,9 @@ public class SetUp2Activity extends BaseActivity implements View.OnClickListener
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup2);
         initViews();
+        super.onCreate(savedInstanceState);
     }
 
     private void initViews() {
@@ -46,7 +46,7 @@ public class SetUp2Activity extends BaseActivity implements View.OnClickListener
             case R.id.iv_blue_switch:
                 //判断蓝牙开关是否打开
                 if (!btAdapter.isEnabled()) {
-                    showShortToast(getResources().getString(R.string.bluetooth_switch_not_opened));
+//                    showShortToast(getResources().getString(R.string.bluetooth_switch_not_opened));
                     final ComReminderDialog dialog = new ComReminderDialog(this, getResources().getString(R.string.open_bluetooth_switch)
                             , getResources().getString(R.string.no), getResources().getString(R.string.yes));
                     dialog.show();
@@ -55,6 +55,7 @@ public class SetUp2Activity extends BaseActivity implements View.OnClickListener
 
                         @Override
                         public void onClick(View v) {
+                            showShortToast(getResources().getString(R.string.bluetooth_switch_not_opened));
                             dialog.cancel();
                         }
                     });
@@ -69,7 +70,7 @@ public class SetUp2Activity extends BaseActivity implements View.OnClickListener
                     });
 
                 } else {
-                    showShortToast(getResources().getString(R.string.bluetooth_switch_has_opened));
+//                    showShortToast(getResources().getString(R.string.bluetooth_switch_has_opened));
                     intent = new Intent(this, ConnectCatActivity.class);
                     startActivity(intent);
                 }
@@ -83,7 +84,7 @@ public class SetUp2Activity extends BaseActivity implements View.OnClickListener
         switch (requestCode) {
             case REQUEST_ENABLE_CODE: {
                 if (resultCode == Activity.RESULT_OK) {
-                    showShortToast(getResources().getString(R.string.bluetooth_switch_has_opened));
+//                    showShortToast(getResources().getString(R.string.bluetooth_switch_has_opened));
                     Intent intent = new Intent(this, ConnectCatActivity.class);
                     startActivity(intent);
                 } else {
