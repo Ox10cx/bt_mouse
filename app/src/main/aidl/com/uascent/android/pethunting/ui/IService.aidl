@@ -11,7 +11,7 @@ interface IService {
     boolean connect(String addr);
     void disconnect(String addr);
 
-    void turnOnImmediateAlert(String addr);
+    void turnOnImmediateAlert(String addr,int index);
     void turnOffImmediateAlert(String addr);
 
     void setAntiLost(boolean enable);

@@ -5,19 +5,24 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.util.Log;
 
+import com.uascent.android.pethunting.tools.Lg;
+
 import java.util.UUID;
 
 /**
  * Created by Administrator on 16-3-9.
  */
 public class BluetoothAntiLostDevice extends BluetoothLeClass {
+    private static final String TAG = "BluetoothAntiLostDevice";
     public static final UUID POWER_SERVICE_UUID = UUID.fromString("00001804-0000-1000-8000-00805f9b34fb");
     public static final UUID POWER_FUNC_UUID = UUID.fromString("00002a07-0000-1000-8000-00805f9b34fb");
 
     public static final UUID BATTERY_SERVICE_UUID = UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb");
     public static final UUID BATTERY_FUNC_UUID = UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb");
 
+    public static final UUID KEY_FUNC1_UUID = UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb");
     public static final UUID KEY_FUNC_UUID = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
+    public static final UUID KEY_SERVICE1_UUID = UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb");
     public static final UUID KEY_SERVICE_UUID = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb");
 
     public static final UUID ALERT_SERVICE_UUID = UUID.fromString("00001802-0000-1000-8000-00805f9b34fb");
@@ -26,16 +31,21 @@ public class BluetoothAntiLostDevice extends BluetoothLeClass {
     public static final UUID LOSS_SERVICE_UUID = UUID.fromString("00001803-0000-1000-8000-00805f9b34fb");
     public static final UUID LOSS_FUNC_UUID = UUID.fromString("00002a06-0000-1000-8000-00805f9b34fb");
 
-    public static final int ALERT_ON = 2;
-    public static final int ALERT_OFF = 0;
+    //    public static final int ALERT_ON = 2;
+//    public static final int ALERT_OFF = 0;
+    private static final int STOPCMD = 0;
+    private static final int TOPCMD = 1;
+    private static final int BOMCMD = 2;
+    private static final int LEFTCMD = 3;
+    private static final int RIGHTCMD = 4;
 
-    private final String TAG = "hjq";
+//    private final String TAG = "hjq";
 
     public BluetoothAntiLostDevice(Context c) {
         super(c);
     }
 
-    public boolean checkBleStatus(){
+    public boolean checkBleStatus() {
         Log.e(TAG, "check ble status = " + mBleStatus);
         return mBleStatus == BLE_STATE_CONNECTED;
     }
@@ -94,7 +104,7 @@ public class BluetoothAntiLostDevice extends BluetoothLeClass {
         }
 
         if (characteristic != null) {
-            characteristic.setValue(new byte[] { val });
+            characteristic.setValue(new byte[]{val});
             //往蓝牙模块写入数据
             writeCharacteristic(characteristic);
         }
@@ -120,32 +130,36 @@ public class BluetoothAntiLostDevice extends BluetoothLeClass {
             return;
         }
 
-        BluetoothGattService service = mBluetoothGatt.getService(ALERT_SERVICE_UUID);
+        BluetoothGattService service = mBluetoothGatt.getService(KEY_SERVICE1_UUID);
 
         if (service != null) {
-            BluetoothGattCharacteristic characteristic = service.getCharacteristic(ALERT_FUNC_UUID);
+            BluetoothGattCharacteristic characteristic = service.getCharacteristic(KEY_FUNC1_UUID);
             if (characteristic == null) {
                 Log.e(TAG, "not support the immediate alert funcion?");
                 return;
             }
 
             if (characteristic != null) {
-                characteristic.setValue(new byte[] { (byte)val });
+                characteristic.setValue(new byte[]{(byte) val});
+                Log.e(TAG, "writeCharacteristic:" + val);
                 //往蓝牙模块写入数据
                 writeCharacteristic(characteristic);
             }
         } else {
+            Lg.i(TAG,"characteristic= null");
             Log.e(TAG, "not support the immediate alert service?");
         }
 
     }
 
-    public void turnOnImmediateAlert() {
-        setImmediateAlert(ALERT_ON);
+    public void turnOnImmediateAlert(int index) {
+        Log.i(TAG, "turnOnImmediateAlert:" + index);
+        setImmediateAlert(index);
     }
 
     public void turnOffImmediateAlert() {
-        setImmediateAlert(ALERT_OFF);
+        Log.i(TAG, "turnOffImmediateAlert:");
+        setImmediateAlert(STOPCMD);
     }
 }
 

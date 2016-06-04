@@ -31,13 +31,13 @@ import java.util.UUID;
  * Created by Administrator on 16-3-15.
  */
 public class BleComService extends Service {
-    private static final String  TAG = "BleComService";
+    private static final String TAG = "BleComService";
     private static final int SCAN_PERIOD = 10000;
     private static final long LIVE_PERIOD = 1000 * 7;       //点击开始扫描后的10秒停止扫描
 
-    private Map<String, BluetoothAntiLostDevice> mActiveDevices = new HashMap<String, BluetoothAntiLostDevice>() ;
+    private Map<String, BluetoothAntiLostDevice> mActiveDevices = new HashMap<String, BluetoothAntiLostDevice>();
     private Map<String, Integer> mScaningRssi = new HashMap<String, Integer>();
-    private Map<String,List<Integer>> mlivingRssiData = new HashMap<String,List<Integer>>();
+    private Map<String, List<Integer>> mlivingRssiData = new HashMap<String, List<Integer>>();
 
     private RemoteCallbackList<ICallback> mCallbacks = new RemoteCallbackList<ICallback>();
     private boolean antiLostEnabled;
@@ -59,12 +59,12 @@ public class BleComService extends Service {
     public void onDestroy() {
         mCallbacks.kill();
         super.onDestroy();
-        Lg.i(TAG,"onDestroy");
+        Lg.i(TAG, "onDestroy");
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Lg.i(TAG,"onUnbind");
+        Lg.i(TAG, "onUnbind");
         return super.onUnbind(intent);
     }
 
@@ -84,13 +84,13 @@ public class BleComService extends Service {
             disconnectBtDevice(addr);
         }
 
-        public void unregisterCallback(ICallback cb){
+        public void unregisterCallback(ICallback cb) {
             if (cb != null) {
                 mCallbacks.unregister(cb);
             }
         }
 
-        public void registerCallback(ICallback cb){
+        public void registerCallback(ICallback cb) {
             if (cb != null) {
                 mCallbacks.register(cb);
             }
@@ -100,8 +100,8 @@ public class BleComService extends Service {
             bleTurnOffImmediateAlert(addr);
         }
 
-        public void turnOnImmediateAlert(String addr) {
-            bleTurnOnImmediateAlert(addr);
+        public void turnOnImmediateAlert(String addr, int index) {
+            bleTurnOnImmediateAlert(addr, index);
         }
 
         public void setAntiLost(boolean enable) {
@@ -109,10 +109,11 @@ public class BleComService extends Service {
         }
     };
 
-    private void bleTurnOnImmediateAlert(String addr) {
+    private void bleTurnOnImmediateAlert(String addr, int index) {
         BluetoothAntiLostDevice device = mActiveDevices.get(addr);
         if (device != null) {
-            device.turnOnImmediateAlert();
+            Lg.i(TAG,"device != null");
+            device.turnOnImmediateAlert(index);
         } else {
             Lg.i("hjq", "the device is null?");
         }
@@ -219,7 +220,7 @@ public class BleComService extends Service {
                                         mCallbacks.getBroadcastItem(i).onSignalChanged(key, rssi);
                                     }
                                 } catch (RemoteException e) {
-                                    Lg.i(TAG, "remote call exception->>>"+ e);
+                                    Lg.i(TAG, "remote call exception->>>" + e);
                                 }
                                 mCallbacks.finishBroadcast();
                             }
@@ -242,11 +243,10 @@ public class BleComService extends Service {
      * Connects to the GATT server hosted on the Bluetooth LE device.
      *
      * @param address The device address of the destination device.
-     *
      * @return Return true if the connection is initiated successfully. The connection result
-     *         is reported asynchronously through the
-     *         {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
-     *         callback.
+     * is reported asynchronously through the
+     * {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
+     * callback.
      */
     boolean connectBtDevice(String address) {
         boolean ret;
@@ -271,7 +271,7 @@ public class BleComService extends Service {
         mActiveDevices.put(address, device);
 
         ret = device.connect(address);
-        if (ret)  {
+        if (ret) {
             Lg.i(TAG, "connect to " + address + " success");
         } else {
             Lg.i(TAG, "connect to " + address + " failed");
@@ -313,7 +313,7 @@ public class BleComService extends Service {
                         mCallbacks.getBroadcastItem(i).onDisconnect(gatt.getDevice().getAddress());
                     }
                 } catch (RemoteException e) {
-                    Lg.i(TAG, "remote call exception->>>"+ e);
+                    Lg.i(TAG, "remote call exception->>>" + e);
                 }
                 mCallbacks.finishBroadcast();
             }
@@ -343,7 +343,7 @@ public class BleComService extends Service {
                         mCallbacks.getBroadcastItem(i).onConnect(gatt.getDevice().getAddress());
                     }
                 } catch (RemoteException e) {
-                    Lg.i(TAG, "remote call exception->>>"+ e);
+                    Lg.i(TAG, "remote call exception->>>" + e);
                 }
                 mCallbacks.finishBroadcast();
             }
@@ -354,7 +354,7 @@ public class BleComService extends Service {
     /**
      * 搜索到BLE终端服务的事件
      */
-    private BluetoothLeClass.OnServiceDiscoverListener mOnServiceDiscover = new BluetoothLeClass.OnServiceDiscoverListener(){
+    private BluetoothLeClass.OnServiceDiscoverListener mOnServiceDiscover = new BluetoothLeClass.OnServiceDiscoverListener() {
         @Override
         public void onServiceDiscover(BluetoothGatt gatt) {
             BluetoothDevice device = gatt.getDevice();
@@ -371,7 +371,7 @@ public class BleComService extends Service {
                             mCallbacks.getBroadcastItem(i).onAlertServiceDiscovery(device.getAddress(), alertSupport);
                         }
                     } catch (RemoteException e) {
-                        Lg.i(TAG, "remote call exception->>>"+ e);
+                        Lg.i(TAG, "remote call exception->>>" + e);
                     }
                     mCallbacks.finishBroadcast();
                 }
@@ -388,7 +388,7 @@ public class BleComService extends Service {
 
         for (BluetoothGattService gattService : gattServices) {
             final UUID serviceUUID = gattService.getUuid();
-            Lg.i(TAG,"-->service uuid:" + gattService.getUuid());
+            Lg.i(TAG, "-->service uuid:" + gattService.getUuid());
 
             if (!serviceUUID.equals(BluetoothAntiLostDevice.ALERT_SERVICE_UUID)) {
                 continue;
@@ -409,7 +409,7 @@ public class BleComService extends Service {
     /**
      * 收到BLE终端数据交互的事件
      */
-    private BluetoothLeClass.OnDataAvailableListener mOnDataAvailable = new BluetoothLeClass.OnDataAvailableListener(){
+    private BluetoothLeClass.OnDataAvailableListener mOnDataAvailable = new BluetoothLeClass.OnDataAvailableListener() {
 
         /**
          * BLE终端数据被读的事件
@@ -432,7 +432,7 @@ public class BleComService extends Service {
                             mCallbacks.getBroadcastItem(i).onRead(gatt.getDevice().getAddress(), characteristic.getValue());
                         }
                     } catch (RemoteException e) {
-                        Lg.i(TAG, "remote call exception->>>"+ e);
+                        Lg.i(TAG, "remote call exception->>>" + e);
                     }
                     mCallbacks.finishBroadcast();
                 }
@@ -461,7 +461,7 @@ public class BleComService extends Service {
                         mCallbacks.getBroadcastItem(i).onWrite(gatt.getDevice().getAddress(), characteristic.getValue());
                     }
                 } catch (RemoteException e) {
-                    Lg.i(TAG, "remote call exception->>"+e);
+                    Lg.i(TAG, "remote call exception->>" + e);
                 }
                 mCallbacks.finishBroadcast();
             }
@@ -477,24 +477,24 @@ public class BleComService extends Service {
             //-----Service的字段信息-----//
             int type = gattService.getType();
             final UUID serviceUUID = gattService.getUuid();
-            Lg.i(TAG,"-->service type:"+Utils.getServiceType(type));
-            Lg.i(TAG,"-->includedServices size:"+gattService.getIncludedServices().size());
-            Lg.i(TAG,"-->service uuid:"+gattService.getUuid());
+            Lg.i(TAG, "-->service type:" + Utils.getServiceType(type));
+            Lg.i(TAG, "-->includedServices size:" + gattService.getIncludedServices().size());
+            Lg.i(TAG, "-->service uuid:" + gattService.getUuid());
 
             //-----Characteristics的字段信息-----//
-            List<BluetoothGattCharacteristic> gattCharacteristics =gattService.getCharacteristics();
-            for (final BluetoothGattCharacteristic  gattCharacteristic: gattCharacteristics) {
-                Lg.i(TAG,"---->char uuid:"+gattCharacteristic.getUuid());
+            List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
+            for (final BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
+                Lg.i(TAG, "---->char uuid:" + gattCharacteristic.getUuid());
 
                 int permission = gattCharacteristic.getPermissions();
-                Lg.i(TAG,"---->char permission:"+Utils.getCharPermission(permission));
+                Lg.i(TAG, "---->char permission:" + Utils.getCharPermission(permission));
 
                 int property = gattCharacteristic.getProperties();
-                Lg.i(TAG,"---->char property:"+Utils.getCharPropertie(property));
+                Lg.i(TAG, "---->char property:" + Utils.getCharPropertie(property));
 
                 byte[] data = gattCharacteristic.getValue();
                 if (data != null && data.length > 0) {
-                    Lg.i(TAG,"---->char value:"+new String(data));
+                    Lg.i(TAG, "---->char value:" + new String(data));
                 }
 
                 //-----Descriptors的字段信息-----//
@@ -502,11 +502,11 @@ public class BleComService extends Service {
                 for (BluetoothGattDescriptor gattDescriptor : gattDescriptors) {
                     Lg.i(TAG, "-------->desc uuid:" + gattDescriptor.getUuid());
                     int descPermission = gattDescriptor.getPermissions();
-                    Lg.i(TAG,"-------->desc permission:"+ Utils.getDescPermission(descPermission));
+                    Lg.i(TAG, "-------->desc permission:" + Utils.getDescPermission(descPermission));
 
                     byte[] desData = gattDescriptor.getValue();
                     if (desData != null && desData.length > 0) {
-                        Lg.i(TAG, "-------->desc value:"+ new String(desData));
+                        Lg.i(TAG, "-------->desc value:" + new String(desData));
                     }
                 }
             }

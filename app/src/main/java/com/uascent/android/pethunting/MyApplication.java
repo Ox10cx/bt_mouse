@@ -3,8 +3,6 @@ package com.uascent.android.pethunting;
 import android.app.Activity;
 import android.app.Application;
 
-import com.uascent.android.pethunting.tools.AppCrashHandler;
-
 import java.util.LinkedList;
 
 /**
@@ -18,8 +16,8 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         //异常重启
-        AppCrashHandler ch = AppCrashHandler.getInstance();
-        ch.init(getApplicationContext());
+//        AppCrashHandler ch = AppCrashHandler.getInstance();
+//        ch.init(getApplicationContext());
     }
 
     public static MyApplication getInstance() {

@@ -31,8 +31,8 @@ public class BaseActivity extends FragmentActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         MyApplication.getInstance().removeActivity(this);
+        super.onDestroy();
     }
 
     protected void setStatusBar() {

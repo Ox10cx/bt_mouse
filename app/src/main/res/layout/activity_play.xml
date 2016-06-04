@@ -90,14 +90,15 @@
             android:layout_marginLeft="@dimen/layout_size_20"
             android:layout_marginRight="@dimen/layout_size_20"
             android:layout_marginTop="@dimen/layout_size_5"
-            android:layout_weight="1"
-            >
+            android:layout_weight="1">
 
             <TextView
                 android:id="@+id/tv_empty"
                 android:layout_width="@dimen/layout_size_100"
                 android:layout_height="@dimen/layout_size_100"
-                android:layout_centerInParent="true" />
+                android:gravity="center"
+                android:layout_centerInParent="true"
+                android:text="@string/stop" />
 
             <ImageView
                 android:id="@+id/iv_top_dir"
@@ -136,8 +137,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/layout_size_10"
-            android:layout_marginBottom="@dimen/layout_size_10">
+            android:layout_marginBottom="@dimen/layout_size_10"
+            android:layout_marginTop="@dimen/layout_size_10">
 
             <ImageView
                 android:id="@+id/iv_play_guide"

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -52,7 +53,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         mHandler = new Handler();
         showLoadingDialog();
         Intent i = new Intent(this, BleComService.class);
-        getApplicationContext().bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
         Lg.i(TAG, "onCreate()");
     }
 
@@ -311,6 +312,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         device = mListData.get(index);
         int status = device.getStatus();
         Lg.i(TAG, "device_status = " + status);
+        Lg.i(TAG, "device_address = " + device.getAddress());
         try {
             ret = mService.connect(device.getAddress());
         } catch (RemoteException e) {
@@ -320,4 +322,18 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         return ret;
     }
 
+    @Override
+    protected void onDestroy() {
+        if (mConnection != null) {
+            try {
+                Log.i(TAG, "onDestroy->>unregisterCallback");
+                mService.unregisterCallback(mCallback);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        unbindService(mConnection);
+        Log.i(TAG, "onDestroy->>unbindService");
+        super.onDestroy();
+    }
 }
