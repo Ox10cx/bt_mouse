@@ -29,6 +29,18 @@
     <string name="connect_the_toy">Connect The Toy</string>
     <string name="match">Match</string>
 
+    <string name="system_cancel">Cancel</string>
+    <string name="system_sure">Confirm</string>
+    <string name="system_sureifexit">Are you sure to exit?</string>
+    <string name="bt_not_enabled_leaving">The bluetooth device is disabled.</string>
+    <string name="str_gps" translatable="false">GPS</string>
+    <string name="str_bluetooth">Bluetooth</string>
+    <string name="str_camera">Camera</string>
+    <string name="str_permission_prompt">You need to grant access to </string>
+    <string name="str_permission_denied">Some Permission is Denied</string>
+
+
+
     <string name="cmd_sending">请稍后...</string>
     <string name="data_loading">数据加载中...</string>
     <string name="search_device_empty">搜索的设备为空</string>
@@ -39,5 +51,6 @@
     <string name="exit_app_remind">您是否确定退出Pets Hunting应用</string>
     <string name="crash_reminder">抱歉,程序异常,即将重启</string>
     <string name="stop">Stop</string>
+    <string name="str_location">access my location</string>
 
 </resources>
