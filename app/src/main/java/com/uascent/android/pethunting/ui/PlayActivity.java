@@ -25,7 +25,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
     private ImageView iv_play_guide, iv_play_home;
     private ImageView iv_top_dir, iv_below_dir, iv_left_dir, iv_right_dir;
     private IService mService;
-//    private Handler mHandler;
+    //    private Handler mHandler;
     private BtDevice device;
     private static final int STOPCMD = 0;
     private static final int TOPCMD = 1;
@@ -128,14 +128,6 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
             } catch (RemoteException e) {
                 Lg.i(TAG, " " + e);
             }
-
-//            mHandler.post(new Runnable() {
-//                @Override
-//                public void run() {
-////                    scanLeDevice(true);
-//                    Lg.i(TAG, "scanLeDevice(true)");
-//                }
-//            });
         }
     };
 
@@ -147,25 +139,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
 
         @Override
         public void onDisconnect(String address) throws RemoteException {
-//            synchronized (mListData) {
             Lg.i(TAG, "onDisconnect called");
-            //断开连接， do .....
-//                for (int i = 0; i < mListData.size(); i++) {
-//                    BtDevice d = mListData.get(i);
-//                    if (d.getAddress().equals(address)) {
-//                        d.setStatus(BluetoothAntiLostDevice.BLE_STATE_INIT);
-//                        d.setPosition(BtDevice.LOST);
-//                    }
-//                }
-//            }
-
-//            mHandler.post(new Runnable() {
-//                @Override
-//                public void run() {
-////                    mDeviceListAdapter.notifyDataSetChanged();
-////                    checkAntiLost();
-//                }
-//            });
         }
 
         @Override
@@ -184,27 +158,11 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
 
         @Override
         public void onSignalChanged(String address, int rssi) throws RemoteException {
-//            synchronized (mListData) {
             Lg.i(TAG, "onSignalChanged called address = " + address + " rssi = " + rssi);
-//                for (int i = 0; i < mListData.size(); i++) {
-//                    BtDevice d = mListData.get(i);
-//                    if (d.getAddress().equals(address)) {
-//                        d.setRssi(rssi);
-//                    }
-//                }
-//            }
         }
 
         public void onPositionChanged(String address, int position) throws RemoteException {
-//            synchronized (mListData) {
             Lg.i(TAG, "onPositionChanged called address = " + address + " newpos = " + position);
-//                for (int i = 0; i < mListData.size(); i++) {
-//                    BtDevice d = mListData.get(i);
-//                    if (d.getAddress().equals(address)) {
-//                        d.setPosition(position);
-//                    }
-//                }
-//            }
         }
 
         @Override
@@ -227,6 +185,10 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
             try {
                 Log.i(TAG, "onDestroy->>unregisterCallback");
                 mService.unregisterCallback(mCallback);
+                if (device != null) {
+                    mService.disconnect(device.getAddress());
+                    Lg.i(TAG, "disconnect_device_address = " + device.getAddress());
+                }
             } catch (RemoteException e) {
                 e.printStackTrace();
             }

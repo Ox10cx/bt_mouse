@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -17,7 +16,6 @@ import android.widget.Toast;
 
 import com.uascent.android.pethunting.R;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -99,7 +97,7 @@ public class FristFlashActivity extends BaseActivity {
         }
 
         // Need Rationale
-        String message = getString(R.string.str_permission_prompt) + permissionsNeeded.get(0);
+        String message = getString(R.string.str_permission_prompt) + " " + permissionsNeeded.get(0);
         for (int i = 1; i < permissionsNeeded.size(); i++) {
             message = message + ", " + permissionsNeeded.get(i);
         }

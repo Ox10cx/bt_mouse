@@ -149,6 +149,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     private ICallback.Stub mCallback = new ICallback.Stub() {
         @Override
         public void onConnect(String address) throws RemoteException {
+            Lg.i(TAG, "onConnect");
         }
 
         @Override
@@ -327,6 +328,10 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         if (mConnection != null) {
             try {
                 Log.i(TAG, "onDestroy->>unregisterCallback");
+                if (device != null) {
+                    mService.disconnect(device.getAddress());
+                    Lg.i(TAG, "disconnect_device_address = " + device.getAddress());
+                }
                 mService.unregisterCallback(mCallback);
             } catch (RemoteException e) {
                 e.printStackTrace();

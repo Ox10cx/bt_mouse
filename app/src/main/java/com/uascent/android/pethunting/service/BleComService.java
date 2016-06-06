@@ -76,12 +76,14 @@ public class BleComService extends Service {
 
         @Override
         public boolean connect(String addr) throws RemoteException {
+            Lg.i(TAG, "connect->>>" + addr);
             return connectBtDevice(addr);
         }
 
         @Override
         public void disconnect(String addr) throws RemoteException {
             disconnectBtDevice(addr);
+            Lg.i(TAG, "disconnect->>>" + addr);
         }
 
         public void unregisterCallback(ICallback cb) {
@@ -112,7 +114,7 @@ public class BleComService extends Service {
     private void bleTurnOnImmediateAlert(String addr, int index) {
         BluetoothAntiLostDevice device = mActiveDevices.get(addr);
         if (device != null) {
-            Lg.i(TAG,"device != null");
+            Lg.i(TAG, "device != null");
             device.turnOnImmediateAlert(index);
         } else {
             Lg.i("hjq", "the device is null?");
