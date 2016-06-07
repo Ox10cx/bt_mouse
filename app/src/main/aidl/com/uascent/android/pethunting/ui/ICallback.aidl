@@ -11,4 +11,6 @@ interface ICallback {
        void onSignalChanged(String address, int rssi);
        void onPositionChanged(String address, int position);
        void onAlertServiceDiscovery(String address, boolean support);
+
+       void onMouseServiceDiscovery(String address, boolean support);
 }

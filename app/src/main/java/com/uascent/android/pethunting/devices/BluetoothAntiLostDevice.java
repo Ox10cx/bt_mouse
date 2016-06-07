@@ -29,25 +29,15 @@ public class BluetoothAntiLostDevice extends BluetoothLeClass {
     public static final UUID LOSS_SERVICE_UUID = UUID.fromString("00001803-0000-1000-8000-00805f9b34fb");
     public static final UUID LOSS_FUNC_UUID = UUID.fromString("00002a06-0000-1000-8000-00805f9b34fb");
 
-    public static final UUID MOUSE_WRITE_FUNC_UUID = UUID.fromString("0000ffe2-0000-1000-8000-00805f9b34fb");
-    public static final UUID MOUSE_READ_FUNC_UUID = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
+    public static final UUID MOUSE_WRITE_FUNC_UUID = UUID.fromString("0000fff2-0000-1000-8000-00805f9b34fb");
+    public static final UUID MOUSE_READ_FUNC_UUID = UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb");
     public static final UUID MOUSE_SERVICE_UUID = UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb");
 
-
-
+    public static final int MOUSE_STOP = 0;
     public static final int MOUSE_UP = 1;
     public static final int MOUSE_DOWN = 2;
     public static final int MOUSE_LEFT = 3;
     public static final int MOUSE_RIGHT = 4;
-
-
-    //    public static final int ALERT_ON = 2;
-//    public static final int ALERT_OFF = 0;
-    private static final int STOPCMD = 0;
-    private static final int TOPCMD = 1;
-    private static final int BOMCMD = 2;
-    private static final int LEFTCMD = 3;
-    private static final int RIGHTCMD = 4;
 
 
     public BluetoothAntiLostDevice(Context c) {
@@ -63,76 +53,51 @@ public class BluetoothAntiLostDevice extends BluetoothLeClass {
         return mBleStatus;
     }
 
-//    public void enableKeyReport(boolean on) {
-//        Log.e(TAG, "enable notification");
-//
-//        if (!checkBleStatus()) {
-//            return;
-//        }
-//
-//        //接受Characteristic被写的通知,收到蓝牙模块的数据后会触发mOnDataAvailable.onCharacteristicWrite()
-//        setCharacteristicNotification(KEY_SERVICE_UUID, KEY_FUNC_UUID, on);
-//
-//        BluetoothGattService service = mBluetoothGatt.getService(KEY_SERVICE_UUID);
-//        if (service == null) {
-//            return;
-//        }
-//
-//        BluetoothGattCharacteristic characteristic = mBluetoothGatt.getService(KEY_SERVICE_UUID).getCharacteristic(KEY_FUNC_UUID);
-//
-//        if (characteristic != null) {
-//            characteristic.setValue("send data->");
-//            //往蓝牙模块写入数据
-//            writeCharacteristic(characteristic);
-//        }
-//    }
+    public void getLinkLossSetting() {
+        Log.e(TAG, "getLinkLossSetting()");
+        if (!checkBleStatus()) {
+            return;
+        }
+        BluetoothGattCharacteristic characteristic = mBluetoothGatt.getService(LOSS_SERVICE_UUID).getCharacteristic(LOSS_FUNC_UUID);
+        if (characteristic == null) {
+            Log.e(TAG, "not support the loss service?");
+            return;
+        }
 
+        readCharacteristic(characteristic);
+    }
 
-//    public void getLinkLossSetting() {
-//        Log.e(TAG, "getLinkLossSetting()");
-//        if (!checkBleStatus()) {
-//            return;
-//        }
-//        BluetoothGattCharacteristic characteristic = mBluetoothGatt.getService(LOSS_SERVICE_UUID).getCharacteristic(LOSS_FUNC_UUID);
-//        if (characteristic == null) {
-//            Log.e(TAG, "not support the loss service?");
-//            return;
-//        }
-//
-//        readCharacteristic(characteristic);
-//    }
+    public void setLinkLossSetting(byte val) {
+        Log.e(TAG, "setLinkLossSetting()");
+        if (!checkBleStatus()) {
+            return;
+        }
+        BluetoothGattCharacteristic characteristic = mBluetoothGatt.getService(LOSS_SERVICE_UUID).getCharacteristic(LOSS_FUNC_UUID);
+        if (characteristic == null) {
+            Log.e(TAG, "not support the loss service?");
+            return;
+        }
 
-//    public void setLinkLossSetting(byte val) {
-//        Log.e(TAG, "setLinkLossSetting()");
-//        if (!checkBleStatus()) {
-//            return;
-//        }
-//        BluetoothGattCharacteristic characteristic = mBluetoothGatt.getService(LOSS_SERVICE_UUID).getCharacteristic(LOSS_FUNC_UUID);
-//        if (characteristic == null) {
-//            Log.e(TAG, "not support the loss service?");
-//            return;
-//        }
-//
-//        if (characteristic != null) {
-//            characteristic.setValue(new byte[]{val});
-//            //往蓝牙模块写入数据
-//            writeCharacteristic(characteristic);
-//        }
-//    }
+        if (characteristic != null) {
+            characteristic.setValue(new byte[]{val});
+            //往蓝牙模块写入数据
+            writeCharacteristic(characteristic);
+        }
+    }
 
-//    public void getBatteryLevel() {
-//        Log.e(TAG, "getBatteryLevel()");
-//        if (!checkBleStatus()) {
-//            return;
-//        }
-//        BluetoothGattCharacteristic characteristic = mBluetoothGatt.getService(BATTERY_SERVICE_UUID).getCharacteristic(BATTERY_FUNC_UUID);
-//        if (characteristic == null) {
-//            Log.e(TAG, "not support the loss service?");
-//            return;
-//        }
-//
-//        readCharacteristic(characteristic);
-//    }
+    public void getBatteryLevel() {
+        Log.e(TAG, "getBatteryLevel()");
+        if (!checkBleStatus()) {
+            return;
+        }
+        BluetoothGattCharacteristic characteristic = mBluetoothGatt.getService(BATTERY_SERVICE_UUID).getCharacteristic(BATTERY_FUNC_UUID);
+        if (characteristic == null) {
+            Log.e(TAG, "not support the loss service?");
+            return;
+        }
+
+        readCharacteristic(characteristic);
+    }
 
     public void enableKeyReport(boolean on) {
         Log.e(TAG, "enable notification");
@@ -158,30 +123,47 @@ public class BluetoothAntiLostDevice extends BluetoothLeClass {
         }
     }
 
-    public void mouseControl(int direction) {
+    public boolean getMouseRsp() {
+        Log.e(TAG, "getMouseRsp()");
+        if (!checkBleStatus()) {
+            return false;
+        }
+        BluetoothGattCharacteristic characteristic = mBluetoothGatt.getService(MOUSE_SERVICE_UUID).getCharacteristic(MOUSE_READ_FUNC_UUID);
+        if (characteristic == null) {
+            Log.e(TAG, "not support the readback service?");
+            return false;
+        }
+
+        return readCharacteristic(characteristic);
+    }
+
+    public boolean mouseControl(int direction) {
         Log.e(TAG, "mouseControl");
 
         if (!checkBleStatus()) {
-            return;
+            return false;
         }
 
-        //接受Characteristic被写的通知,收到蓝牙模块的数据后会触发mOnDataAvailable.onCharacteristicWrite()
-        setCharacteristicNotification(KEY_SERVICE_UUID, KEY_FUNC_UUID, true);
+////        //接受Characteristic被写的通知,收到蓝牙模块的数据后会触发mOnDataAvailable.onCharacteristicWrite()
+//      if (!setCharacteristicNotification(MOUSE_SERVICE_UUID, MOUSE_READ_FUNC_UUID, true)) {
+//            Log.e(TAG, "setCharacteristicNotification() failed!");
+//            return false;
+//        }
 
         BluetoothGattService service = mBluetoothGatt.getService(MOUSE_SERVICE_UUID);
         if (service == null) {
-            return;
+            return false;
         }
 
         BluetoothGattCharacteristic characteristic = mBluetoothGatt.getService(MOUSE_SERVICE_UUID).getCharacteristic(MOUSE_WRITE_FUNC_UUID);
-
         if (characteristic != null) {
-            characteristic.setValue("send data->");
+            characteristic.setValue( new byte[]{ (byte)direction });
             //往蓝牙模块写入数据
             writeCharacteristic(characteristic);
         }
-    }
 
+        return  true;
+    }
 
     public void setImmediateAlert(int val) {
         Lg.i(TAG, "setImmediateAlert() value = " + val);
@@ -189,10 +171,10 @@ public class BluetoothAntiLostDevice extends BluetoothLeClass {
             return;
         }
 
-        BluetoothGattService service = mBluetoothGatt.getService(KEY_SERVICE1_UUID);
+        BluetoothGattService service = mBluetoothGatt.getService(ALERT_SERVICE_UUID);
 
         if (service != null) {
-            BluetoothGattCharacteristic characteristic = service.getCharacteristic(KEY_FUNC1_UUID);
+            BluetoothGattCharacteristic characteristic = service.getCharacteristic(ALERT_FUNC_UUID);
             if (characteristic == null) {
                 Log.e(TAG, "not support the immediate alert funcion?");
                 return;
@@ -227,19 +209,19 @@ public class BluetoothAntiLostDevice extends BluetoothLeClass {
      *
      * @param val
      */
-    public void setSpeedCmd(int val) {
+    public boolean setSpeedCmd(int val) {
         Lg.i(TAG, "setSpeedCmd value = " + val);
         if (!checkBleStatus()) {
-            return;
+            return false;
         }
 
-        BluetoothGattService service = mBluetoothGatt.getService(KEY_SERVICE1_UUID);
+        BluetoothGattService service = mBluetoothGatt.getService(MOUSE_SERVICE_UUID);
 
         if (service != null) {
-            BluetoothGattCharacteristic characteristic = service.getCharacteristic(KEY_FUNC1_UUID);
+            BluetoothGattCharacteristic characteristic = service.getCharacteristic(MOUSE_WRITE_FUNC_UUID);
             if (characteristic == null) {
                 Log.e(TAG, "not support the immediate alert funcion?");
-                return;
+                return false;
             }
 
             if (characteristic != null) {
@@ -251,8 +233,10 @@ public class BluetoothAntiLostDevice extends BluetoothLeClass {
         } else {
             Lg.i(TAG, "characteristic= null");
             Log.e(TAG, "not support the immediate alert service?");
+            return false;
         }
 
+        return true;
     }
 
 }

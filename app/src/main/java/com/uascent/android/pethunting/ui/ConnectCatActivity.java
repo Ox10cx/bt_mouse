@@ -213,6 +213,10 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         @Override
         public void onAlertServiceDiscovery(final String btaddr, final boolean support) throws RemoteException {
             Lg.i(TAG, "onAlertServiceDiscovery");
+        }
+
+        @Override
+        public void onMouseServiceDiscovery(final String address, final boolean support) throws RemoteException {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -230,7 +234,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                         Lg.i(TAG, "onAlertServiceDiscovery_not_support");
                         closeLoadingDialog();
                         try {
-                            mService.disconnect(btaddr);
+                            mService.disconnect(address);
                         } catch (RemoteException e) {
                             e.printStackTrace();
                         }

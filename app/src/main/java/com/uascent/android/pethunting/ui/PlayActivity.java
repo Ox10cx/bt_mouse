@@ -14,6 +14,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.uascent.android.pethunting.R;
+import com.uascent.android.pethunting.devices.BluetoothAntiLostDevice;
 import com.uascent.android.pethunting.model.BtDevice;
 import com.uascent.android.pethunting.myviews.VerticalSeekBar;
 import com.uascent.android.pethunting.service.BleComService;
@@ -78,33 +79,45 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 intent = new Intent(this, UserGuide4Activity.class);
                 startActivity(intent);
                 break;
+
             case R.id.iv_play_home:
                 intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
                 break;
+
             case R.id.tv_empty:
-                dirValue = 0;
-                turnOnImmediateAlert(device.getAddress(), 0);
+                dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
+                sendMouseCmd(device.getAddress(), dirValue);
                 break;
+
             case R.id.iv_top_dir:
-                dirValue = 1;
-                turnOnImmediateAlert(device.getAddress(), 1);
+                dirValue = BluetoothAntiLostDevice.MOUSE_UP;
+                sendMouseCmd(device.getAddress(), BluetoothAntiLostDevice.MOUSE_UP);
                 break;
+
             case R.id.iv_below_dir:
-                dirValue = 2;
-                turnOnImmediateAlert(device.getAddress(), 2);
+                dirValue = BluetoothAntiLostDevice.MOUSE_DOWN;
+                sendMouseCmd(device.getAddress(), dirValue);
                 break;
+
             case R.id.iv_left_dir:
-                dirValue = 3;
-                turnOnImmediateAlert(device.getAddress(), 3);
+                dirValue = BluetoothAntiLostDevice.MOUSE_LEFT;
+                sendMouseCmd(device.getAddress(), dirValue);
                 break;
+
             case R.id.iv_right_dir:
-                dirValue = 4;
-                turnOnImmediateAlert(device.getAddress(), 4);
+                dirValue = BluetoothAntiLostDevice.MOUSE_RIGHT;
+                sendMouseCmd(device.getAddress(), dirValue);
                 break;
+
             default:
                 break;
         }
+    }
+
+    void sendMouseCmd(String addr, int cmd) {
+        controlMouseDir(addr, cmd);
+        getMouseRsp(addr);
     }
 
 
@@ -158,6 +171,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         @Override
         public boolean onRead(String address, byte[] val) throws RemoteException {
             Lg.i(TAG, "onRead called");
+
             return false;
         }
 
@@ -167,7 +181,6 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             Lg.i(TAG, "onWrite called");
             return true;
         }
-
 
         @Override
         public void onSignalChanged(String address, int rssi) throws RemoteException {
@@ -182,43 +195,37 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         public void onAlertServiceDiscovery(final String btaddr, boolean support) throws RemoteException {
 
         }
+
+        @Override
+        public void onMouseServiceDiscovery(String address, boolean support) throws RemoteException {
+
+        }
     };
 
-    /**
-     * 调节方向
-     *
-     * @param addr
-     * @param index
-     */
-    public void turnOnImmediateAlert(String addr, int index) {
+    public void controlMouseDir(String addr, int dir) {
         try {
-            mService.turnOnImmediateAlert(addr, index);
-            Lg.i(TAG, "turnOnImmediateAlert->>" + index);
+            mService.controlMouse(addr, dir);
+            Lg.i(TAG, "controlMouseDir->>" + dir);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * 调节速度
-     *
-     * @param addr
-     */
-    public void turnOffImmediateAlert(String addr, int index) {
+    public void getMouseRsp(String addr) {
         try {
-            mService.turnOffImmediateAlert(addr, index);
+            mService.readMouseRsp(addr);
+            Lg.i(TAG, "readMouseRsp->>" + addr);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
-
 
     @Override
     protected void onDestroy() {
         if (mConnection != null) {
             try {
-                if (dirValue != 0) {
-                    turnOnImmediateAlert(device.getAddress(), 0);
+                if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
+                    controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
                 }
                 Log.i(TAG, "onDestroy->>unregisterCallback");
                 mService.unregisterCallback(mCallback);
@@ -234,7 +241,6 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         Log.i(TAG, "onDestroy->>unbindService");
         super.onDestroy();
     }
-
 
     @Override
     public void onSeekBarStop() {

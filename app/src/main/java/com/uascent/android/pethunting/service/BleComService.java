@@ -11,6 +11,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
+import android.util.Log;
 
 import com.uascent.android.pethunting.devices.BluetoothAntiLostDevice;
 import com.uascent.android.pethunting.devices.BluetoothLeClass;
@@ -111,10 +112,44 @@ public class BleComService extends Service {
             bleTurnOnImmediateAlert(addr, index);
         }
 
+
         public void setAntiLost(boolean enable) {
             setBleAntiLost(enable);
         }
+
+        @Override
+        public boolean controlMouse(String addr, int dir) throws RemoteException {
+            return bleControlMouse(addr, dir);
+        }
+
+        @Override
+        public boolean readMouseRsp(String addr) throws RemoteException {
+            return bleReadRsp(addr);
+        }
     };
+
+    private boolean bleReadRsp(String addr) {
+        BluetoothAntiLostDevice device = mActiveDevices.get(addr);
+        if (device == null) {
+            Lg.i(TAG, "the device is null?");
+            return false;
+        }
+
+        Lg.i(TAG, "device != null");
+        return device.getMouseRsp();
+    }
+
+    private boolean bleControlMouse(String addr, int dir) {
+        BluetoothAntiLostDevice device = mActiveDevices.get(addr);
+        if (device != null) {
+            Lg.i(TAG, "device != null");
+            return device.mouseControl(dir);
+        } else {
+            Lg.i(TAG, "the device is null?");
+
+            return false;
+        }
+    }
 
     private void bleTurnOnImmediateAlert(String addr, int index) {
         BluetoothAntiLostDevice device = mActiveDevices.get(addr);
@@ -374,14 +409,13 @@ public class BleComService extends Service {
             if (leDevice != null) {
                 Lg.i(TAG, "leDevice != null");
                 displayGattServices(leDevice.getSupportedGattServices());
-//                leDevice.enableKeyReport(true);     // 打开上报按键信息
-                boolean alertSupport = checkCon_MouseService(leDevice.getSupportedGattServices());
+                boolean supported = checkMouseService(leDevice.getSupportedGattServices());
                 synchronized (mCallbacks) {
                     int n = mCallbacks.beginBroadcast();
                     try {
                         int i;
                         for (i = 0; i < n; i++) {
-                            mCallbacks.getBroadcastItem(i).onAlertServiceDiscovery(device.getAddress(), alertSupport);
+                            mCallbacks.getBroadcastItem(i).onMouseServiceDiscovery(device.getAddress(), supported);
                         }
                     } catch (RemoteException e) {
                         Lg.i(TAG, "remote call exception->>>" + e);
@@ -394,8 +428,11 @@ public class BleComService extends Service {
         }
     };
 
-    boolean checkCon_MouseService(List<BluetoothGattService> gattServices) {
-        Lg.i(TAG, "checkCon_MouseService");
+    boolean checkMouseService(List<BluetoothGattService> gattServices) {
+        Log.e(TAG, "checkCon_MouseService");
+        boolean bWriteFn = false;
+        boolean bReadFn = false;
+
         if (gattServices == null) {
             return false;
         }
@@ -404,19 +441,28 @@ public class BleComService extends Service {
             final UUID serviceUUID = gattService.getUuid();
             Lg.i(TAG, "-->service uuid:" + gattService.getUuid());
 
-            if (!serviceUUID.equals(BluetoothAntiLostDevice.KEY_SERVICE1_UUID)) {
+            if (!serviceUUID.equals(BluetoothAntiLostDevice.MOUSE_SERVICE_UUID)) {
                 continue;
             }
 
             List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
             for (final BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
+
                 Lg.i(TAG, "---->char uuid:" + gattCharacteristic.getUuid());
-                if (gattCharacteristic.getUuid().equals(BluetoothAntiLostDevice.KEY_FUNC1_UUID)) {
-                    Lg.i(TAG, "support mouse service");
+                if (!bWriteFn) {
+                    bWriteFn = gattCharacteristic.getUuid().equals(BluetoothAntiLostDevice.MOUSE_WRITE_FUNC_UUID);
+                }
+
+                if (!bReadFn) {
+                    bReadFn = gattCharacteristic.getUuid().equals(BluetoothAntiLostDevice.MOUSE_READ_FUNC_UUID);
+                }
+
+                if (bWriteFn && bReadFn) {
                     return true;
                 }
             }
         }
+
         return false;
     }
 

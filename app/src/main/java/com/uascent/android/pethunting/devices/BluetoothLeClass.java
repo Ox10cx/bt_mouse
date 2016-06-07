@@ -270,22 +270,23 @@ public class BluetoothLeClass {
      *
      * @param characteristic The characteristic to read from.
      */
-    public void readCharacteristic(BluetoothGattCharacteristic characteristic) {
+    public boolean readCharacteristic(BluetoothGattCharacteristic characteristic) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
-            return;
+            return false;
         }
-        mBluetoothGatt.readCharacteristic(characteristic);
+
+        return mBluetoothGatt.readCharacteristic(characteristic);
     }
 
     /**
      * Enables or disables notification on a give characteristic.
      */
-    public void setCharacteristicNotification(UUID serviceUuid, UUID characteristicUuid,
+    public boolean setCharacteristicNotification(UUID serviceUuid, UUID characteristicUuid,
                                               boolean enabled) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
-            return;
+            return false;
         }
 
         BluetoothGattService gattService = mBluetoothGatt.getService(serviceUuid);
@@ -300,7 +301,10 @@ public class BluetoothLeClass {
             mBluetoothGatt.writeDescriptor(descriptor);
         } else {
             Log.e("hjq", "service id = " + serviceUuid + " is not support!");
+            return false;
         }
+
+        return true;
     }
 
     public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
