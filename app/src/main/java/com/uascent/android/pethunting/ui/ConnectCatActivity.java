@@ -63,10 +63,8 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
             return;
         }
         mBluetoothAdapter = mBluetoothManager.getAdapter();
-
         Intent i = new Intent(this, BleComService.class);
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-        Lg.i(TAG, "onCreate()");
     }
 
     private void initViews() {
@@ -113,13 +111,6 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 
 
     private void scanLeDevice(final boolean enable) {
-//        BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-//        if (mBluetoothManager == null) {
-//            Lg.i(TAG, "Unable to initialize BluetoothManager.");
-//            return;
-//        }
-//        final BluetoothAdapter mBluetoothAdapter = mBluetoothManager.getAdapter();
-
         if (enable) {
             //搜索10s,10s后停止搜索
             mHandler.postDelayed(new Runnable() {
@@ -152,7 +143,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
             new BluetoothAdapter.LeScanCallback() {
                 @Override
                 public void onLeScan(final BluetoothDevice device, final int rssi, byte[] scanRecord) {
-                    closeLoadingDialog();
+//                    closeLoadingDialog();
                     addDevice(device.getAddress(), device.getName(), rssi);
                 }
             };
@@ -291,14 +282,6 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                     //有用
                     showLoadingDialog(getString(R.string.connecting_device));
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
-
-                    // 没用
-//                    isConnecting = true;
-//                    showShortToast(getResources().getString(R.string.match_device_ok));
-
-//                    Intent intent = new Intent(this, PlayActivity.class);
-//                    intent.putExtra("device", device);
-//                    startActivity(intent);
                 } else {
                     showShortToast(getResources().getString(R.string.match_device_fail));
                 }
