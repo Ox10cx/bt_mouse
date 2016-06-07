@@ -12,7 +12,7 @@ interface IService {
     void disconnect(String addr);
 
     void turnOnImmediateAlert(String addr,int index);
-    void turnOffImmediateAlert(String addr);
+    void turnOffImmediateAlert(String addr,int index);
 
     void setAntiLost(boolean enable);
 }

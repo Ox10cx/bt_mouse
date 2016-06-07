@@ -40,8 +40,8 @@
     <string name="str_permission_denied">Some Permission is Denied</string>
 
 
-
     <string name="cmd_sending">请稍后...</string>
+    <string name="connecting_device">连接中...</string>
     <string name="data_loading">数据加载中...</string>
     <string name="search_device_empty">搜索的设备为空</string>
     <string name="search_device_over">搜索设备完成</string>

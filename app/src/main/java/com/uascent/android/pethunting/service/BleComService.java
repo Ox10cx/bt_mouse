@@ -76,14 +76,14 @@ public class BleComService extends Service {
 
         @Override
         public boolean connect(String addr) throws RemoteException {
-            Lg.i(TAG, "connect->>>" + addr);
+            Lg.i(TAG, "IService_connect->>>" + addr);
             return connectBtDevice(addr);
         }
 
         @Override
         public void disconnect(String addr) throws RemoteException {
             disconnectBtDevice(addr);
-            Lg.i(TAG, "disconnect->>>" + addr);
+            Lg.i(TAG, "IService_disconnect->>>" + addr);
         }
 
         public void unregisterCallback(ICallback cb) {
@@ -98,10 +98,15 @@ public class BleComService extends Service {
             }
         }
 
-        public void turnOffImmediateAlert(String addr) {
-            bleTurnOffImmediateAlert(addr);
+        public void turnOffImmediateAlert(String addr, int index) {
+            bleTurnOffImmediateAlert(addr, index);
         }
 
+        /**
+         * 发送方向指令
+         * @param addr
+         * @param index
+         */
         public void turnOnImmediateAlert(String addr, int index) {
             bleTurnOnImmediateAlert(addr, index);
         }
@@ -117,14 +122,14 @@ public class BleComService extends Service {
             Lg.i(TAG, "device != null");
             device.turnOnImmediateAlert(index);
         } else {
-            Lg.i("hjq", "the device is null?");
+            Lg.i(TAG, "the device is null?");
         }
     }
 
-    private void bleTurnOffImmediateAlert(String addr) {
+    private void bleTurnOffImmediateAlert(String addr, int index) {
         BluetoothAntiLostDevice device = mActiveDevices.get(addr);
         if (device != null) {
-            device.turnOffImmediateAlert();
+            device.turnOffImmediateAlert(index);
         } else {
             Lg.i("hjq", "the device is null?");
         }
@@ -255,7 +260,7 @@ public class BleComService extends Service {
 
         BluetoothAntiLostDevice d = mActiveDevices.get(address);
         if (d != null) {
-            Lg.i("hjq", "warning the address: " + address + " is not disconnected");
+            Lg.i(TAG, "warning the address: " + address + " is not disconnected");
             d.disconnect();
             d.close();
             mActiveDevices.remove(address);
@@ -263,6 +268,7 @@ public class BleComService extends Service {
 
         BluetoothAntiLostDevice device = new BluetoothAntiLostDevice(this);
         device.initialize();
+        Lg.i(TAG, "mOnServiceDiscover");
         device.setOnServiceDiscoverListener(mOnServiceDiscover);
         //收到BLE终端数据交互的事件
         device.setOnDataAvailableListener(mOnDataAvailable);
@@ -291,8 +297,11 @@ public class BleComService extends Service {
     void disconnectBtDevice(String address) {
         BluetoothAntiLostDevice device = mActiveDevices.get(address);
         if (device != null) {
+            Lg.i(TAG, "device != null");
             mActiveDevices.remove(address);
             device.disconnect();
+        } else {
+            Lg.i(TAG, "device == null");
         }
     }
 
@@ -359,12 +368,14 @@ public class BleComService extends Service {
     private BluetoothLeClass.OnServiceDiscoverListener mOnServiceDiscover = new BluetoothLeClass.OnServiceDiscoverListener() {
         @Override
         public void onServiceDiscover(BluetoothGatt gatt) {
+            Lg.i(TAG, "onServiceDiscover");
             BluetoothDevice device = gatt.getDevice();
             BluetoothAntiLostDevice leDevice = mActiveDevices.get(device.getAddress());
             if (leDevice != null) {
+                Lg.i(TAG, "leDevice != null");
                 displayGattServices(leDevice.getSupportedGattServices());
-                leDevice.enableKeyReport(true);     // 打开上报按键信息
-                boolean alertSupport = checkAlertService(leDevice.getSupportedGattServices());
+//                leDevice.enableKeyReport(true);     // 打开上报按键信息
+                boolean alertSupport = checkCon_MouseService(leDevice.getSupportedGattServices());
                 synchronized (mCallbacks) {
                     int n = mCallbacks.beginBroadcast();
                     try {
@@ -378,12 +389,13 @@ public class BleComService extends Service {
                     mCallbacks.finishBroadcast();
                 }
             } else {
-                Lg.i("hjq", "address = " + device.getAddress() + " is null");
+                Lg.i(TAG, "address = " + device.getAddress() + " is null");
             }
         }
     };
 
-    boolean checkAlertService(List<BluetoothGattService> gattServices) {
+    boolean checkCon_MouseService(List<BluetoothGattService> gattServices) {
+        Lg.i(TAG, "checkCon_MouseService");
         if (gattServices == null) {
             return false;
         }
@@ -392,15 +404,15 @@ public class BleComService extends Service {
             final UUID serviceUUID = gattService.getUuid();
             Lg.i(TAG, "-->service uuid:" + gattService.getUuid());
 
-            if (!serviceUUID.equals(BluetoothAntiLostDevice.ALERT_SERVICE_UUID)) {
+            if (!serviceUUID.equals(BluetoothAntiLostDevice.KEY_SERVICE1_UUID)) {
                 continue;
             }
 
             List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
             for (final BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
                 Lg.i(TAG, "---->char uuid:" + gattCharacteristic.getUuid());
-                if (gattCharacteristic.getUuid().equals(BluetoothAntiLostDevice.ALERT_FUNC_UUID)) {
-                    Lg.i(TAG, "support alert service");
+                if (gattCharacteristic.getUuid().equals(BluetoothAntiLostDevice.KEY_FUNC1_UUID)) {
+                    Lg.i(TAG, "support mouse service");
                     return true;
                 }
             }

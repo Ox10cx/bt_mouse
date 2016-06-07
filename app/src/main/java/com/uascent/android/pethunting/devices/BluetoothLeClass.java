@@ -47,7 +47,9 @@ public class BluetoothLeClass {
     static public final int BLE_STATE_CONNECTED = 1;
     static public final int BLE_STATE_CONNECTING = 2;
     static public final int BLE_STATE_ERROR = 3;
-    static public final int BLE_STATE_ALERTING = 4;
+
+
+//    static public final int BLE_STATE_ALERTING = 4;
 
     protected int mBleStatus = BLE_STATE_INIT;
 

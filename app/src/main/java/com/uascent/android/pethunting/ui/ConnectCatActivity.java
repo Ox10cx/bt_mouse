@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -32,7 +31,7 @@ import java.util.ArrayList;
 public class ConnectCatActivity extends BaseActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
     private static final String TAG = "ConnectCatActivity";
 
-    private ArrayList<BtDevice> mListData = new ArrayList<BtDevice>();
+    private ArrayList<BtDevice> mListData = new ArrayList<>();
     private IService mService;
     private Handler mHandler;
     boolean mScanningStopped;
@@ -44,6 +43,12 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     private int index_checked = 0;
     private int count_device = 0;
     private BtDevice device;
+    private BluetoothAdapter mBluetoothAdapter;
+
+    /**
+     * 正在连接设备
+     */
+    private boolean isConnecting = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +57,13 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         initViews();
         mHandler = new Handler();
         showLoadingDialog();
+        BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        if (mBluetoothManager == null) {
+            Lg.i(TAG, "Unable to initialize BluetoothManager.");
+            return;
+        }
+        mBluetoothAdapter = mBluetoothManager.getAdapter();
+
         Intent i = new Intent(this, BleComService.class);
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
         Lg.i(TAG, "onCreate()");
@@ -99,14 +111,14 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         }
     };
 
+
     private void scanLeDevice(final boolean enable) {
-        BluetoothManager mBluetoothManager;
-        mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        if (mBluetoothManager == null) {
-            Lg.i(TAG, "Unable to initialize BluetoothManager.");
-            return;
-        }
-        final BluetoothAdapter mBluetoothAdapter = mBluetoothManager.getAdapter();
+//        BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+//        if (mBluetoothManager == null) {
+//            Lg.i(TAG, "Unable to initialize BluetoothManager.");
+//            return;
+//        }
+//        final BluetoothAdapter mBluetoothAdapter = mBluetoothManager.getAdapter();
 
         if (enable) {
             //搜索10s,10s后停止搜索
@@ -140,7 +152,6 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
             new BluetoothAdapter.LeScanCallback() {
                 @Override
                 public void onLeScan(final BluetoothDevice device, final int rssi, byte[] scanRecord) {
-                    Lg.i(TAG, "before_addDevice");
                     closeLoadingDialog();
                     addDevice(device.getAddress(), device.getName(), rssi);
                 }
@@ -149,30 +160,23 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     private ICallback.Stub mCallback = new ICallback.Stub() {
         @Override
         public void onConnect(String address) throws RemoteException {
-            Lg.i(TAG, "onConnect");
+            Lg.i(TAG, "onConnect calll");
+            isConnecting = true;
+//            closeLoadingDialog();
+//            if (isConnecting) {
+//                //判断服务
+//                Intent intent = new Intent(ConnectCatActivity.this, PlayActivity.class);
+//                intent.putExtra("device", device);
+//                startActivity(intent);
+//                isConnecting = false;
+//            }
         }
 
         @Override
         public void onDisconnect(String address) throws RemoteException {
-            synchronized (mListData) {
-                Lg.i(TAG, "onDisconnect called");
-                //断开连接， do .....
-//                for (int i = 0; i < mListData.size(); i++) {
-//                    BtDevice d = mListData.get(i);
-//                    if (d.getAddress().equals(address)) {
-//                        d.setStatus(BluetoothAntiLostDevice.BLE_STATE_INIT);
-//                        d.setPosition(BtDevice.LOST);
-//                    }
-//                }
-            }
-
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-//                    mDeviceListAdapter.notifyDataSetChanged();
-//                    checkAntiLost();
-                }
-            });
+            Lg.i(TAG, "onDisconnect called");
+            closeLoadingDialog();
+            isConnecting = false;
         }
 
         @Override
@@ -191,32 +195,48 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 
         @Override
         public void onSignalChanged(String address, int rssi) throws RemoteException {
-            synchronized (mListData) {
-                Lg.i(TAG, "onSignalChanged called address = " + address + " rssi = " + rssi);
+//            synchronized (mListData) {
+            Lg.i(TAG, "onSignalChanged called address = " + address + " rssi = " + rssi);
 //                for (int i = 0; i < mListData.size(); i++) {
 //                    BtDevice d = mListData.get(i);
 //                    if (d.getAddress().equals(address)) {
 //                        d.setRssi(rssi);
 //                    }
 //                }
-            }
+//            }
         }
 
         public void onPositionChanged(String address, int position) throws RemoteException {
-            synchronized (mListData) {
-                Lg.i(TAG, "onPositionChanged called address = " + address + " newpos = " + position);
-//                for (int i = 0; i < mListData.size(); i++) {
-//                    BtDevice d = mListData.get(i);
-//                    if (d.getAddress().equals(address)) {
-//                        d.setPosition(position);
-//                    }
-//                }
-            }
+            Lg.i(TAG, "onPositionChanged called address = " + address + " newpos = " + position);
         }
 
         @Override
-        public void onAlertServiceDiscovery(final String btaddr, boolean support) throws RemoteException {
-
+        public void onAlertServiceDiscovery(final String btaddr, final boolean support) throws RemoteException {
+            Lg.i(TAG, "onAlertServiceDiscovery");
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (support) {
+                        Lg.i(TAG, "onAlertServiceDiscovery_support");
+                        closeLoadingDialog();
+                        if (isConnecting) {
+                            //判断服务
+                            Intent intent = new Intent(ConnectCatActivity.this, PlayActivity.class);
+                            intent.putExtra("device", device);
+                            startActivity(intent);
+                            isConnecting = false;
+                        }
+                    } else {
+                        Lg.i(TAG, "onAlertServiceDiscovery_not_support");
+                        closeLoadingDialog();
+                        try {
+                            mService.disconnect(btaddr);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
         }
     };
 
@@ -256,7 +276,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 
     @Override
     public void onClick(View v) {
-        Intent intent = null;
+//        Intent intent = null;
         switch (v.getId()) {
             case R.id.bt_match:
                 if (mListData == null || mListData.size() == 0) {
@@ -264,10 +284,17 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                     return;
                 }
                 if (connectBLE(index_checked)) {
-                    showShortToast(getResources().getString(R.string.match_device_ok));
-                    intent = new Intent(this, PlayActivity.class);
-                    intent.putExtra("device", device);
-                    startActivity(intent);
+                    //有用
+                    showLoadingDialog(getString(R.string.connecting_device));
+                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
+
+                    // 没用
+//                    isConnecting = true;
+//                    showShortToast(getResources().getString(R.string.match_device_ok));
+
+//                    Intent intent = new Intent(this, PlayActivity.class);
+//                    intent.putExtra("device", device);
+//                    startActivity(intent);
                 } else {
                     showShortToast(getResources().getString(R.string.match_device_fail));
                 }
@@ -277,36 +304,6 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         }
     }
 
-//    public void goConnectDevice(int index) {
-//        BtDevice device = mListData.get(index);
-//        int status = device.getStatus();
-//        Lg.i(TAG, "device_status = " + status);
-//        switch (status) {
-//            case BluetoothLeClass.BLE_STATE_CONNECTED: {
-////                turnOnImmediateAlert(device.getAddress());
-////                device.setStatus(BluetoothLeClass.BLE_STATE_ALERTING);
-//                break;
-//            }
-//
-//            case BluetoothLeClass.BLE_STATE_ALERTING: {
-////                turnOffImmediateAlert(device.getAddress());
-////                device.setStatus(BluetoothLeClass.BLE_STATE_CONNECTED);
-//                break;
-//            }
-//            case BluetoothLeClass.BLE_STATE_CONNECTING: {
-//                break;
-//            }
-//            default:
-//            case BluetoothLeClass.BLE_STATE_INIT: {
-//                synchronized (mListData) {
-//                    if (connectBLE(device.getAddress())) {
-//                        device.setStatus(BluetoothLeClass.BLE_STATE_CONNECTING);
-//                    }
-//                }
-//                break;
-//            }
-//        }
-//    }
 
     public boolean connectBLE(int index) {
         boolean ret = false;
@@ -327,7 +324,6 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     protected void onDestroy() {
         if (mConnection != null) {
             try {
-                Log.i(TAG, "onDestroy->>unregisterCallback");
                 if (device != null) {
                     mService.disconnect(device.getAddress());
                     Lg.i(TAG, "disconnect_device_address = " + device.getAddress());
@@ -338,7 +334,6 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
             }
         }
         unbindService(mConnection);
-        Log.i(TAG, "onDestroy->>unbindService");
         super.onDestroy();
     }
 }

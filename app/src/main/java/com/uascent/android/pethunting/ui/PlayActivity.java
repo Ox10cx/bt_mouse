@@ -15,23 +15,27 @@ import android.widget.TextView;
 
 import com.uascent.android.pethunting.R;
 import com.uascent.android.pethunting.model.BtDevice;
+import com.uascent.android.pethunting.myviews.VerticalSeekBar;
 import com.uascent.android.pethunting.service.BleComService;
 import com.uascent.android.pethunting.tools.Lg;
 
-public class PlayActivity extends BaseActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+public class PlayActivity extends BaseActivity implements View.OnClickListener,
+        SeekBar.OnSeekBarChangeListener, VerticalSeekBar.OnSeekBarStopListener {
     private static final String TAG = "PlayActivity";
-    private SeekBar ver_sb;
+    private VerticalSeekBar ver_sb;
     private TextView ver_sb_per, tv_empty;
     private ImageView iv_play_guide, iv_play_home;
     private ImageView iv_top_dir, iv_below_dir, iv_left_dir, iv_right_dir;
     private IService mService;
     //    private Handler mHandler;
     private BtDevice device;
-    private static final int STOPCMD = 0;
-    private static final int TOPCMD = 1;
-    private static final int BOMCMD = 2;
-    private static final int LEFTCMD = 3;
-    private static final int RIGHTCMD = 4;
+    //    private static final int STOPCMD = 0;
+//    private static final int TOPCMD = 1;
+//    private static final int BOMCMD = 2;
+//    private static final int LEFTCMD = 3;
+//    private static final int RIGHTCMD = 4;
+    private static int speedValue = 0;
+    private static int dirValue = 0;
 
 
     @Override
@@ -46,7 +50,9 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
 
     private void initViews() {
         ver_sb_per = (TextView) findViewById(R.id.ver_sb_per);
-        ver_sb = (SeekBar) findViewById(R.id.ver_sb);
+        ver_sb = (VerticalSeekBar) findViewById(R.id.ver_sb);
+//        new VerticalSeekBar(this).setSeekBarStopListener(this);
+        VerticalSeekBar.setSeekBarStopListener(this);
         ver_sb.setOnSeekBarChangeListener(this);
         tv_empty = (TextView) findViewById(R.id.tv_empty);
         tv_empty.setOnClickListener(this);
@@ -77,18 +83,23 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
                 startActivity(intent);
                 break;
             case R.id.tv_empty:
+                dirValue = 0;
                 turnOnImmediateAlert(device.getAddress(), 0);
                 break;
             case R.id.iv_top_dir:
+                dirValue = 1;
                 turnOnImmediateAlert(device.getAddress(), 1);
                 break;
             case R.id.iv_below_dir:
+                dirValue = 2;
                 turnOnImmediateAlert(device.getAddress(), 2);
                 break;
             case R.id.iv_left_dir:
+                dirValue = 3;
                 turnOnImmediateAlert(device.getAddress(), 3);
                 break;
             case R.id.iv_right_dir:
+                dirValue = 4;
                 turnOnImmediateAlert(device.getAddress(), 4);
                 break;
             default:
@@ -100,17 +111,18 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         ver_sb_per.setText(progress + "%");
+        speedValue = progress;
+        Lg.i(TAG, "onProgressChanged");
     }
 
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
-
     }
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
-
     }
+
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
@@ -135,6 +147,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
     private ICallback.Stub mCallback = new ICallback.Stub() {
         @Override
         public void onConnect(String address) throws RemoteException {
+            Lg.i(TAG, "onConnect called");
         }
 
         @Override
@@ -171,18 +184,42 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
         }
     };
 
+    /**
+     * 调节方向
+     *
+     * @param addr
+     * @param index
+     */
     public void turnOnImmediateAlert(String addr, int index) {
         try {
             mService.turnOnImmediateAlert(addr, index);
+            Lg.i(TAG, "turnOnImmediateAlert->>" + index);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * 调节速度
+     *
+     * @param addr
+     */
+    public void turnOffImmediateAlert(String addr, int index) {
+        try {
+            mService.turnOffImmediateAlert(addr, index);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     @Override
     protected void onDestroy() {
         if (mConnection != null) {
             try {
+                if (dirValue != 0) {
+                    turnOnImmediateAlert(device.getAddress(), 0);
+                }
                 Log.i(TAG, "onDestroy->>unregisterCallback");
                 mService.unregisterCallback(mCallback);
                 if (device != null) {
@@ -197,4 +234,12 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener, 
         Log.i(TAG, "onDestroy->>unbindService");
         super.onDestroy();
     }
+
+
+    @Override
+    public void onSeekBarStop() {
+        Lg.i(TAG, "onSeekBarStop_onStartTrackingTouch");
+//        turnOffImmediateAlert(device.getAddress(), speedValue);
+    }
+
 }
