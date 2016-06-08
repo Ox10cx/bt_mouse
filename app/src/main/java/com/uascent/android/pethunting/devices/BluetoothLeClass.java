@@ -227,9 +227,14 @@ public class BluetoothLeClass {
         }
         // We want to directly connect to the device, so we are setting the autoConnect
         // parameter to false.
-        mBluetoothGatt = device.connectGatt(mContext, false, mGattCallback);
-        Log.d(TAG, "Trying to create a new connection.");
-        mBluetoothDeviceAddress = address;
+        try {
+            mBluetoothGatt = device.connectGatt(mContext, false, mGattCallback);
+            Log.d(TAG, "Trying to create a new connection.");
+            mBluetoothDeviceAddress = address;
+        } catch (Exception e) {
+            Log.d(TAG, "device.connectGatt fail");
+            return false;
+        }
         return true;
     }
 
@@ -283,7 +288,7 @@ public class BluetoothLeClass {
      * Enables or disables notification on a give characteristic.
      */
     public boolean setCharacteristicNotification(UUID serviceUuid, UUID characteristicUuid,
-                                              boolean enabled) {
+                                                 boolean enabled) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
             return false;

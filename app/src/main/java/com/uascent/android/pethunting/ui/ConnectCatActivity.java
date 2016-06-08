@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.uascent.android.pethunting.MyApplication;
 import com.uascent.android.pethunting.R;
 import com.uascent.android.pethunting.adapter.DeviceListAdapter;
 import com.uascent.android.pethunting.model.BtDevice;
@@ -224,6 +225,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                     } else {
                         Lg.i(TAG, "onAlertServiceDiscovery_not_support");
                         closeLoadingDialog();
+                        showShortToast(getString(R.string.device_service_not_match));
                         try {
                             mService.disconnect(address);
                         } catch (RemoteException e) {
@@ -279,9 +281,13 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                     return;
                 }
                 if (connectBLE(index_checked)) {
-                    //有用
-                    showLoadingDialog(getString(R.string.connecting_device));
-                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                    if (mBluetoothAdapter.isEnabled()) {
+                        //有用
+                        showLoadingDialog(getString(R.string.connecting_device));
+                        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                    } else {
+                        showShortToast(getString(R.string.bluetooth_switch_not_opened));
+                    }
                 } else {
                     showShortToast(getResources().getString(R.string.match_device_fail));
                 }
@@ -295,20 +301,23 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     public boolean connectBLE(int index) {
         boolean ret = false;
         device = mListData.get(index);
-        int status = device.getStatus();
-        Lg.i(TAG, "device_status = " + status);
-        Lg.i(TAG, "device_address = " + device.getAddress());
-        try {
-            ret = mService.connect(device.getAddress());
-        } catch (RemoteException e) {
-            e.printStackTrace();
-            return ret;
+//        int status = device.getStatus();
+//        Lg.i(TAG, "device_status = " + status);
+        if (device != null && device.getAddress() != null) {
+            Lg.i(TAG, "device_address = " + device.getAddress());
+            try {
+                ret = mService.connect(device.getAddress());
+            } catch (RemoteException e) {
+                e.printStackTrace();
+                return ret;
+            }
         }
         return ret;
     }
 
     @Override
     protected void onDestroy() {
+        MyApplication.getInstance().isAutoBreak = true;
         if (mConnection != null) {
             try {
                 if (device != null) {

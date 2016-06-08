@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.uascent.android.pethunting.MyApplication;
 import com.uascent.android.pethunting.R;
 import com.uascent.android.pethunting.devices.BluetoothAntiLostDevice;
 import com.uascent.android.pethunting.model.BtDevice;
@@ -28,13 +30,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     private ImageView iv_play_guide, iv_play_home;
     private ImageView iv_top_dir, iv_below_dir, iv_left_dir, iv_right_dir;
     private IService mService;
-    //    private Handler mHandler;
+    private Handler mHandler;
     private BtDevice device;
-    //    private static final int STOPCMD = 0;
-//    private static final int TOPCMD = 1;
-//    private static final int BOMCMD = 2;
-//    private static final int LEFTCMD = 3;
-//    private static final int RIGHTCMD = 4;
     private static int speedValue = 0;
     private static int dirValue = 0;
 
@@ -44,6 +41,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         setContentView(R.layout.activity_play);
         super.onCreate(savedInstanceState);
         initViews();
+        mHandler = new Handler();
         device = (BtDevice) getIntent().getSerializableExtra("device");
         Intent i = new Intent(this, BleComService.class);
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
@@ -52,7 +50,6 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     private void initViews() {
         ver_sb_per = (TextView) findViewById(R.id.ver_sb_per);
         ver_sb = (VerticalSeekBar) findViewById(R.id.ver_sb);
-//        new VerticalSeekBar(this).setSeekBarStopListener(this);
         VerticalSeekBar.setSeekBarStopListener(this);
         ver_sb.setOnSeekBarChangeListener(this);
         tv_empty = (TextView) findViewById(R.id.tv_empty);
@@ -166,12 +163,20 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         @Override
         public void onDisconnect(String address) throws RemoteException {
             Lg.i(TAG, "onDisconnect called");
+            //蓝牙意外断开，考虑重连接
+            if (!MyApplication.getInstance().isAutoBreak && device != null) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        showShortToast(getString(R.string.bluetooth_has_breaked));
+                    }
+                });
+            }
         }
 
         @Override
         public boolean onRead(String address, byte[] val) throws RemoteException {
             Lg.i(TAG, "onRead called");
-
             return false;
         }
 
@@ -221,16 +226,29 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        if (mConnection != null) {
+            if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
+                controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
+                Lg.i(TAG, "onPause" + "direct exit");
+            }
+        }
+    }
+
+    @Override
     protected void onDestroy() {
+        MyApplication.getInstance().isAutoBreak = true;
         if (mConnection != null) {
             try {
-                if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
-                    controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
-                }
+//                if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
+//                    controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
+//                }
                 Log.i(TAG, "onDestroy->>unregisterCallback");
                 mService.unregisterCallback(mCallback);
                 if (device != null) {
                     mService.disconnect(device.getAddress());
+                    device = null;
                     Lg.i(TAG, "disconnect_device_address = " + device.getAddress());
                 }
             } catch (RemoteException e) {

@@ -52,5 +52,7 @@
     <string name="crash_reminder">抱歉,程序异常,即将重启</string>
     <string name="stop">Stop</string>
     <string name="str_location">access my location</string>
+    <string name="device_service_not_match">您选择设备的服务与本服务不匹配</string>
+    <string name="bluetooth_has_breaked">手机与设备之间的蓝牙已断开</string>
 
 </resources>

@@ -11,6 +11,7 @@ import java.util.LinkedList;
 public class MyApplication extends Application {
     public LinkedList<Activity> activityList = new LinkedList<Activity>();
     private static MyApplication instance;
+    public boolean isAutoBreak = false;
 
     @Override
     public void onCreate() {
