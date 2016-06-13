@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "D:\\UascentProjectCode\\PetsHunting_1.0\\bt_mouse\\library\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-mdpi-v4\\default_ptr_rotate.png",
+        "source": "D:\\UascentProjectCode\\PetsHunting_1.0\\bt_mouse\\library\\build\\intermediates\\bundles\\debug\\res\\drawable-mdpi-v4\\default_ptr_rotate.png"
+    },
+    {
+        "merged": "D:\\UascentProjectCode\\PetsHunting_1.0\\bt_mouse\\library\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-mdpi-v4\\indicator_arrow.png",
+        "source": "D:\\UascentProjectCode\\PetsHunting_1.0\\bt_mouse\\library\\build\\intermediates\\bundles\\debug\\res\\drawable-mdpi-v4\\indicator_arrow.png"
+    },
+    {
+        "merged": "D:\\UascentProjectCode\\PetsHunting_1.0\\bt_mouse\\library\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-mdpi-v4\\default_ptr_flip.png",
+        "source": "D:\\UascentProjectCode\\PetsHunting_1.0\\bt_mouse\\library\\build\\intermediates\\bundles\\debug\\res\\drawable-mdpi-v4\\default_ptr_flip.png"
+    }
+]

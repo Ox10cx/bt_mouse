@@ -11,12 +11,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.uascent.android.pethunting.MyApplication;
 import com.uascent.android.pethunting.R;
 import com.uascent.android.pethunting.adapter.DeviceListAdapter;
@@ -38,7 +41,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     boolean mScanningStopped;
     private ImageView iv_load_null;
     private Button bt_match;
-    private ListView lv_device;
+    private PullToRefreshListView lv_device;
     private DeviceListAdapter adpater;
 
     private int index_checked = 0;
@@ -50,6 +53,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
      * 正在连接设备
      */
     private boolean isConnecting = false;
+    private boolean isRefresh = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +76,22 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         bt_match = (Button) findViewById(R.id.bt_match);
         bt_match.setOnClickListener(this);
         iv_load_null = (ImageView) findViewById(R.id.iv_load_null);
-        lv_device = (ListView) findViewById(R.id.lv_device);
+        lv_device = (PullToRefreshListView) findViewById(R.id.lv_device);
         lv_device.setOnItemClickListener(this);
+        lv_device.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<ListView>() {
+            @Override
+            public void onRefresh(PullToRefreshBase<ListView> refreshView) {
+                String label = DateUtils.formatDateTime(getApplicationContext(), System.currentTimeMillis(),
+                        DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
+                Lg.i(TAG, "onRefresh>>>>" + label);
+
+                // Update the LastUpdatedLabel
+                refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+
+                // Do work to refresh the list here.
+                doRefreshWork();
+            }
+        });
         adpater = new DeviceListAdapter(this, mListData);
         lv_device.setAdapter(adpater);
     }
@@ -119,6 +137,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                 public void run() {
                     closeLoadingDialog();
                     Lg.i(TAG, "stop scanning after 10s");
+                    refreshOk();
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
                     mScanningStopped = true;
                     if (mListData == null || mListData.size() == 0) {
@@ -137,6 +156,13 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         } else {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
             mScanningStopped = true;
+        }
+    }
+
+    private void refreshOk() {
+        if (isRefresh) {
+            lv_device.onRefreshComplete();
+            isRefresh = false;
         }
     }
 
@@ -266,8 +292,9 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         mListData.get(index_checked).setChecked(false);
-        mListData.get(position).setChecked(true);
-        index_checked = position;
+        Lg.i(TAG,"position-1=:"+(position-1));
+        mListData.get(position-1).setChecked(true);
+        index_checked = position-1;
         adpater.notifyDataSetChanged();
     }
 
@@ -282,6 +309,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                 }
                 if (connectBLE(index_checked)) {
                     if (mBluetoothAdapter.isEnabled()) {
+                        refreshOk();
                         //有用
                         showLoadingDialog(getString(R.string.connecting_device));
                         mBluetoothAdapter.stopLeScan(mLeScanCallback);
@@ -332,4 +360,16 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         unbindService(mConnection);
         super.onDestroy();
     }
+
+    public void doRefreshWork() {
+        if (mService != null) {
+            index_checked = 0;
+            mListData.clear();
+            isRefresh = true;
+            scanLeDevice(true);
+        } else {
+            showShortToast(getString(R.string.bluetooth_service_break_restart));
+        }
+    }
+
 }
