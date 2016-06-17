@@ -55,5 +55,6 @@
     <string name="device_service_not_match">您选择设备的服务与本服务不匹配</string>
     <string name="bluetooth_has_breaked">手机与设备之间的蓝牙已断开</string>
     <string name="bluetooth_service_break_restart">蓝牙服务已经断开,请您再次进入该界面</string>
+    <string name="moible_not_support_bluetooth4">该手机设备不支持蓝牙4.0</string>
 
 </resources>

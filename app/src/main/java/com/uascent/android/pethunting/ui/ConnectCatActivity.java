@@ -63,11 +63,11 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         mHandler = new Handler();
         showLoadingDialog();
         BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        if (mBluetoothManager == null) {
-            Lg.i(TAG, "Unable to initialize BluetoothManager.");
-            return;
+        if (mBluetoothManager != null) {
+            mBluetoothAdapter = mBluetoothManager.getAdapter();
+        } else {
+            showShortToast(getString(R.string.moible_not_support_bluetooth4));
         }
-        mBluetoothAdapter = mBluetoothManager.getAdapter();
         Intent i = new Intent(this, BleComService.class);
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
     }
@@ -142,16 +142,21 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                     mScanningStopped = true;
                     if (mListData == null || mListData.size() == 0) {
                         showShortToast(getResources().getString(R.string.search_device_empty));
-                        lv_device.setVisibility(View.GONE);
+//                        lv_device.setVisibility(View.GONE);
                         iv_load_null.setVisibility(View.VISIBLE);
                         Lg.i(TAG, "mListData的大小为0");
                     } else {
-                        showShortToast(getResources().getString(R.string.search_device_over));
+//                        showShortToast(getResources().getString(R.string.search_device_over));
                     }
 
                 }
             }, 10 * 1000);
+
             mBluetoothAdapter.startLeScan(mLeScanCallback);
+//            mBluetoothAdapter.startLeScan(new UUID[]{BluetoothAntiLostDevice.MOUSE_SERVICE_UUID,
+//                    BluetoothAntiLostDevice.ALERT_SERVICE_UUID,BluetoothAntiLostDevice.LOSS_SERVICE_UUID,
+//                    BluetoothAntiLostDevice.POWER_SERVICE_UUID,BluetoothAntiLostDevice.KEY_SERVICE_UUID}, mLeScanCallback);
+//            mBluetoothAdapter.startLeScan(new UUID[]{BluetoothAntiLostDevice.KEY_SERVICE_UUID}, mLeScanCallback);
             mScanningStopped = false;
         } else {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
@@ -282,6 +287,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                     device.setChecked(true);
                 }
                 mListData.add(device);
+                iv_load_null.setVisibility(View.GONE);
                 count_device = count_device + 1;
                 Lg.i(TAG, "add_device_ok");
                 adpater.notifyDataSetChanged();
@@ -292,9 +298,9 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         mListData.get(index_checked).setChecked(false);
-        Lg.i(TAG,"position-1=:"+(position-1));
-        mListData.get(position-1).setChecked(true);
-        index_checked = position-1;
+        Lg.i(TAG, "position-1=:" + (position - 1));
+        mListData.get(position - 1).setChecked(true);
+        index_checked = position - 1;
         adpater.notifyDataSetChanged();
     }
 
@@ -364,6 +370,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     public void doRefreshWork() {
         if (mService != null) {
             index_checked = 0;
+            count_device=0;
             mListData.clear();
             isRefresh = true;
             scanLeDevice(true);

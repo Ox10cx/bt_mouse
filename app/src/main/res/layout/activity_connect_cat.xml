@@ -40,10 +40,6 @@
         android:layout_marginTop="@dimen/layout_size_5"
         android:background="@color/white">
 
-        <!--            android:cacheColorHint="@color/list_cacheColor"
-        android:divider="@drawable/listview_divider_shape"
-         android:listSelector="@drawable/listview_item_bg"
-        -->
 
         <com.handmark.pulltorefresh.library.PullToRefreshListView
             android:id="@+id/lv_device"
