@@ -47,6 +47,6 @@
 
     </ScrollView>
 
-    <include layout="@layout/com_userguide"></include>
+   <!-- <include layout="@layout/com_userguide"></include>-->
 
 </LinearLayout>

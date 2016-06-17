@@ -4,12 +4,12 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.uascent.android.pethunting.MyApplication;
 import com.uascent.android.pethunting.R;
 import com.uascent.android.pethunting.myviews.LoadDialog;
+import com.uascent.android.pethunting.tools.Lg;
 import com.uascent.android.pethunting.tools.StatusBarUtil;
 
 public class BaseActivity extends FragmentActivity {
@@ -68,13 +68,12 @@ public class BaseActivity extends FragmentActivity {
     }
 
     protected void onDialogCancel() {
-        Log.e("hjq", "onDialogCancel called");
+        Lg.i(TAG, "onDialogCancel called");
     }
 
     public boolean closeLoadingDialog() {
         if (dialog != null && dialog.isShowing()) {
             dialog.dismiss();
-
             return true;
         } else {
             return false;

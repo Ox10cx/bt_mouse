@@ -73,7 +73,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         Intent intent = null;
         switch (v.getId()) {
             case R.id.iv_play_guide:
-                intent = new Intent(this, UserGuide4Activity.class);
+                intent = new Intent(this, UserGuide1Fragment.class);
                 startActivity(intent);
                 break;
 

@@ -53,7 +53,16 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
      * 正在连接设备
      */
     private boolean isConnecting = false;
+
+    /**
+     * 正在刷新
+     */
     private boolean isRefresh = false;
+
+    //没有触发检查服务
+    private boolean isClickMatch = false;
+    private boolean isCheckServicee = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,21 +194,24 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         public void onConnect(String address) throws RemoteException {
             Lg.i(TAG, "onConnect calll");
             isConnecting = true;
-//            closeLoadingDialog();
-//            if (isConnecting) {
-//                //判断服务
-//                Intent intent = new Intent(ConnectCatActivity.this, PlayActivity.class);
-//                intent.putExtra("device", device);
-//                startActivity(intent);
-//                isConnecting = false;
-//            }
+            isCheckServicee = false;
         }
 
         @Override
         public void onDisconnect(String address) throws RemoteException {
             Lg.i(TAG, "onDisconnect called");
-            closeLoadingDialog();
-            isConnecting = false;
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    closeLoadingDialog();
+                    isConnecting = false;
+                    if (isCheckServicee == false && isClickMatch == true) {
+                        showShortToast(getString(R.string.device_service_not_match));
+                        isClickMatch = false;
+                    }
+                }
+            });
+
         }
 
         @Override
@@ -240,6 +252,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 
         @Override
         public void onMouseServiceDiscovery(final String address, final boolean support) throws RemoteException {
+            isCheckServicee = true;
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -325,6 +338,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                 } else {
                     showShortToast(getResources().getString(R.string.match_device_fail));
                 }
+                isClickMatch = true;
                 break;
             default:
                 break;
@@ -350,6 +364,12 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+    }
+
+    @Override
     protected void onDestroy() {
         MyApplication.getInstance().isAutoBreak = true;
         if (mConnection != null) {
@@ -370,7 +390,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     public void doRefreshWork() {
         if (mService != null) {
             index_checked = 0;
-            count_device=0;
+            count_device = 0;
             mListData.clear();
             isRefresh = true;
             scanLeDevice(true);

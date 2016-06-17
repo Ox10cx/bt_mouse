@@ -58,24 +58,28 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".ui.UserGuide4Activity"
+            android:name=".ui.UserGuideActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"></activity>
+        <!--<activity
+            android:name=".ui.UserGuide1Fragment"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".ui.UserGuide5Activity"
+            android:name=".ui.UserGuide2Fragment"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".ui.UserGuide6Activity"
+            android:name=".ui.UserGuide3Fragment"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".ui.UserGuide7Activity"
+            android:name=".ui.UserGuide4Fragment"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".ui.UserGuide8Activity"
+            android:name=".ui.UserGuide5Fragment"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"></activity>-->
         <activity
             android:name=".ui.PlayActivity"
             android:launchMode="singleTask"

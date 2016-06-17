@@ -80,7 +80,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 startActivity(intent);
                 break;
             case R.id.bt_user_guide:
-                intent = new Intent(this, UserGuide4Activity.class);
+                intent = new Intent(this, UserGuideActivity.class);
                 startActivity(intent);
                 break;
             case R.id.bt_play:

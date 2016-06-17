@@ -57,4 +57,5 @@
     <string name="bluetooth_service_break_restart">蓝牙服务已经断开,请您再次进入该界面</string>
     <string name="moible_not_support_bluetooth4">该手机设备不支持蓝牙4.0</string>
 
+
 </resources>
