@@ -13,7 +13,8 @@
         android:flipInterval="30" />
 
 
-    <RelativeLayout
+    <!--viewPager 的显示效果-->
+    <!--<RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -30,51 +31,51 @@
             android:visibility="gone"
             android:textSize="20sp" />
         />
-    </RelativeLayout>
+    </RelativeLayout>-->
 
-    <LinearLayout
-        android:id="@+id/llIndicator"
-        android:layout_width="@dimen/layout_size_100"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="@dimen/layout_size_30">
+    <!-- <LinearLayout
+         android:id="@+id/llIndicator"
+         android:layout_width="@dimen/layout_size_100"
+         android:layout_height="wrap_content"
+         android:layout_alignParentBottom="true"
+         android:layout_centerHorizontal="true"
+         android:layout_marginBottom="@dimen/layout_size_30">
 
-        <ImageView
-            android:id="@+id/ivIndicatorFirst"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.0"
-            android:src="@drawable/page_indicator_focused" />
+         <ImageView
+             android:id="@+id/ivIndicatorFirst"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_weight="1.0"
+             android:src="@drawable/page_indicator_focused" />
 
-        <ImageView
-            android:id="@+id/ivIndicatorSecond"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.0"
-            android:src="@drawable/page_indicator" />
+         <ImageView
+             android:id="@+id/ivIndicatorSecond"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_weight="1.0"
+             android:src="@drawable/page_indicator" />
 
-        <ImageView
-            android:id="@+id/ivIndicatorThird"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.0"
-            android:src="@drawable/page_indicator" />
+         <ImageView
+             android:id="@+id/ivIndicatorThird"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_weight="1.0"
+             android:src="@drawable/page_indicator" />
 
-        <ImageView
-            android:id="@+id/ivIndicatorFouth"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.0"
-            android:src="@drawable/page_indicator" />
+         <ImageView
+             android:id="@+id/ivIndicatorFouth"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_weight="1.0"
+             android:src="@drawable/page_indicator" />
 
-        <ImageView
-            android:id="@+id/ivIndicatorFiveth"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.0"
-            android:src="@drawable/page_indicator" />
-    </LinearLayout>
-
+         <ImageView
+             android:id="@+id/ivIndicatorFiveth"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_weight="1.0"
+             android:src="@drawable/page_indicator" />
+     </LinearLayout>
+ -->
 
 </RelativeLayout>

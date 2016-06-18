@@ -22,6 +22,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scrollbars="none"
         android:layout_weight="1">
 
         <LinearLayout
@@ -34,7 +35,25 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/layout_size_10"
                 android:gravity="center"
-                android:text="@string/setup_steps"
+                android:text="@string/setup_1"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_20" />
+
+            <!--字体加粗-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/setup_2"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_25"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/setup_3"
                 android:textColor="@color/white"
                 android:textSize="@dimen/text_size_20" />
 
@@ -114,14 +133,13 @@
 
     <Button
         android:id="@+id/bt_menu"
+        style="@style/text_style"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="@dimen/layout_size_40"
         android:background="@drawable/small_button_shape"
-        android:gravity="center"
-        android:text="@string/menu"
-        android:textSize="@dimen/text_size_20" />
+        android:text="@string/menu" />
 
 
 </LinearLayout>

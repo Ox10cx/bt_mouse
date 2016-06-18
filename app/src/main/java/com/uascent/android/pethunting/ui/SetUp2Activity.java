@@ -32,7 +32,8 @@ public class SetUp2Activity extends BaseActivity implements View.OnClickListener
         bt_menu = (Button) findViewById(R.id.bt_menu);
         bt_menu.setOnClickListener(this);
         iv_blue_switch = (ImageView) findViewById(R.id.iv_blue_switch);
-        iv_blue_switch.setOnClickListener(this);
+        //取消点击蓝牙开关
+//        iv_blue_switch.setOnClickListener(this);
     }
 
     @Override
@@ -46,7 +47,6 @@ public class SetUp2Activity extends BaseActivity implements View.OnClickListener
             case R.id.iv_blue_switch:
                 //判断蓝牙开关是否打开
                 if (!btAdapter.isEnabled()) {
-//                    showShortToast(getResources().getString(R.string.bluetooth_switch_not_opened));
                     final ComReminderDialog dialog = new ComReminderDialog(this, getResources().getString(R.string.open_bluetooth_switch)
                             , getResources().getString(R.string.no), getResources().getString(R.string.yes));
                     dialog.show();
@@ -70,7 +70,6 @@ public class SetUp2Activity extends BaseActivity implements View.OnClickListener
                     });
 
                 } else {
-//                    showShortToast(getResources().getString(R.string.bluetooth_switch_has_opened));
                     intent = new Intent(this, ConnectCatActivity.class);
                     startActivity(intent);
                 }
@@ -84,7 +83,6 @@ public class SetUp2Activity extends BaseActivity implements View.OnClickListener
         switch (requestCode) {
             case REQUEST_ENABLE_CODE: {
                 if (resultCode == Activity.RESULT_OK) {
-//                    showShortToast(getResources().getString(R.string.bluetooth_switch_has_opened));
                     Intent intent = new Intent(this, ConnectCatActivity.class);
                     startActivity(intent);
                 } else {

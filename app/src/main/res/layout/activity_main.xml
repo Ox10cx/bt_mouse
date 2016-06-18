@@ -13,32 +13,29 @@
 
         <Button
             android:id="@+id/bt_set_up"
+            style="@style/text_style"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/big_button_shape"
-            android:gravity="center"
-            android:text="@string/set_up"
-            android:textSize="@dimen/text_size_20" />
+            android:text="@string/set_up" />
 
         <Button
             android:id="@+id/bt_user_guide"
+            style="@style/text_style"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_size_10"
             android:background="@drawable/big_button_shape"
-            android:gravity="center"
-            android:text="@string/user_guide"
-            android:textSize="@dimen/text_size_20" />
+            android:text="@string/user_guide" />
 
         <Button
             android:id="@+id/bt_play"
+            style="@style/text_style"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_size_10"
             android:background="@drawable/big_button_shape"
-            android:gravity="center"
-            android:text="@string/play"
-            android:textSize="@dimen/text_size_20" />
+            android:text="@string/play" />
 
     </LinearLayout>
 
