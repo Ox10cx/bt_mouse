@@ -322,7 +322,13 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 //        Intent intent = null;
         switch (v.getId()) {
             case R.id.bt_match:
-                if (mListData == null || mListData.size() == 0) {
+                //没用
+                Intent intent = new Intent(ConnectCatActivity.this, PlayActivity.class);
+                intent.putExtra("device", device);
+                startActivity(intent);
+
+                //有用
+               /* if (mListData == null || mListData.size() == 0) {
                     showShortToast(getResources().getString(R.string.device_is_empty_not_match));
                     return;
                 }
@@ -338,7 +344,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                 } else {
                     showShortToast(getResources().getString(R.string.match_device_fail));
                 }
-                isClickMatch = true;
+                isClickMatch = true;*/
                 break;
             default:
                 break;

@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -23,7 +24,8 @@ import com.uascent.android.pethunting.service.BleComService;
 import com.uascent.android.pethunting.tools.Lg;
 
 public class PlayActivity extends BaseActivity implements View.OnClickListener,
-        SeekBar.OnSeekBarChangeListener, VerticalSeekBar.OnSeekBarStopListener {
+        SeekBar.OnSeekBarChangeListener, VerticalSeekBar.OnSeekBarStopListener
+        , View.OnTouchListener {
     private static final String TAG = "PlayActivity";
     private VerticalSeekBar ver_sb;
     private TextView ver_sb_per, tv_empty;
@@ -58,69 +60,76 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         iv_play_guide.setOnClickListener(this);
         iv_play_home = (ImageView) findViewById(R.id.iv_play_home);
         iv_play_home.setOnClickListener(this);
+
         iv_top_dir = (ImageView) findViewById(R.id.iv_top_dir);
+        iv_top_dir.setOnTouchListener(this);
         iv_top_dir.setOnClickListener(this);
+
         iv_below_dir = (ImageView) findViewById(R.id.iv_below_dir);
         iv_below_dir.setOnClickListener(this);
+        iv_below_dir.setOnTouchListener(this);
+
         iv_left_dir = (ImageView) findViewById(R.id.iv_left_dir);
         iv_left_dir.setOnClickListener(this);
+        iv_left_dir.setOnTouchListener(this);
+
         iv_right_dir = (ImageView) findViewById(R.id.iv_right_dir);
         iv_right_dir.setOnClickListener(this);
+        iv_right_dir.setOnTouchListener(this);
     }
 
     @Override
     public void onClick(View v) {
+        Lg.i(TAG, "onClick" + v.getId());
         Intent intent = null;
         switch (v.getId()) {
             case R.id.iv_play_guide:
-                intent = new Intent(this, UserGuide1Fragment.class);
+                intent = new Intent(this, UserGuideActivity.class);
                 startActivity(intent);
                 break;
-
             case R.id.iv_play_home:
                 intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
                 break;
+//            case R.id.tv_empty:
+//                dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
+//                sendMouseCmd(device.getAddress(), dirValue);
+//                break;
 
-            case R.id.tv_empty:
-                dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
-                sendMouseCmd(device.getAddress(), dirValue);
-                break;
-
-            case R.id.iv_top_dir:
-                dirValue = BluetoothAntiLostDevice.MOUSE_UP;
-                sendMouseCmd(device.getAddress(), BluetoothAntiLostDevice.MOUSE_UP);
-                break;
-
-            case R.id.iv_below_dir:
-                dirValue = BluetoothAntiLostDevice.MOUSE_DOWN;
-                sendMouseCmd(device.getAddress(), dirValue);
-                break;
-
-            case R.id.iv_left_dir:
-                dirValue = BluetoothAntiLostDevice.MOUSE_LEFT;
-                sendMouseCmd(device.getAddress(), dirValue);
-                break;
-
-            case R.id.iv_right_dir:
-                dirValue = BluetoothAntiLostDevice.MOUSE_RIGHT;
-                sendMouseCmd(device.getAddress(), dirValue);
-                break;
-
-            default:
-                break;
+//            case R.id.iv_top_dir:
+//                dirValue = BluetoothAntiLostDevice.MOUSE_UP;
+//                sendMouseCmd(device.getAddress(), dirValue);
+//                break;
+//
+//            case R.id.iv_below_dir:
+//                dirValue = BluetoothAntiLostDevice.MOUSE_DOWN;
+//                sendMouseCmd(device.getAddress(), dirValue);
+//                break;
+//
+//            case R.id.iv_left_dir:
+//                dirValue = BluetoothAntiLostDevice.MOUSE_LEFT;
+//                sendMouseCmd(device.getAddress(), dirValue);
+//                break;
+//
+//            case R.id.iv_right_dir:
+//                dirValue = BluetoothAntiLostDevice.MOUSE_RIGHT;
+//                sendMouseCmd(device.getAddress(), dirValue);
+//                break;
         }
     }
 
     void sendMouseCmd(String addr, int cmd) {
-        controlMouseDir(addr, cmd);
-        getMouseRsp(addr);
+        Lg.i(TAG, "sendMouseCmd:" + cmd);
+//        return;
+        //有用
+//        controlMouseDir(addr, cmd);
+//        getMouseRsp(addr);
     }
 
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        ver_sb_per.setText(progress + "%");
+//        ver_sb_per.setText(progress + "%");
         speedValue = progress;
         Lg.i(TAG, "onProgressChanged");
     }
@@ -264,6 +273,44 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     public void onSeekBarStop() {
         Lg.i(TAG, "onSeekBarStop_onStartTrackingTouch");
 //        turnOffImmediateAlert(device.getAddress(), speedValue);
+        ver_sb.setProgress(0);
     }
 
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        switch (v.getId()) {
+            case R.id.iv_top_dir:
+                dirValue = BluetoothAntiLostDevice.MOUSE_UP;
+                break;
+            case R.id.iv_below_dir:
+                dirValue = BluetoothAntiLostDevice.MOUSE_DOWN;
+                break;
+            case R.id.iv_left_dir:
+                dirValue = BluetoothAntiLostDevice.MOUSE_LEFT;
+                break;
+            case R.id.iv_right_dir:
+                dirValue = BluetoothAntiLostDevice.MOUSE_RIGHT;
+                break;
+        }
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                Lg.i(TAG, "event.getAction()---ACTION_DOWN--" + v.getId() + "   " + dirValue);
+//                sendMouseCmd(device.getAddress(), dirValue);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                break;
+            case MotionEvent.ACTION_UP:
+                dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
+                Lg.i(TAG, "event.getAction()---ACTION_UP--" + v.getId() + "   " + dirValue);
+//                sendMouseCmd(device.getAddress(), dirValue);
+                break;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        Lg.i(TAG, "onTouchEvent");
+        return super.onTouchEvent(event);
+    }
 }
