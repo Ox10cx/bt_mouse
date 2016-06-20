@@ -40,7 +40,7 @@
             android:name=".ui.FristFlashActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+            android:theme="@style/FirstTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
