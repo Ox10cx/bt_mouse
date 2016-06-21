@@ -8,9 +8,9 @@
     <string name="setup_1">Follow these</string>
     <string name="setup_2">3 steps to start</string>
     <string name="setup_3">your toy:</string>
-    <string name="setup_step_1">1 Switch the dongle on \n&#160;&#160;&#160;back of the toy to ON.</string>
+    <string name="setup_step_1">1 Switch the dongle on \nback of the toy to ON.</string>
     <string name="setup_step_2">2 Turn on Bluetooth</string>
-    <string name="setup_step_3">3 Start the app \n&#160;&#160;&#160;on your phone</string>
+    <string name="setup_step_3">3 Start the app \non your phone</string>
     <string name="user_guide_remind">Pet products remote control,it can control the direction and speed.</string>
     <string name="user_guide_blue">Transmission signal with  bluetooth connection.</string>
     <string name="back">Back</string>

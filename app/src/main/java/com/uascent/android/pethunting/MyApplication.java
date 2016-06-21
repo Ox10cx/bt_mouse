@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Application;
 import android.graphics.Typeface;
 
+import com.uascent.android.pethunting.tools.AppCrashHandler;
+
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 
@@ -19,10 +21,11 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        //设置字体样式
         setTypeface();
         //异常重启
-//        AppCrashHandler ch = AppCrashHandler.getInstance();
-//        ch.init(getApplicationContext());
+        AppCrashHandler ch = AppCrashHandler.getInstance();
+        ch.init(getApplicationContext());
     }
 
     public static MyApplication getInstance() {

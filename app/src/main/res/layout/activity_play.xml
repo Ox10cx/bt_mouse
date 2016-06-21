@@ -47,14 +47,15 @@
                 android:focusable="true"
                 android:max="100"
                 android:progress="0"
-                android:progressDrawable="@drawable/po_seekbar" />
+                android:progressDrawable="@drawable/po_seekbar"
+                android:thumb="@drawable/seekbar_thunm" />
 
             <TextView
                 android:id="@+id/ver_sb_per"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/ver_sb"
                 android:layout_marginLeft="@dimen/layout_size_10"
-                android:layout_marginTop="@dimen/default_margin"
                 android:layout_toRightOf="@+id/ver_sb"
                 android:text="@string/sb_max"
                 android:textColor="@color/white"
@@ -64,8 +65,7 @@
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="@dimen/default_margin"
+                android:layout_alignBottom="@+id/ver_sb"
                 android:layout_marginLeft="@dimen/layout_size_10"
                 android:layout_toRightOf="@+id/ver_sb"
                 android:text="@string/sb_min"
