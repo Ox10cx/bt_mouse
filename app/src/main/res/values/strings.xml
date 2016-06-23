@@ -11,8 +11,8 @@
     <string name="setup_step_1">1 Switch the dongle on \nback of the toy to ON.</string>
     <string name="setup_step_2">2 Turn on Bluetooth</string>
     <string name="setup_step_3">3 Start the app \non your phone</string>
-    <string name="user_guide_remind">Pet products remote control,it can control the direction and speed.</string>
-    <string name="user_guide_blue">Transmission signal with  bluetooth connection.</string>
+    <string name="user_guide_remind">Pet products remote control,\nit can control the direction \nand speed.</string>
+    <string name="user_guide_blue">Transmission signal with  \nbluetooth connection.</string>
     <string name="back">Back</string>
     <string name="next">Next</string>
     <string name="user_guide_5">From the home page you \nwant to start control make the \ncat toy.Simply click the \"play\"  \nbutton icon.</string>
