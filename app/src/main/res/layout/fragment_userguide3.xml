@@ -34,7 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/layout_size_10"
+                android:layout_marginTop="@dimen/default_margin"
                 android:background="@drawable/user_guide6" />
 
             <TextView
@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/default_margin"
                 android:layout_marginRight="@dimen/default_margin"
-                android:layout_marginTop="@dimen/layout_size_5"
+                android:layout_marginTop="@dimen/layout_size_80"
                 android:text="@string/user_guide_6"
                 android:textColor="@color/white"
                 android:textSize="@dimen/text_size_20" />

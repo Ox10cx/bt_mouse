@@ -31,6 +31,7 @@
             android:orientation="vertical">
 
             <ImageView
+                android:layout_marginTop="@dimen/default_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -41,6 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/default_margin"
                 android:layout_marginRight="@dimen/default_margin"
+                android:layout_marginTop="@dimen/default_margin"
                 android:text="@string/user_guide_remind"
                 android:textColor="@color/white"
                 android:textSize="@dimen/text_size_20" />
@@ -49,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/layout_size_5"
+                android:layout_marginTop="@dimen/default_margin"
                 android:background="@drawable/con_bluetooth" />
 
             <TextView
@@ -57,6 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/default_margin"
                 android:layout_marginRight="@dimen/default_margin"
+                android:layout_marginTop="@dimen/default_margin"
                 android:text="@string/user_guide_blue"
                 android:textColor="@color/white"
                 android:textSize="@dimen/text_size_20" />

@@ -319,10 +319,9 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 
     @Override
     public void onClick(View v) {
-//        Intent intent = null;
         switch (v.getId()) {
             case R.id.bt_match:
-//                //没用
+                //没用
                 Intent intent = new Intent(ConnectCatActivity.this, PlayActivity.class);
                 intent.putExtra("device", device);
                 startActivity(intent);
@@ -345,7 +344,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 //                    showShortToast(getResources().getString(R.string.match_device_fail));
 //                }
 //                isClickMatch = true;
-                break;
+//                break;
             default:
                 break;
         }

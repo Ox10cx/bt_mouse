@@ -32,7 +32,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_size_10"
+                android:layout_marginTop="@dimen/default_margin"
                 android:layout_gravity="center_horizontal"
                 android:background="@drawable/home_page"/>
 
@@ -40,7 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="0dp"
-                android:layout_marginTop="@dimen/layout_size_5"
+                android:layout_marginTop="@dimen/layout_size_80"
                 android:layout_marginLeft="@dimen/default_margin"
                 android:layout_marginRight="@dimen/default_margin"
                 android:text="@string/user_guide_5"

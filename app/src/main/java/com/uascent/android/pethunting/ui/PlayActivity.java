@@ -122,8 +122,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         Lg.i(TAG, "sendMouseCmd:" + cmd);
 //        return;
         //有用
-//        controlMouseDir(addr, cmd);
-//        getMouseRsp(addr);
+        controlMouseDir(addr, cmd);
+        getMouseRsp(addr);
     }
 
 
@@ -295,14 +295,14 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 Lg.i(TAG, "event.getAction()---ACTION_DOWN--" + v.getId() + "   " + dirValue);
-//                sendMouseCmd(device.getAddress(), dirValue);
+                sendMouseCmd(device.getAddress(), dirValue);
                 break;
             case MotionEvent.ACTION_MOVE:
                 break;
             case MotionEvent.ACTION_UP:
                 dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
                 Lg.i(TAG, "event.getAction()---ACTION_UP--" + v.getId() + "   " + dirValue);
-//                sendMouseCmd(device.getAddress(), dirValue);
+                sendMouseCmd(device.getAddress(), dirValue);
                 break;
         }
         return false;

@@ -42,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_centerHorizontal="true"
-                android:layout_marginBottom="@dimen/default_margin"
+                android:layout_marginBottom="@dimen/layout_size_20"
                 android:layout_marginTop="@dimen/default_margin"
                 android:focusable="true"
                 android:max="100"
@@ -109,61 +109,67 @@
         <!--android:background="@color/white"-->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/layout_size_20"
             android:layout_marginRight="@dimen/layout_size_20"
-            android:layout_marginTop="@dimen/layout_size_5"
             android:layout_weight="1">
 
-            <!--
-                        android:text="@string/stop"
-            -->
+
             <TextView
                 android:id="@+id/tv_empty"
-                android:layout_width="@dimen/layout_size_100"
-                android:layout_height="@dimen/layout_size_100"
-                android:layout_centerInParent="true"
-                android:gravity="center" />
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_centerInParent="true" />
 
             <ImageView
                 android:id="@+id/iv_top_dir"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/layout_size_dir_witch"
+                android:layout_height="@dimen/layout_size_dir_heigth"
                 android:layout_above="@+id/tv_empty"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/top_dir_selector" />
+                android:layout_marginBottom="@dimen/layout_size_dir_rad"
+                android:background="@drawable/top_dir_selector"
+                android:scaleType="centerCrop" />
 
             <ImageView
                 android:id="@+id/iv_below_dir"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/layout_size_dir_witch"
+                android:layout_height="@dimen/layout_size_dir_heigth"
                 android:layout_below="@+id/tv_empty"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/below_dir_selector" />
+                android:layout_marginTop="@dimen/layout_size_dir_rad"
+                android:background="@drawable/below_dir_selector"
+                android:scaleType="centerCrop" />
 
             <ImageView
                 android:id="@+id/iv_left_dir"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/layout_size_dir_heigth"
+                android:layout_height="@dimen/layout_size_dir_witch"
                 android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/layout_size_dir_rad"
                 android:layout_toLeftOf="@+id/tv_empty"
-                android:background="@drawable/left_dir_selector" />
+                android:background="@drawable/left_dir_selector"
+                android:scaleType="centerCrop" />
 
             <ImageView
                 android:id="@+id/iv_right_dir"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/layout_size_dir_heigth"
+                android:layout_height="@dimen/layout_size_dir_witch"
                 android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/layout_size_dir_rad"
                 android:layout_toRightOf="@+id/tv_empty"
-                android:background="@drawable/right_dir_selector" />
+                android:background="@drawable/right_dir_selector"
+                android:scaleType="centerCrop" />
         </RelativeLayout>
 
 
+        <!--
+                android:layout_marginTop="@dimen/layout_size_10"
+        -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/layout_size_10"
-            android:layout_marginTop="@dimen/layout_size_10">
+            android:layout_marginBottom="@dimen/default_margin">
 
             <ImageView
                 android:id="@+id/iv_play_guide"
