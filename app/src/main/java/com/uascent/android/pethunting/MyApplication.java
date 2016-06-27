@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.graphics.Typeface;
 
-import com.uascent.android.pethunting.tools.AppCrashHandler;
 import com.uascent.android.pethunting.tools.Lg;
 
 import java.lang.reflect.Field;
@@ -26,8 +25,8 @@ public class MyApplication extends Application {
         //设置字体样式
         setTypeface();
         //异常重启
-        AppCrashHandler ch = AppCrashHandler.getInstance();
-        ch.init(getApplicationContext());
+//        AppCrashHandler ch = AppCrashHandler.getInstance();
+//        ch.init(getApplicationContext());
     }
 
     public static MyApplication getInstance() {

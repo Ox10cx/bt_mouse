@@ -91,6 +91,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
                 break;
+
 //            case R.id.tv_empty:
 //                dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
 //                sendMouseCmd(device.getAddress(), dirValue);
@@ -121,9 +122,11 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     void sendMouseCmd(String addr, int cmd) {
         Lg.i(TAG, "sendMouseCmd:" + cmd);
 //        return;
+
         //有用
-        controlMouseDir(addr, cmd);
-        getMouseRsp(addr);
+//        controlMouseDir(addr, cmd);
+//        getMouseRsp(addr);
+
     }
 
 
@@ -280,6 +283,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     public boolean onTouch(View v, MotionEvent event) {
         switch (v.getId()) {
             case R.id.iv_top_dir:
+                Lg.i(TAG, "onTouch_iv_top_dir");
                 dirValue = BluetoothAntiLostDevice.MOUSE_UP;
                 break;
             case R.id.iv_below_dir:
@@ -295,22 +299,17 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 Lg.i(TAG, "event.getAction()---ACTION_DOWN--" + v.getId() + "   " + dirValue);
-                sendMouseCmd(device.getAddress(), dirValue);
+//                sendMouseCmd(device.getAddress(), dirValue);
                 break;
             case MotionEvent.ACTION_MOVE:
                 break;
             case MotionEvent.ACTION_UP:
                 dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
                 Lg.i(TAG, "event.getAction()---ACTION_UP--" + v.getId() + "   " + dirValue);
-                sendMouseCmd(device.getAddress(), dirValue);
+//                sendMouseCmd(device.getAddress(), dirValue);
                 break;
         }
         return false;
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        Lg.i(TAG, "onTouchEvent");
-        return super.onTouchEvent(event);
-    }
 }

@@ -151,11 +151,9 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                     mScanningStopped = true;
                     if (mListData == null || mListData.size() == 0) {
                         showShortToast(getResources().getString(R.string.search_device_empty));
-//                        lv_device.setVisibility(View.GONE);
                         iv_load_null.setVisibility(View.VISIBLE);
                         Lg.i(TAG, "mListData的大小为0");
                     } else {
-//                        showShortToast(getResources().getString(R.string.search_device_over));
                     }
 
                 }

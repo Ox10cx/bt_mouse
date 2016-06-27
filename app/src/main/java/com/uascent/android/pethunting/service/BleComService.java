@@ -60,12 +60,10 @@ public class BleComService extends Service {
     public void onDestroy() {
         mCallbacks.kill();
         super.onDestroy();
-        Lg.i(TAG, "onDestroy");
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Lg.i(TAG, "onUnbind");
         return super.onUnbind(intent);
     }
 
