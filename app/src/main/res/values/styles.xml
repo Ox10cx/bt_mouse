@@ -1,22 +1,17 @@
 <resources>
-
-    <!--&lt;!&ndash; Base application theme. &ndash;&gt;-->
-    <!--<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
-    <!--&lt;!&ndash; Customize your theme here. &ndash;&gt;-->
-    <!--<item name="colorPrimary">@color/colorPrimary</item>-->
-    <!--<item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
-    <!--<item name="colorAccent">@color/colorAccent</item>-->
-    <!--</style>-->
-
+    <!--应用主题-->
     <style name="MyAppTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:typeface">serif</item>
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
-    <style name="FirstTheme" parent="@android:style/Theme.Black.NoTitleBar.Fullscreen">
-        <item name="android:typeface">serif</item>
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-    </style>
+    <!--<style name="FirstTheme" parent="@android:style/Theme.Light.NoTitleBar">-->
+        <!--<item name="android:typeface">serif</item>-->
+        <!--&lt;!&ndash;<item name="android:windowIsTranslucent">true</item>&ndash;&gt;-->
+        <!--&lt;!&ndash; All customizations that are NOT specific to a particular API-level can go here. &ndash;&gt;-->
+    <!--</style>-->
+
+
     <!--自定义提示对话框-->
     <style name="CustomProgressDialog" parent="@style/CustomDialog">
         <item name="android:windowBackground">@drawable/comm_dialog_bg_shape</item>
@@ -41,12 +36,11 @@
     </style>
 
 
+    <!--文本样式主题-->
     <style name="text_style">
         <item name="android:gravity">center</item>
         <item name="android:textSize">@dimen/text_size_20</item>
         <item name="android:textColor">@color/colorPrimary</item>
-
-
     </style>
 
 
