@@ -124,8 +124,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 //        return;
 
         //有用
-//        controlMouseDir(addr, cmd);
-//        getMouseRsp(addr);
+        controlMouseDir(addr, cmd);
+        getMouseRsp(addr);
 
     }
 
@@ -253,15 +253,15 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         MyApplication.getInstance().isAutoBreak = true;
         if (mConnection != null) {
             try {
-//                if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
-//                    controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
-//                }
+                if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
+                    controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
+                }
                 Log.i(TAG, "onDestroy->>unregisterCallback");
                 mService.unregisterCallback(mCallback);
                 if (device != null) {
+                    Lg.i(TAG, "disconnect_device_address = " + device.getAddress());
                     mService.disconnect(device.getAddress());
                     device = null;
-                    Lg.i(TAG, "disconnect_device_address = " + device.getAddress());
                 }
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -299,14 +299,14 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 Lg.i(TAG, "event.getAction()---ACTION_DOWN--" + v.getId() + "   " + dirValue);
-//                sendMouseCmd(device.getAddress(), dirValue);
+                sendMouseCmd(device.getAddress(), dirValue);
                 break;
             case MotionEvent.ACTION_MOVE:
                 break;
             case MotionEvent.ACTION_UP:
                 dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
                 Lg.i(TAG, "event.getAction()---ACTION_UP--" + v.getId() + "   " + dirValue);
-//                sendMouseCmd(device.getAddress(), dirValue);
+                sendMouseCmd(device.getAddress(), dirValue);
                 break;
         }
         return false;
