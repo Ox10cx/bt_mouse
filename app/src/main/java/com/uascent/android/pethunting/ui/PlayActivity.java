@@ -261,12 +261,14 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     @Override
     protected void onPause() {
         super.onPause();
+
         if (mConnection != null) {
             if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
                 controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
                 Lg.i(TAG, "onPause" + "direct exit");
             }
         }
+
     }
 
     @Override
@@ -278,6 +280,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                     controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
                 }
                 Log.i(TAG, "onDestroy->>unregisterCallback");
+
                 mService.unregisterCallback(mCallback);
                 if (device != null) {
                     Lg.i(TAG, "disconnect_device_address = " + device.getAddress());
@@ -325,8 +328,10 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 Lg.i("time123", "sendtime->>>>" + System.currentTimeMillis());
                 sendMouseCmd(device.getAddress(), dirValue);
                 break;
+
             case MotionEvent.ACTION_MOVE:
                 break;
+
             case MotionEvent.ACTION_UP:
                 dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
                 Lg.i(TAG, "event.getAction()---ACTION_UP--" + v.getId() + "   " + dirValue);
