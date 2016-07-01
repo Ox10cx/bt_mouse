@@ -1,25 +1,33 @@
 <resources>
     <string name="app_name">Pets Hunting</string>
+    <string name="app_versionName" translatable="false">1.5.1</string>
     <string name="set_up">Setup</string>
     <string name="user_guide">User Guide</string>
     <string name="play">Play</string>
     <string name="set_up_title">Setup:Device optimization</string>
     <string name="menu">Menu</string>
-    <string name="setup_steps">Follow these \n 4 steps to start \n your toy:</string>
-    <string name="setup_step_1">1 Switch the dongle on back of the toy to ON.</string>
-    <string name="setup_step_2">2 Turn on Bluetooth</string>
-    <string name="setup_step_3">3 Start the app on your phone</string>
-    <string name="user_guide_remind">Pet products remote control,it can control the direction and speed.</string>
-    <string name="user_guide_blue">Transmission signal with bluetooth connection.</string>
+    <string name="setup_1">Follow these</string>
+    <string name="setup_2">3 steps to start</string>
+    <string name="setup_3">your toy:</string>
+    <string name="setup_one">1 </string>
+    <string name="setup_two">2 </string>
+    <string name="setup_three">3 </string>
+
+    <string name="setup_step_1">Switch the dongle on \nback of the toy to ON.</string>
+    <string name="setup_step_2">Turn on Bluetooth</string>
+    <string name="setup_step_3">Start the app \non your phone</string>
+    <string name="user_guide_remind">Pet products remote control,\nit can control the direction \nand speed.</string>
+    <string name="user_guide_blue">Transmission signal with  \nbluetooth connection.</string>
     <string name="back">Back</string>
     <string name="next">Next</string>
-    <string name="user_guide_5">From the home page you want to start control make the cat toy.Simply click the \"play\" button icon.</string>
-    <string name="user_guide_6">The remote control is horizontal screen. Manual rotation mobile phonesis avaiable in this app.</string>
-    <string name="user_guide_7">The Anione Mouse User Guide is always available by clicking the \"User Guide\" icon button on the bottom of page. \n \nThis will take you to the User Guide menu and get help.</string>
-    <string name="user_guide_8">Congratulations!! You now know how to use the App for use with the product Hava fun!</string>
+    <string name="user_guide_5">From the home page you \nwant to start control make the \ncat toy.Simply click the \"play\"  \nbutton icon.</string>
+    <string name="user_guide_6">The remote control is \nhorizontal screen. \nManual rotation mobile \nphones is avaiable in this app.</string>
+    <string name="user_guide_7">The Anione Mouse User Guide \nis always available by clicking \nthe \"User Guide\" icon \nbutton on the bottom of page. \nThis will take you to the User \nGuide menu and get help.</string>
+    <string name="user_guide_8">Congratulations!! You now \nknow how to use the App \nfor use with the product \nHava fun!</string>
     <string name="speed">SPEED</string>
     <string name="direction">DIRECTION</string>
-    <string name="sb_per">0%</string>
+    <string name="sb_max">100</string>
+    <string name="sb_min">0</string>
     <string name="play_title">Play:Remote Control</string>
     <string name="bluetooth_switch_has_opened">蓝牙已打开</string>
     <string name="bluetooth_switch_not_opened">蓝牙未打开</string>
@@ -52,5 +60,10 @@
     <string name="crash_reminder">抱歉,程序异常,即将重启</string>
     <string name="stop">Stop</string>
     <string name="str_location">access my location</string>
+    <string name="device_service_not_match">您选择设备的服务与本服务不匹配</string>
+    <string name="bluetooth_has_breaked">手机与设备之间的蓝牙已断开</string>
+    <string name="bluetooth_service_break_restart">蓝牙服务已经断开,请您再次进入该界面</string>
+    <string name="moible_not_support_bluetooth4">该手机设备不支持蓝牙4.0</string>
+
 
 </resources>

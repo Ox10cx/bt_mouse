@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vpMain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/transparent"
+        android:flipInterval="30" />
+
+
+    <!--viewPager 的显示效果-->
+    <!--<RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/layout_size_60">
+
+        <Button
+            android:id="@+id/btnStart"
+            android:layout_width="@dimen/layout_size_100"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@drawable/title_button_shape"
+            android:text="@string/play"
+            android:visibility="gone"
+            android:textSize="20sp" />
+        />
+    </RelativeLayout>-->
+
+    <!-- <LinearLayout
+         android:id="@+id/llIndicator"
+         android:layout_width="@dimen/layout_size_100"
+         android:layout_height="wrap_content"
+         android:layout_alignParentBottom="true"
+         android:layout_centerHorizontal="true"
+         android:layout_marginBottom="@dimen/layout_size_30">
+
+         <ImageView
+             android:id="@+id/ivIndicatorFirst"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_weight="1.0"
+             android:src="@drawable/page_indicator_focused" />
+
+         <ImageView
+             android:id="@+id/ivIndicatorSecond"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_weight="1.0"
+             android:src="@drawable/page_indicator" />
+
+         <ImageView
+             android:id="@+id/ivIndicatorThird"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_weight="1.0"
+             android:src="@drawable/page_indicator" />
+
+         <ImageView
+             android:id="@+id/ivIndicatorFouth"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_weight="1.0"
+             android:src="@drawable/page_indicator" />
+
+         <ImageView
+             android:id="@+id/ivIndicatorFiveth"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_weight="1.0"
+             android:src="@drawable/page_indicator" />
+     </LinearLayout>
+ -->
+
+</RelativeLayout>

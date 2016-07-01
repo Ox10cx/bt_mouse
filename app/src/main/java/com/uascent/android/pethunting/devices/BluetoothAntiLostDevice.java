@@ -13,7 +13,7 @@ import java.util.UUID;
  * Created by Administrator on 16-3-9.
  */
 public class BluetoothAntiLostDevice extends BluetoothLeClass {
-    private static final String TAG = "BluetoothAntiLostDevice";
+    private static final String TAG = "BluetoothAntiLostDevice123";
     public static final UUID POWER_SERVICE_UUID = UUID.fromString("00001804-0000-1000-8000-00805f9b34fb");
     public static final UUID POWER_FUNC_UUID = UUID.fromString("00002a07-0000-1000-8000-00805f9b34fb");
 
@@ -38,6 +38,7 @@ public class BluetoothAntiLostDevice extends BluetoothLeClass {
     public static final int MOUSE_DOWN = 2;
     public static final int MOUSE_LEFT = 3;
     public static final int MOUSE_RIGHT = 4;
+    public static final byte SPEED_ID = 5;
 
 
     public BluetoothAntiLostDevice(Context c) {
@@ -157,12 +158,35 @@ public class BluetoothAntiLostDevice extends BluetoothLeClass {
 
         BluetoothGattCharacteristic characteristic = mBluetoothGatt.getService(MOUSE_SERVICE_UUID).getCharacteristic(MOUSE_WRITE_FUNC_UUID);
         if (characteristic != null) {
-            characteristic.setValue( new byte[]{ (byte)direction });
+            characteristic.setValue(new byte[]{(byte) direction});
             //往蓝牙模块写入数据
+            Lg.i(TAG, "value:" + direction);
             writeCharacteristic(characteristic);
         }
 
-        return  true;
+        return true;
+    }
+
+    public boolean mouseControlSpeed(int speed, int direction) {
+        Lg.e(TAG, "mouseControlSpeed");
+        if (!checkBleStatus()) {
+            return false;
+        }
+
+        BluetoothGattService service = mBluetoothGatt.getService(MOUSE_SERVICE_UUID);
+        if (service == null) {
+            return false;
+        }
+
+        BluetoothGattCharacteristic characteristic = mBluetoothGatt.getService(MOUSE_SERVICE_UUID).getCharacteristic(MOUSE_WRITE_FUNC_UUID);
+        if (characteristic != null) {
+            characteristic.setValue(new byte[]{SPEED_ID, (byte) speed, (byte) direction});
+            //往蓝牙模块写入数据
+            Lg.i(TAG, "speed:" + speed + "  " + "value:" + direction);
+            writeCharacteristic(characteristic);
+        }
+
+        return true;
     }
 
     public void setImmediateAlert(int val) {

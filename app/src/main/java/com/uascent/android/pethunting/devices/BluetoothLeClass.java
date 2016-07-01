@@ -28,6 +28,8 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.util.Log;
 
+import com.uascent.android.pethunting.tools.Lg;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -54,6 +56,7 @@ public class BluetoothLeClass {
     protected int mBleStatus = BLE_STATE_INIT;
 
     protected static final UUID CHARACTERISTIC_UPDATE_NOTIFICATION_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
+    private long currentTime = 0;
 
     public interface OnConnectListener {
         public void onConnect(BluetoothGatt gatt);
@@ -227,9 +230,14 @@ public class BluetoothLeClass {
         }
         // We want to directly connect to the device, so we are setting the autoConnect
         // parameter to false.
-        mBluetoothGatt = device.connectGatt(mContext, false, mGattCallback);
-        Log.d(TAG, "Trying to create a new connection.");
-        mBluetoothDeviceAddress = address;
+        try {
+            mBluetoothGatt = device.connectGatt(mContext, false, mGattCallback);
+            Log.d(TAG, "Trying to create a new connection.");
+            mBluetoothDeviceAddress = address;
+        } catch (Exception e) {
+            Log.d(TAG, "device.connectGatt fail");
+            return false;
+        }
         return true;
     }
 
@@ -283,7 +291,7 @@ public class BluetoothLeClass {
      * Enables or disables notification on a give characteristic.
      */
     public boolean setCharacteristicNotification(UUID serviceUuid, UUID characteristicUuid,
-                                              boolean enabled) {
+                                                 boolean enabled) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
             return false;
@@ -308,7 +316,34 @@ public class BluetoothLeClass {
     }
 
     public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
-        mBluetoothGatt.writeCharacteristic(characteristic);
+//        long timeStamp = System.currentTimeMillis() - currentTime;
+//        Lg.i(TAG, "threadName:---->" + Thread.currentThread().getName());
+//        if (timeStamp < 1000) {
+//            try {
+////                Thread.sleep(1000 - timeStamp);
+//                Thread.sleep(450);
+//                Lg.i(TAG, "Thread.sleep(1000)");
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+
+        int count = 0;
+        while (true) {
+            Lg.i("time123", "sendrec_time->>>>" + System.currentTimeMillis());
+            boolean var = mBluetoothGatt.writeCharacteristic(characteristic);
+            Lg.e("time123", "sendrec_time_end->>>>" + var);
+            if (var == true) {
+                break;
+            }
+            count++;
+            if (count > 5) {
+                break;
+            }
+
+            Lg.i("time123", "sendrec_time_end->>>>" + System.currentTimeMillis());
+            currentTime = System.currentTimeMillis();
+        }
     }
 
     /**

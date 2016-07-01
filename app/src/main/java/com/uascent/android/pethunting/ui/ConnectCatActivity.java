@@ -11,12 +11,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.uascent.android.pethunting.MyApplication;
 import com.uascent.android.pethunting.R;
 import com.uascent.android.pethunting.adapter.DeviceListAdapter;
 import com.uascent.android.pethunting.model.BtDevice;
@@ -37,7 +41,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     boolean mScanningStopped;
     private ImageView iv_load_null;
     private Button bt_match;
-    private ListView lv_device;
+    private PullToRefreshListView lv_device;
     private DeviceListAdapter adpater;
 
     private int index_checked = 0;
@@ -50,6 +54,16 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
      */
     private boolean isConnecting = false;
 
+    /**
+     * 正在刷新
+     */
+    private boolean isRefresh = false;
+
+    //没有触发检查服务
+    private boolean isClickMatch = false;
+    private boolean isCheckServicee = false;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_connect_cat);
@@ -58,23 +72,35 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         mHandler = new Handler();
         showLoadingDialog();
         BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        if (mBluetoothManager == null) {
-            Lg.i(TAG, "Unable to initialize BluetoothManager.");
-            return;
+        if (mBluetoothManager != null) {
+            mBluetoothAdapter = mBluetoothManager.getAdapter();
+        } else {
+            showShortToast(getString(R.string.moible_not_support_bluetooth4));
         }
-        mBluetoothAdapter = mBluetoothManager.getAdapter();
-
         Intent i = new Intent(this, BleComService.class);
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
-        Lg.i(TAG, "onCreate()");
     }
 
     private void initViews() {
         bt_match = (Button) findViewById(R.id.bt_match);
         bt_match.setOnClickListener(this);
         iv_load_null = (ImageView) findViewById(R.id.iv_load_null);
-        lv_device = (ListView) findViewById(R.id.lv_device);
+        lv_device = (PullToRefreshListView) findViewById(R.id.lv_device);
         lv_device.setOnItemClickListener(this);
+        lv_device.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<ListView>() {
+            @Override
+            public void onRefresh(PullToRefreshBase<ListView> refreshView) {
+                String label = DateUtils.formatDateTime(getApplicationContext(), System.currentTimeMillis(),
+                        DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
+                Lg.i(TAG, "onRefresh>>>>" + label);
+
+                // Update the LastUpdatedLabel
+                refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+
+                // Do work to refresh the list here.
+                doRefreshWork();
+            }
+        });
         adpater = new DeviceListAdapter(this, mListData);
         lv_device.setAdapter(adpater);
     }
@@ -113,13 +139,6 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 
 
     private void scanLeDevice(final boolean enable) {
-//        BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-//        if (mBluetoothManager == null) {
-//            Lg.i(TAG, "Unable to initialize BluetoothManager.");
-//            return;
-//        }
-//        final BluetoothAdapter mBluetoothAdapter = mBluetoothManager.getAdapter();
-
         if (enable) {
             //搜索10s,10s后停止搜索
             mHandler.postDelayed(new Runnable() {
@@ -127,20 +146,24 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                 public void run() {
                     closeLoadingDialog();
                     Lg.i(TAG, "stop scanning after 10s");
+                    refreshOk();
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
                     mScanningStopped = true;
                     if (mListData == null || mListData.size() == 0) {
                         showShortToast(getResources().getString(R.string.search_device_empty));
-                        lv_device.setVisibility(View.GONE);
                         iv_load_null.setVisibility(View.VISIBLE);
                         Lg.i(TAG, "mListData的大小为0");
                     } else {
-                        showShortToast(getResources().getString(R.string.search_device_over));
                     }
 
                 }
             }, 10 * 1000);
+
             mBluetoothAdapter.startLeScan(mLeScanCallback);
+//            mBluetoothAdapter.startLeScan(new UUID[]{BluetoothAntiLostDevice.MOUSE_SERVICE_UUID,
+//                    BluetoothAntiLostDevice.ALERT_SERVICE_UUID,BluetoothAntiLostDevice.LOSS_SERVICE_UUID,
+//                    BluetoothAntiLostDevice.POWER_SERVICE_UUID,BluetoothAntiLostDevice.KEY_SERVICE_UUID}, mLeScanCallback);
+//            mBluetoothAdapter.startLeScan(new UUID[]{BluetoothAntiLostDevice.KEY_SERVICE_UUID}, mLeScanCallback);
             mScanningStopped = false;
         } else {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
@@ -148,11 +171,18 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         }
     }
 
+    private void refreshOk() {
+        if (isRefresh) {
+            lv_device.onRefreshComplete();
+            isRefresh = false;
+        }
+    }
+
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
                 @Override
                 public void onLeScan(final BluetoothDevice device, final int rssi, byte[] scanRecord) {
-                    closeLoadingDialog();
+//                    closeLoadingDialog();
                     addDevice(device.getAddress(), device.getName(), rssi);
                 }
             };
@@ -162,21 +192,24 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         public void onConnect(String address) throws RemoteException {
             Lg.i(TAG, "onConnect calll");
             isConnecting = true;
-//            closeLoadingDialog();
-//            if (isConnecting) {
-//                //判断服务
-//                Intent intent = new Intent(ConnectCatActivity.this, PlayActivity.class);
-//                intent.putExtra("device", device);
-//                startActivity(intent);
-//                isConnecting = false;
-//            }
+            isCheckServicee = false;
         }
 
         @Override
         public void onDisconnect(String address) throws RemoteException {
             Lg.i(TAG, "onDisconnect called");
-            closeLoadingDialog();
-            isConnecting = false;
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    closeLoadingDialog();
+                    isConnecting = false;
+                    if (isCheckServicee == false && isClickMatch == true) {
+                        showShortToast(getString(R.string.device_service_not_match));
+                        isClickMatch = false;
+                    }
+                }
+            });
+
         }
 
         @Override
@@ -217,6 +250,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 
         @Override
         public void onMouseServiceDiscovery(final String address, final boolean support) throws RemoteException {
+            isCheckServicee = true;
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -233,6 +267,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                     } else {
                         Lg.i(TAG, "onAlertServiceDiscovery_not_support");
                         closeLoadingDialog();
+                        showShortToast(getString(R.string.device_service_not_match));
                         try {
                             mService.disconnect(address);
                         } catch (RemoteException e) {
@@ -263,6 +298,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                     device.setChecked(true);
                 }
                 mListData.add(device);
+                iv_load_null.setVisibility(View.GONE);
                 count_device = count_device + 1;
                 Lg.i(TAG, "add_device_ok");
                 adpater.notifyDataSetChanged();
@@ -273,35 +309,39 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         mListData.get(index_checked).setChecked(false);
-        mListData.get(position).setChecked(true);
-        index_checked = position;
+        Lg.i(TAG, "position-1=:" + (position - 1));
+        mListData.get(position - 1).setChecked(true);
+        index_checked = position - 1;
         adpater.notifyDataSetChanged();
     }
 
     @Override
     public void onClick(View v) {
-//        Intent intent = null;
         switch (v.getId()) {
             case R.id.bt_match:
+                //没用
+//                Intent intent = new Intent(ConnectCatActivity.this, PlayActivity.class);
+//                intent.putExtra("device", device);
+//                startActivity(intent);
+
+                //有用
                 if (mListData == null || mListData.size() == 0) {
                     showShortToast(getResources().getString(R.string.device_is_empty_not_match));
                     return;
                 }
                 if (connectBLE(index_checked)) {
-                    //有用
-                    showLoadingDialog(getString(R.string.connecting_device));
-                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
-
-                    // 没用
-//                    isConnecting = true;
-//                    showShortToast(getResources().getString(R.string.match_device_ok));
-
-//                    Intent intent = new Intent(this, PlayActivity.class);
-//                    intent.putExtra("device", device);
-//                    startActivity(intent);
+                    if (mBluetoothAdapter.isEnabled()) {
+                        refreshOk();
+                        //有用
+                        showLoadingDialog(getString(R.string.connecting_device));
+                        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                    } else {
+                        showShortToast(getString(R.string.bluetooth_switch_not_opened));
+                    }
                 } else {
                     showShortToast(getResources().getString(R.string.match_device_fail));
                 }
+                isClickMatch = true;
                 break;
             default:
                 break;
@@ -312,20 +352,29 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     public boolean connectBLE(int index) {
         boolean ret = false;
         device = mListData.get(index);
-        int status = device.getStatus();
-        Lg.i(TAG, "device_status = " + status);
-        Lg.i(TAG, "device_address = " + device.getAddress());
-        try {
-            ret = mService.connect(device.getAddress());
-        } catch (RemoteException e) {
-            e.printStackTrace();
-            return ret;
+//        int status = device.getStatus();
+//        Lg.i(TAG, "device_status = " + status);
+        if (device != null && device.getAddress() != null) {
+            Lg.i(TAG, "device_address = " + device.getAddress());
+            try {
+                ret = mService.connect(device.getAddress());
+            } catch (RemoteException e) {
+                e.printStackTrace();
+                return ret;
+            }
         }
         return ret;
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+    }
+
+    @Override
     protected void onDestroy() {
+        MyApplication.getInstance().isAutoBreak = true;
         if (mConnection != null) {
             try {
                 if (device != null) {
@@ -340,4 +389,17 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         unbindService(mConnection);
         super.onDestroy();
     }
+
+    public void doRefreshWork() {
+        if (mService != null) {
+            index_checked = 0;
+            count_device = 0;
+            mListData.clear();
+            isRefresh = true;
+            scanLeDevice(true);
+        } else {
+            showShortToast(getString(R.string.bluetooth_service_break_restart));
+        }
+    }
+
 }

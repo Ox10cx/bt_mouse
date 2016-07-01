@@ -26,8 +26,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:background="@drawable/micsmall_button_shape"
             android:layout_marginRight="@dimen/layout_size_10"
+            android:background="@drawable/micsmall_button_shape"
             android:gravity="center"
             android:text="@string/match"
             android:textSize="@dimen/text_size_15"></Button>
@@ -40,18 +40,14 @@
         android:layout_marginTop="@dimen/layout_size_5"
         android:background="@color/white">
 
-        <!--            android:cacheColorHint="@color/list_cacheColor"
-        android:divider="@drawable/listview_divider_shape"
-         android:listSelector="@drawable/listview_item_bg"
-        -->
 
-        <ListView
+        <com.handmark.pulltorefresh.library.PullToRefreshListView
             android:id="@+id/lv_device"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:cacheColorHint="@android:color/transparent"
             android:divider="@drawable/listview_divider_shape"
-            android:scrollbars="none"></ListView>
+            android:scrollbars="none"></com.handmark.pulltorefresh.library.PullToRefreshListView>
 
 
         <ImageView

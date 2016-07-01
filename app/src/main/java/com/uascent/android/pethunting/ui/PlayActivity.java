@@ -5,14 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.uascent.android.pethunting.MyApplication;
 import com.uascent.android.pethunting.R;
 import com.uascent.android.pethunting.devices.BluetoothAntiLostDevice;
 import com.uascent.android.pethunting.model.BtDevice;
@@ -21,20 +24,16 @@ import com.uascent.android.pethunting.service.BleComService;
 import com.uascent.android.pethunting.tools.Lg;
 
 public class PlayActivity extends BaseActivity implements View.OnClickListener,
-        SeekBar.OnSeekBarChangeListener, VerticalSeekBar.OnSeekBarStopListener {
+        SeekBar.OnSeekBarChangeListener, VerticalSeekBar.OnSeekBarStopListener
+        , View.OnTouchListener {
     private static final String TAG = "PlayActivity";
     private VerticalSeekBar ver_sb;
     private TextView ver_sb_per, tv_empty;
     private ImageView iv_play_guide, iv_play_home;
     private ImageView iv_top_dir, iv_below_dir, iv_left_dir, iv_right_dir;
     private IService mService;
-    //    private Handler mHandler;
+    private Handler mHandler;
     private BtDevice device;
-    //    private static final int STOPCMD = 0;
-//    private static final int TOPCMD = 1;
-//    private static final int BOMCMD = 2;
-//    private static final int LEFTCMD = 3;
-//    private static final int RIGHTCMD = 4;
     private static int speedValue = 0;
     private static int dirValue = 0;
 
@@ -44,6 +43,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         setContentView(R.layout.activity_play);
         super.onCreate(savedInstanceState);
         initViews();
+        mHandler = new Handler();
         device = (BtDevice) getIntent().getSerializableExtra("device");
         Intent i = new Intent(this, BleComService.class);
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
@@ -52,7 +52,6 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     private void initViews() {
         ver_sb_per = (TextView) findViewById(R.id.ver_sb_per);
         ver_sb = (VerticalSeekBar) findViewById(R.id.ver_sb);
-//        new VerticalSeekBar(this).setSeekBarStopListener(this);
         VerticalSeekBar.setSeekBarStopListener(this);
         ver_sb.setOnSeekBarChangeListener(this);
         tv_empty = (TextView) findViewById(R.id.tv_empty);
@@ -61,71 +60,80 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         iv_play_guide.setOnClickListener(this);
         iv_play_home = (ImageView) findViewById(R.id.iv_play_home);
         iv_play_home.setOnClickListener(this);
+
         iv_top_dir = (ImageView) findViewById(R.id.iv_top_dir);
+        iv_top_dir.setOnTouchListener(this);
         iv_top_dir.setOnClickListener(this);
+
         iv_below_dir = (ImageView) findViewById(R.id.iv_below_dir);
         iv_below_dir.setOnClickListener(this);
+        iv_below_dir.setOnTouchListener(this);
+
         iv_left_dir = (ImageView) findViewById(R.id.iv_left_dir);
         iv_left_dir.setOnClickListener(this);
+        iv_left_dir.setOnTouchListener(this);
+
         iv_right_dir = (ImageView) findViewById(R.id.iv_right_dir);
         iv_right_dir.setOnClickListener(this);
+        iv_right_dir.setOnTouchListener(this);
     }
 
     @Override
     public void onClick(View v) {
+        Lg.i(TAG, "onClick" + v.getId());
         Intent intent = null;
         switch (v.getId()) {
             case R.id.iv_play_guide:
-                intent = new Intent(this, UserGuide4Activity.class);
+                intent = new Intent(this, UserGuideActivity.class);
                 startActivity(intent);
                 break;
-
             case R.id.iv_play_home:
                 intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
                 break;
-
-            case R.id.tv_empty:
-                dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
-                sendMouseCmd(device.getAddress(), dirValue);
-                break;
-
-            case R.id.iv_top_dir:
-                dirValue = BluetoothAntiLostDevice.MOUSE_UP;
-                sendMouseCmd(device.getAddress(), BluetoothAntiLostDevice.MOUSE_UP);
-                break;
-
-            case R.id.iv_below_dir:
-                dirValue = BluetoothAntiLostDevice.MOUSE_DOWN;
-                sendMouseCmd(device.getAddress(), dirValue);
-                break;
-
-            case R.id.iv_left_dir:
-                dirValue = BluetoothAntiLostDevice.MOUSE_LEFT;
-                sendMouseCmd(device.getAddress(), dirValue);
-                break;
-
-            case R.id.iv_right_dir:
-                dirValue = BluetoothAntiLostDevice.MOUSE_RIGHT;
-                sendMouseCmd(device.getAddress(), dirValue);
-                break;
-
             default:
                 break;
         }
     }
 
     void sendMouseCmd(String addr, int cmd) {
+        Lg.i(TAG, "sendMouseCmd:" + cmd);
+//        return;
+
+        //有用
         controlMouseDir(addr, cmd);
-        getMouseRsp(addr);
+       // getMouseRsp(addr);
+
+    }
+
+    /**
+     * 发送控制老鼠速度命令
+     *
+     * @param addr
+     * @param cmd
+     */
+    void sendMouseSpeedCmd(String addr, int value, int cmd) {
+        Lg.i(TAG, "sendMouseCmd:" + value + "  " + cmd);
+//        return;
+        //有用
+        controlMouseSpeed(addr, value, cmd);
+        //没有改变
+       // getMouseRsp(addr);
+
     }
 
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        ver_sb_per.setText(progress + "%");
-        speedValue = progress;
-        Lg.i(TAG, "onProgressChanged");
+//        ver_sb_per.setText(progress + "%");
+        if (speedValue != progress / 10) {
+            speedValue = progress / 10;
+            if (dirValue != 0) {
+                Lg.i("time123", "sendspeedtime->>>>" + System.currentTimeMillis());
+                sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+            }
+        }
+        Lg.i(TAG, "onProgressChanged:" + speedValue);
     }
 
     @Override
@@ -166,12 +174,20 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         @Override
         public void onDisconnect(String address) throws RemoteException {
             Lg.i(TAG, "onDisconnect called");
+            //蓝牙意外断开，考虑重连接
+            if (!MyApplication.getInstance().isAutoBreak && device != null) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        showShortToast(getString(R.string.bluetooth_has_breaked));
+                    }
+                });
+            }
         }
 
         @Override
         public boolean onRead(String address, byte[] val) throws RemoteException {
             Lg.i(TAG, "onRead called");
-
             return false;
         }
 
@@ -202,6 +218,12 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         }
     };
 
+    /**
+     * 控制方向
+     *
+     * @param addr
+     * @param dir
+     */
     public void controlMouseDir(String addr, int dir) {
         try {
             mService.controlMouse(addr, dir);
@@ -210,6 +232,22 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             e.printStackTrace();
         }
     }
+
+    /**
+     * 控制加速度
+     *
+     * @param addr
+     * @param dir
+     */
+    public void controlMouseSpeed(String addr, int value, int dir) {
+        try {
+            mService.controlMouseSpeed(addr, value, dir);
+            Lg.i(TAG, "controlMouseDir->>" + dir);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void getMouseRsp(String addr) {
         try {
@@ -224,11 +262,18 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     protected void onPause() {
         super.onPause();
 
+        if (mConnection != null) {
+            if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
+                controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
+                Lg.i(TAG, "onPause" + "direct exit");
+            }
+        }
 
     }
 
     @Override
     protected void onDestroy() {
+        MyApplication.getInstance().isAutoBreak = true;
         if (mConnection != null) {
             try {
                 if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
@@ -238,8 +283,9 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
                 mService.unregisterCallback(mCallback);
                 if (device != null) {
-                    mService.disconnect(device.getAddress());
                     Lg.i(TAG, "disconnect_device_address = " + device.getAddress());
+                    mService.disconnect(device.getAddress());
+                    device = null;
                 }
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -253,7 +299,47 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     @Override
     public void onSeekBarStop() {
         Lg.i(TAG, "onSeekBarStop_onStartTrackingTouch");
-//        turnOffImmediateAlert(device.getAddress(), speedValue);
+        ver_sb.setProgress(0);
+        if (dirValue != 0) {
+            sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+        }
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        switch (v.getId()) {
+            case R.id.iv_top_dir:
+                Lg.i(TAG, "onTouch_iv_top_dir");
+                dirValue = BluetoothAntiLostDevice.MOUSE_UP;
+                break;
+            case R.id.iv_below_dir:
+                dirValue = BluetoothAntiLostDevice.MOUSE_DOWN;
+                break;
+            case R.id.iv_left_dir:
+                dirValue = BluetoothAntiLostDevice.MOUSE_LEFT;
+                break;
+            case R.id.iv_right_dir:
+                dirValue = BluetoothAntiLostDevice.MOUSE_RIGHT;
+                break;
+        }
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                Lg.i(TAG, "event.getAction()---ACTION_DOWN--" + v.getId() + "   " + dirValue);
+                Lg.i("time123", "sendtime->>>>" + System.currentTimeMillis());
+                sendMouseCmd(device.getAddress(), dirValue);
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                break;
+
+            case MotionEvent.ACTION_UP:
+                dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
+                Lg.i(TAG, "event.getAction()---ACTION_UP--" + v.getId() + "   " + dirValue);
+                Lg.i("time123", "sendtime->>>>" + System.currentTimeMillis());
+                sendMouseCmd(device.getAddress(), dirValue);
+                break;
+        }
+        return false;
     }
 
 }
