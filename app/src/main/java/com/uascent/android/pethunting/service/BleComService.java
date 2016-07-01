@@ -121,6 +121,11 @@ public class BleComService extends Service {
         }
 
         @Override
+        public boolean controlMouseSpeed(String addr, int value, int index) throws RemoteException {
+            return bleControlMouseSpeed(addr, value, index);
+        }
+
+        @Override
         public boolean readMouseRsp(String addr) throws RemoteException {
             return bleReadRsp(addr);
         }
@@ -142,6 +147,18 @@ public class BleComService extends Service {
         if (device != null) {
             Lg.i(TAG, "device != null");
             return device.mouseControl(dir);
+        } else {
+            Lg.i(TAG, "the device is null?");
+
+            return false;
+        }
+    }
+
+    private boolean bleControlMouseSpeed(String addr, int value, int dir) {
+        BluetoothAntiLostDevice device = mActiveDevices.get(addr);
+        if (device != null) {
+            Lg.i(TAG, "device != null");
+            return device.mouseControlSpeed(value, dir);
         } else {
             Lg.i(TAG, "the device is null?");
 

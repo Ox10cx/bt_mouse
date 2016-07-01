@@ -17,5 +17,6 @@ interface IService {
     void setAntiLost(boolean enable);
 
     boolean controlMouse(String addr, int index);
+    boolean controlMouseSpeed(String addr,int value, int index);
     boolean readMouseRsp(String addr);
 }

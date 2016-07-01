@@ -91,31 +91,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
                 break;
-
-//            case R.id.tv_empty:
-//                dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
-//                sendMouseCmd(device.getAddress(), dirValue);
-//                break;
-
-//            case R.id.iv_top_dir:
-//                dirValue = BluetoothAntiLostDevice.MOUSE_UP;
-//                sendMouseCmd(device.getAddress(), dirValue);
-//                break;
-//
-//            case R.id.iv_below_dir:
-//                dirValue = BluetoothAntiLostDevice.MOUSE_DOWN;
-//                sendMouseCmd(device.getAddress(), dirValue);
-//                break;
-//
-//            case R.id.iv_left_dir:
-//                dirValue = BluetoothAntiLostDevice.MOUSE_LEFT;
-//                sendMouseCmd(device.getAddress(), dirValue);
-//                break;
-//
-//            case R.id.iv_right_dir:
-//                dirValue = BluetoothAntiLostDevice.MOUSE_RIGHT;
-//                sendMouseCmd(device.getAddress(), dirValue);
-//                break;
+            default:
+                break;
         }
     }
 
@@ -129,12 +106,31 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
     }
 
+    /**
+     * 发送控制老鼠速度命令
+     *
+     * @param addr
+     * @param cmd
+     */
+    void sendMouseSpeedCmd(String addr, int value, int cmd) {
+        Lg.i(TAG, "sendMouseCmd:" + value + "  " + cmd);
+//        return;
+        //有用
+        controlMouseSpeed(addr, value, cmd);
+        //没有改变
+        getMouseRsp(addr);
+
+    }
+
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 //        ver_sb_per.setText(progress + "%");
         speedValue = progress;
-        Lg.i(TAG, "onProgressChanged");
+        if (dirValue != 0) {
+            sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+        }
+        Lg.i(TAG, "onProgressChanged:" + speedValue);
     }
 
     @Override
@@ -219,6 +215,12 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         }
     };
 
+    /**
+     * 控制方向
+     *
+     * @param addr
+     * @param dir
+     */
     public void controlMouseDir(String addr, int dir) {
         try {
             mService.controlMouse(addr, dir);
@@ -227,6 +229,22 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             e.printStackTrace();
         }
     }
+
+    /**
+     * 控制加速度
+     *
+     * @param addr
+     * @param dir
+     */
+    public void controlMouseSpeed(String addr, int value, int dir) {
+        try {
+            mService.controlMouseSpeed(addr, value, dir);
+            Lg.i(TAG, "controlMouseDir->>" + dir);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void getMouseRsp(String addr) {
         try {
@@ -275,8 +293,10 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     @Override
     public void onSeekBarStop() {
         Lg.i(TAG, "onSeekBarStop_onStartTrackingTouch");
-//        turnOffImmediateAlert(device.getAddress(), speedValue);
         ver_sb.setProgress(0);
+        if (dirValue != 0) {
+            sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+        }
     }
 
     @Override

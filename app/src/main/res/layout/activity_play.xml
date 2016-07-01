@@ -45,7 +45,7 @@
                 android:layout_marginBottom="@dimen/layout_size_20"
                 android:layout_marginTop="@dimen/default_margin"
                 android:focusable="true"
-                android:max="100"
+                android:max="70"
                 android:progress="0"
                 android:progressDrawable="@drawable/po_seekbar"
                 android:thumb="@drawable/seekbar_thunm" />
