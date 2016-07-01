@@ -25,7 +25,7 @@ import com.uascent.android.pethunting.tools.Lg;
 
 public class PlayActivity extends BaseActivity implements View.OnClickListener,
         SeekBar.OnSeekBarChangeListener, VerticalSeekBar.OnSeekBarStopListener
-        , View.OnTouchListener {
+        , VerticalSeekBar.OnSeekBarStopTouchListener, View.OnTouchListener {
     private static final String TAG = "PlayActivity";
     private VerticalSeekBar ver_sb;
     private TextView ver_sb_per, tv_empty;
@@ -36,6 +36,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     private BtDevice device;
     private static int speedValue = 0;
     private static int dirValue = 0;
+    private int startSpeed = 0;
 
 
     @Override
@@ -53,6 +54,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         ver_sb_per = (TextView) findViewById(R.id.ver_sb_per);
         ver_sb = (VerticalSeekBar) findViewById(R.id.ver_sb);
         VerticalSeekBar.setSeekBarStopListener(this);
+        VerticalSeekBar.setSeekBarStopTouchListener(this);
         ver_sb.setOnSeekBarChangeListener(this);
         tv_empty = (TextView) findViewById(R.id.tv_empty);
         tv_empty.setOnClickListener(this);
@@ -102,7 +104,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
         //有用
         controlMouseDir(addr, cmd);
-       // getMouseRsp(addr);
+        // getMouseRsp(addr);
 
     }
 
@@ -118,7 +120,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         //有用
         controlMouseSpeed(addr, value, cmd);
         //没有改变
-       // getMouseRsp(addr);
+        // getMouseRsp(addr);
 
     }
 
@@ -126,22 +128,23 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 //        ver_sb_per.setText(progress + "%");
-        if (speedValue != progress / 10) {
-            speedValue = progress / 10;
-            if (dirValue != 0) {
-                Lg.i("time123", "sendspeedtime->>>>" + System.currentTimeMillis());
-                sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
-            }
-        }
-        Lg.i(TAG, "onProgressChanged:" + speedValue);
+//        if (speedValue != progress / 10) {
+        speedValue = progress / 10;
+//            if (dirValue != 0) {
+//                sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+//            }
+//        }
+//        Lg.i(TAG, "onProgressChanged:" + speedValue);
     }
 
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
+        Lg.i(TAG, "play_onStartTrackingTouch");
     }
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
+        Lg.i(TAG, "play_onStartTrackingTouch");
     }
 
 
@@ -301,7 +304,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         Lg.i(TAG, "onSeekBarStop_onStartTrackingTouch");
         ver_sb.setProgress(0);
         if (dirValue != 0) {
-            sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+            sendMouseSpeedCmd(device.getAddress(), 0, dirValue);
         }
     }
 
@@ -342,4 +345,15 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         return false;
     }
 
+    @Override
+    public void onSeekBarStopTouch() {
+        Lg.i(TAG, "onSeekBarStopTouch");
+        if (speedValue != startSpeed) {
+            startSpeed = speedValue;
+            if (dirValue != 0) {
+                Lg.i(TAG, "onSeekBarStopTouch123");
+                sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+            }
+        }
+    }
 }

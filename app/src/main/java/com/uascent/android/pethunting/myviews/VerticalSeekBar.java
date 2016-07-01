@@ -10,11 +10,18 @@ import android.widget.SeekBar;
 
 import com.uascent.android.pethunting.tools.Lg;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+
 public class VerticalSeekBar extends SeekBar {
+    private final static String TAG = "VerticalSeekBar";
     private boolean mIsDragging;
     private float mTouchDownY;
     private int mScaledTouchSlop;
     private boolean isInScrollingContainer = false;
+    private Timer timer = null;
+    private float startProgress = 0;
 
     public boolean isInScrollingContainer() {
         return isInScrollingContainer;
@@ -134,6 +141,7 @@ public class VerticalSeekBar extends SeekBar {
     }
 
     private void trackTouchEvent(MotionEvent event) {
+        Lg.i(TAG, "ver_trackTouchEvent");
         final int height = getHeight();
         final int top = getPaddingTop();
         final int bottom = getPaddingBottom();
@@ -156,8 +164,24 @@ public class VerticalSeekBar extends SeekBar {
 
         final int max = getMax();
         progress += scale * max;
-
         setProgress((int) progress);
+
+        //停止滑动超过1.5s
+        if (timer != null) {
+            if (Math.abs(progress - startProgress) > 5) {
+                timer.cancel();
+                startProgress = progress;
+                timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (onSeekBarStopTouchListener != null) {
+                            onSeekBarStopTouchListener.onSeekBarStopTouch();
+                        }
+                    }
+                }, 800);
+            }
+        }
 
     }
 
@@ -166,6 +190,8 @@ public class VerticalSeekBar extends SeekBar {
      */
     void onStartTrackingTouch() {
         mIsDragging = true;
+        timer = new Timer();
+        Lg.i(TAG, "onStartTrackingTouch");
     }
 
     /**
@@ -174,7 +200,6 @@ public class VerticalSeekBar extends SeekBar {
      */
     void onStopTrackingTouch() {
         if (onSeekBarStopListener != null) {
-            Lg.i("lzg", "onStopTrackingTouch_onSeekBarStopListener");
             onSeekBarStopListener.onSeekBarStop();
         }
         mIsDragging = false;
@@ -194,6 +219,9 @@ public class VerticalSeekBar extends SeekBar {
         onSizeChanged(getWidth(), getHeight(), 0, 0);
     }
 
+    /**
+     * 松开滑块
+     */
     public interface OnSeekBarStopListener {
         void onSeekBarStop();
     }
@@ -203,5 +231,18 @@ public class VerticalSeekBar extends SeekBar {
     }
 
     private static OnSeekBarStopListener onSeekBarStopListener;
+
+    /**
+     * 滑块停止滑动，但没有松开滑动
+     */
+    public interface OnSeekBarStopTouchListener {
+        void onSeekBarStopTouch();
+    }
+
+    static public void setSeekBarStopTouchListener(OnSeekBarStopTouchListener listener) {
+        onSeekBarStopTouchListener = listener;
+    }
+
+    private static OnSeekBarStopTouchListener onSeekBarStopTouchListener;
 
 }

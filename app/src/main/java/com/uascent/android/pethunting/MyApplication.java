@@ -23,7 +23,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         //设置字体样式
-      //  setTypeface();
+        setTypeface();
         //异常重启
 //        AppCrashHandler ch = AppCrashHandler.getInstance();
 //        ch.init(getApplicationContext());

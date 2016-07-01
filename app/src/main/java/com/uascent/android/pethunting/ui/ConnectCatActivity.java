@@ -320,28 +320,28 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         switch (v.getId()) {
             case R.id.bt_match:
                 //没用
-//                Intent intent = new Intent(ConnectCatActivity.this, PlayActivity.class);
-//                intent.putExtra("device", device);
-//                startActivity(intent);
+                Intent intent = new Intent(ConnectCatActivity.this, PlayActivity.class);
+                intent.putExtra("device", device);
+                startActivity(intent);
 
                 //有用
-                if (mListData == null || mListData.size() == 0) {
-                    showShortToast(getResources().getString(R.string.device_is_empty_not_match));
-                    return;
-                }
-                if (connectBLE(index_checked)) {
-                    if (mBluetoothAdapter.isEnabled()) {
-                        refreshOk();
-                        //有用
-                        showLoadingDialog(getString(R.string.connecting_device));
-                        mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                    } else {
-                        showShortToast(getString(R.string.bluetooth_switch_not_opened));
-                    }
-                } else {
-                    showShortToast(getResources().getString(R.string.match_device_fail));
-                }
-                isClickMatch = true;
+//                if (mListData == null || mListData.size() == 0) {
+//                    showShortToast(getResources().getString(R.string.device_is_empty_not_match));
+//                    return;
+//                }
+//                if (connectBLE(index_checked)) {
+//                    if (mBluetoothAdapter.isEnabled()) {
+//                        refreshOk();
+//                        //有用
+//                        showLoadingDialog(getString(R.string.connecting_device));
+//                        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+//                    } else {
+//                        showShortToast(getString(R.string.bluetooth_switch_not_opened));
+//                    }
+//                } else {
+//                    showShortToast(getResources().getString(R.string.match_device_fail));
+//                }
+//                isClickMatch = true;
                 break;
             default:
                 break;
