@@ -317,10 +317,11 @@ public class BluetoothLeClass {
 
     public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
         long timeStamp = System.currentTimeMillis() - currentTime;
+        Lg.i(TAG, "threadName:---->" + Thread.currentThread().getName());
         if (timeStamp < 1000) {
             try {
 //                Thread.sleep(1000 - timeStamp);
-                Thread.sleep(1000);
+                Thread.sleep(450);
                 Lg.i(TAG, "Thread.sleep(1000)");
             } catch (InterruptedException e) {
                 e.printStackTrace();

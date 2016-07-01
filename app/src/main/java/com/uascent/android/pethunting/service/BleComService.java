@@ -8,6 +8,8 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
@@ -43,6 +45,8 @@ public class BleComService extends Service {
     private RemoteCallbackList<ICallback> mCallbacks = new RemoteCallbackList<ICallback>();
     private boolean antiLostEnabled;
     private final Object mSync = new Object();
+    private HandlerThread mHandlerThread;
+    private Handler myHandler;
 
     public class LocalBinder extends Binder {
         public BleComService getService() {
@@ -53,6 +57,9 @@ public class BleComService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         Lg.i(TAG, "onBind");
+        mHandlerThread = new HandlerThread("LongConnThread");
+        mHandlerThread.start();
+        myHandler = new Handler(mHandlerThread.getLooper());
         return mBinder;
     }
 
@@ -116,13 +123,24 @@ public class BleComService extends Service {
         }
 
         @Override
-        public boolean controlMouse(String addr, int dir) throws RemoteException {
-            return bleControlMouse(addr, dir);
+        public void controlMouse(final String addr, final int dir) throws RemoteException {
+            myHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    bleControlMouse(addr, dir);
+                }
+            });
+
         }
 
         @Override
-        public boolean controlMouseSpeed(String addr, int value, int index) throws RemoteException {
-            return bleControlMouseSpeed(addr, value, index);
+        public void controlMouseSpeed(final String addr, final int value, final int index) throws RemoteException {
+            myHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    bleControlMouseSpeed(addr, value, index);
+                }
+            });
         }
 
         @Override

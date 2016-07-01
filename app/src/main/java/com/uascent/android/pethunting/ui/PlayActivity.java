@@ -126,9 +126,11 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 //        ver_sb_per.setText(progress + "%");
-        speedValue = progress;
-        if (dirValue != 0) {
-            sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+        if (speedValue != progress / 10) {
+            speedValue = progress / 10;
+            if (dirValue != 0) {
+                sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+            }
         }
         Lg.i(TAG, "onProgressChanged:" + speedValue);
     }
