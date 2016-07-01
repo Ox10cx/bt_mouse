@@ -221,6 +221,13 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+
+
+    }
+
+    @Override
     protected void onDestroy() {
         if (mConnection != null) {
             try {
@@ -228,6 +235,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                     controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
                 }
                 Log.i(TAG, "onDestroy->>unregisterCallback");
+
                 mService.unregisterCallback(mCallback);
                 if (device != null) {
                     mService.disconnect(device.getAddress());
