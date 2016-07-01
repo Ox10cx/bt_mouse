@@ -316,6 +316,7 @@ public class BluetoothLeClass {
     }
 
     public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
+        Lg.e("time123", "threadname->>>>" + Thread.currentThread().getName());
 //        long timeStamp = System.currentTimeMillis() - currentTime;
 //        Lg.i(TAG, "threadName:---->" + Thread.currentThread().getName());
 //        if (timeStamp < 1000) {
@@ -331,7 +332,9 @@ public class BluetoothLeClass {
         int count = 0;
         while (true) {
             Lg.i("time123", "sendrec_time->>>>" + System.currentTimeMillis());
+            characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
             boolean var = mBluetoothGatt.writeCharacteristic(characteristic);
+//            mBluetoothGatt.setCharacteristicNotification();
             Lg.e("time123", "sendrec_time_end->>>>" + var);
             if (var == true) {
                 break;

@@ -46,6 +46,8 @@ public class BleComService extends Service {
     private boolean antiLostEnabled;
     private final Object mSync = new Object();
     private HandlerThread mHandlerThread;
+    private HandlerThread speedHandlerThread;
+    private Handler speedHandler;
     private Handler myHandler;
 
     public class LocalBinder extends Binder {
@@ -57,9 +59,12 @@ public class BleComService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         Lg.i(TAG, "onBind");
-        mHandlerThread = new HandlerThread("LongConnThread");
+        mHandlerThread = new HandlerThread("DirThread");
+        speedHandlerThread = new HandlerThread("SpeedThread");
         mHandlerThread.start();
+        speedHandlerThread.start();
         myHandler = new Handler(mHandlerThread.getLooper());
+        speedHandler = new Handler(speedHandlerThread.getLooper());
         return mBinder;
     }
 
@@ -135,7 +140,7 @@ public class BleComService extends Service {
 
         @Override
         public void controlMouseSpeed(final String addr, final int value, final int index) throws RemoteException {
-            myHandler.post(new Runnable() {
+            speedHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     bleControlMouseSpeed(addr, value, index);
