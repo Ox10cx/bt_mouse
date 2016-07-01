@@ -316,19 +316,34 @@ public class BluetoothLeClass {
     }
 
     public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
-        long timeStamp = System.currentTimeMillis() - currentTime;
-        Lg.i(TAG, "threadName:---->" + Thread.currentThread().getName());
-        if (timeStamp < 1000) {
-            try {
-//                Thread.sleep(1000 - timeStamp);
-                Thread.sleep(450);
-                Lg.i(TAG, "Thread.sleep(1000)");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+//        long timeStamp = System.currentTimeMillis() - currentTime;
+//        Lg.i(TAG, "threadName:---->" + Thread.currentThread().getName());
+//        if (timeStamp < 1000) {
+//            try {
+////                Thread.sleep(1000 - timeStamp);
+//                Thread.sleep(450);
+//                Lg.i(TAG, "Thread.sleep(1000)");
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+
+        int count = 0;
+        while (true) {
+            Lg.i("time123", "sendrec_time->>>>" + System.currentTimeMillis());
+            boolean var = mBluetoothGatt.writeCharacteristic(characteristic);
+            Lg.e("time123", "sendrec_time_end->>>>" + var);
+            if (var == true) {
+                break;
             }
+            count++;
+            if (count > 5) {
+                break;
+            }
+
+            Lg.i("time123", "sendrec_time_end->>>>" + System.currentTimeMillis());
+            currentTime = System.currentTimeMillis();
         }
-        mBluetoothGatt.writeCharacteristic(characteristic);
-        currentTime = System.currentTimeMillis();
     }
 
     /**

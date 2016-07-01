@@ -102,7 +102,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
         //有用
         controlMouseDir(addr, cmd);
-        getMouseRsp(addr);
+       // getMouseRsp(addr);
 
     }
 
@@ -118,7 +118,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         //有用
         controlMouseSpeed(addr, value, cmd);
         //没有改变
-        getMouseRsp(addr);
+       // getMouseRsp(addr);
 
     }
 
@@ -129,6 +129,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         if (speedValue != progress / 10) {
             speedValue = progress / 10;
             if (dirValue != 0) {
+                Lg.i("time123", "sendspeedtime->>>>" + System.currentTimeMillis());
                 sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
             }
         }
@@ -321,6 +322,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 Lg.i(TAG, "event.getAction()---ACTION_DOWN--" + v.getId() + "   " + dirValue);
+                Lg.i("time123", "sendtime->>>>" + System.currentTimeMillis());
                 sendMouseCmd(device.getAddress(), dirValue);
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -328,6 +330,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             case MotionEvent.ACTION_UP:
                 dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
                 Lg.i(TAG, "event.getAction()---ACTION_UP--" + v.getId() + "   " + dirValue);
+                Lg.i("time123", "sendtime->>>>" + System.currentTimeMillis());
                 sendMouseCmd(device.getAddress(), dirValue);
                 break;
         }
