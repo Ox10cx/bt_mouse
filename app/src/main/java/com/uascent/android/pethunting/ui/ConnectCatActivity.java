@@ -325,19 +325,28 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 //                startActivity(intent);
 
                 //有用
+                if (mBluetoothAdapter.isEnabled()) {
+                    refreshOk();
+                    //有用
+                    showLoadingDialog(getString(R.string.connecting_device));
+                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                } else {
+                    showShortToast(getString(R.string.bluetooth_switch_not_opened));
+                }
                 if (mListData == null || mListData.size() == 0) {
                     showShortToast(getResources().getString(R.string.device_is_empty_not_match));
                     return;
                 }
+                Lg.i(TAG,"index_checked——>>>>>"+index_checked);
                 if (connectBLE(index_checked)) {
-                    if (mBluetoothAdapter.isEnabled()) {
-                        refreshOk();
-                        //有用
-                        showLoadingDialog(getString(R.string.connecting_device));
-                        mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                    } else {
-                        showShortToast(getString(R.string.bluetooth_switch_not_opened));
-                    }
+//                    if (mBluetoothAdapter.isEnabled()) {
+//                        refreshOk();
+//                        //有用
+//                        showLoadingDialog(getString(R.string.connecting_device));
+//                        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+//                    } else {
+//                        showShortToast(getString(R.string.bluetooth_switch_not_opened));
+//                    }
                 } else {
                     showShortToast(getResources().getString(R.string.match_device_fail));
                 }

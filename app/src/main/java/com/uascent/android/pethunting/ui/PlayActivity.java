@@ -264,14 +264,12 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     @Override
     protected void onPause() {
         super.onPause();
-
         if (mConnection != null) {
             if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
                 controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
                 Lg.i(TAG, "onPause" + "direct exit");
             }
         }
-
     }
 
     @Override
@@ -299,11 +297,13 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         super.onDestroy();
     }
 
+
     @Override
     public void onSeekBarStop() {
-        Lg.i(TAG, "onSeekBarStop_onStartTrackingTouch");
+        Lg.i(TAG, "滑动到底部");
         ver_sb.setProgress(0);
         if (dirValue != 0) {
+            Lg.i(TAG, "onSeekBarStopTouch123" + "   speedValue:" + 0 + "  dirValue: " + dirValue);
             sendMouseSpeedCmd(device.getAddress(), 0, dirValue);
         }
     }
@@ -327,8 +327,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         }
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                Lg.i(TAG, "event.getAction()---ACTION_DOWN--" + v.getId() + "   " + dirValue);
-                Lg.i("time123", "sendtime->>>>" + System.currentTimeMillis());
+                Lg.i(TAG, "event.getAction()---ACTION_DOWN--" + dirValue);
                 sendMouseCmd(device.getAddress(), dirValue);
                 break;
 
@@ -337,8 +336,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
             case MotionEvent.ACTION_UP:
                 dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
-                Lg.i(TAG, "event.getAction()---ACTION_UP--" + v.getId() + "   " + dirValue);
-                Lg.i("time123", "sendtime->>>>" + System.currentTimeMillis());
+                Lg.i(TAG, "event.getAction()---ACTION_UP--" + dirValue);
                 sendMouseCmd(device.getAddress(), dirValue);
                 break;
         }
@@ -351,7 +349,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         if (speedValue != startSpeed) {
             startSpeed = speedValue;
             if (dirValue != 0) {
-                Lg.i(TAG, "onSeekBarStopTouch123");
+                Lg.i(TAG, "onSeekBarStopTouch123" + "   speedValue:" + speedValue + "  dirValue: " + dirValue);
                 sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
             }
         }

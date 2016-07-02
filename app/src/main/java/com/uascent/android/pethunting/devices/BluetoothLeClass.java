@@ -316,7 +316,6 @@ public class BluetoothLeClass {
     }
 
     public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
-        Lg.e("time123", "threadname->>>>" + Thread.currentThread().getName());
         int count = 0;
         while (true) {
             characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
