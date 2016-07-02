@@ -179,7 +179,7 @@ public class VerticalSeekBar extends SeekBar {
                             onSeekBarStopTouchListener.onSeekBarStopTouch();
                         }
                     }
-                }, 800);
+                }, 500);
             }
         }
 
