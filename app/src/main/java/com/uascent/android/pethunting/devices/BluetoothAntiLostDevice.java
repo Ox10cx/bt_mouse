@@ -17,6 +17,7 @@ public class BluetoothAntiLostDevice extends BluetoothLeClass {
     public static final UUID POWER_SERVICE_UUID = UUID.fromString("00001804-0000-1000-8000-00805f9b34fb");
     public static final UUID POWER_FUNC_UUID = UUID.fromString("00002a07-0000-1000-8000-00805f9b34fb");
 
+    //电量服务
     public static final UUID BATTERY_SERVICE_UUID = UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb");
     public static final UUID BATTERY_FUNC_UUID = UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb");
 

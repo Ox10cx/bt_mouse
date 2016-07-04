@@ -342,11 +342,16 @@ public class BleComService extends Service {
         BluetoothAntiLostDevice device = new BluetoothAntiLostDevice(this);
         device.initialize();
         Lg.i(TAG, "mOnServiceDiscover");
+        //发现服务端是否支持该服务
         device.setOnServiceDiscoverListener(mOnServiceDiscover);
+
         //收到BLE终端数据交互的事件
         device.setOnDataAvailableListener(mOnDataAvailable);
+
         device.setOnConnectListener(mOnConnectListener);
         device.setOnDisconnectListener(mOnDisconnectListener);
+
+        //服务端信号监听
         device.setOnReadRemoteRssiListener(mOnReadRemoteRssiListener);
 
         mActiveDevices.put(address, device);

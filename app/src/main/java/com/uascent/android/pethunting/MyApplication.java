@@ -45,10 +45,7 @@ public class MyApplication extends Application {
     }
 
     public void setTypeface() {
-//        typeFace = Typeface.createFromAsset(getAssets(), "fonts/aaa.ttf");
-//        typeFace = Typeface.createFromAsset(getAssets(), "fonts/test.ttf");
         typeFace = Typeface.createFromAsset(getAssets(), "fonts/arial.ttf");
-        Lg.i(TAG, "setTypeface()");
         try {
             Field field = Typeface.class.getDeclaredField("SERIF");
             field.setAccessible(true);

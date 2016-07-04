@@ -320,6 +320,7 @@ public class BluetoothLeClass {
     public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
         int count = 0;
         while (true) {
+//            characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
             characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
             boolean var = mBluetoothGatt.writeCharacteristic(characteristic);
             Lg.e("time123", "sendrec_time_end->>>>" + var);

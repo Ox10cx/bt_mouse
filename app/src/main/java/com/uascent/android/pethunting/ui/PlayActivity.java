@@ -37,6 +37,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     private static int speedValue = 0;
     private static int dirValue = 0;
     private int startSpeed = 0;
+    private int battery_status = 0;
 
 
     @Override
@@ -227,7 +228,6 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     public void controlMouseDir(String addr, int dir) {
         try {
             mService.controlMouse(addr, dir);
-            Lg.i(TAG, "controlMouseDir->>" + dir);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -242,7 +242,6 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     public void controlMouseSpeed(String addr, int value, int dir) {
         try {
             mService.controlMouseSpeed(addr, value, dir);
-            Lg.i(TAG, "controlMouseDir->>" + dir);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -323,7 +322,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 break;
         }
         switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_DOWN:  //判断按下和抬起的时间间隔
                 Lg.i(TAG, "event.getAction()---ACTION_DOWN--" + dirValue);
                 sendMouseCmd(device.getAddress(), dirValue);
                 break;
