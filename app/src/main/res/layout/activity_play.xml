@@ -27,8 +27,9 @@
 
             <ImageView
                 android:id="@+id/iv_battery"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/layout_size_50"
+                android:layout_height="@dimen/layout_size_25"
+                android:scaleType="centerCrop"
                 android:layout_alignParentRight="true"
                 android:background="@drawable/full_battery" />
         </RelativeLayout>

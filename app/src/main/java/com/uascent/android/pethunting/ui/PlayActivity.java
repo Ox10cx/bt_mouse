@@ -8,9 +8,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -41,6 +41,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_play);
         super.onCreate(savedInstanceState);
         initViews();
@@ -128,13 +130,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 //        ver_sb_per.setText(progress + "%");
-//        if (speedValue != progress / 10) {
         speedValue = progress / 10;
-//            if (dirValue != 0) {
-//                sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
-//            }
-//        }
-//        Lg.i(TAG, "onProgressChanged:" + speedValue);
+        Lg.i(TAG, "onProgressChanged_speedValue->>" + speedValue);
     }
 
     @Override
@@ -280,8 +277,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
                     controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
                 }
-                Log.i(TAG, "onDestroy->>unregisterCallback");
-
+                Lg.i(TAG, "onDestroy->>unregisterCallback");
                 mService.unregisterCallback(mCallback);
                 if (device != null) {
                     Lg.i(TAG, "disconnect_device_address = " + device.getAddress());
@@ -293,18 +289,19 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             }
         }
         unbindService(mConnection);
-        Log.i(TAG, "onDestroy->>unbindService");
+        Lg.i(TAG, "onDestroy->>unbindService");
         super.onDestroy();
     }
 
 
     @Override
     public void onSeekBarStop() {
-        Lg.i(TAG, "滑动到底部");
+        Lg.i(TAG, "onSeekBarStop_滑动到底部-->>" + "   speedValue:" + 0 + "  dirValue: " + dirValue);
         ver_sb.setProgress(0);
         if (dirValue != 0) {
-            Lg.i(TAG, "onSeekBarStopTouch123" + "   speedValue:" + 0 + "  dirValue: " + dirValue);
             sendMouseSpeedCmd(device.getAddress(), 0, dirValue);
+        } else {  //方向键先松开  dirvalue=0
+            sendMouseCmd(device.getAddress(), dirValue);
         }
     }
 
@@ -345,12 +342,13 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onSeekBarStopTouch() {
-        Lg.i(TAG, "onSeekBarStopTouch");
+        Lg.i(TAG, "onSeekBarStopTouch_speedValue->>>" + speedValue + " startSpeed->>>" + startSpeed);
         if (speedValue != startSpeed) {
             startSpeed = speedValue;
             if (dirValue != 0) {
-                Lg.i(TAG, "onSeekBarStopTouch123" + "   speedValue:" + speedValue + "  dirValue: " + dirValue);
                 sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+            } else {  //方向键先松开
+                sendMouseCmd(device.getAddress(), dirValue);
             }
         }
     }

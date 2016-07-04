@@ -141,18 +141,13 @@ public class VerticalSeekBar extends SeekBar {
     }
 
     private void trackTouchEvent(MotionEvent event) {
-        Lg.i(TAG, "ver_trackTouchEvent");
         final int height = getHeight();
         final int top = getPaddingTop();
         final int bottom = getPaddingBottom();
         final int available = height - top - bottom;
-
         int y = (int) event.getY();
-
         float scale;
         float progress = 0;
-
-        // 下面是最小值
         if (y > height - bottom) {
             scale = 0.0f;
         } else if (y < top) {
@@ -168,6 +163,7 @@ public class VerticalSeekBar extends SeekBar {
 
         //停止滑动超过1.5s
         if (timer != null) {
+            Lg.i(TAG, "progress->>" + progress + "  startProgress->>" + startProgress);
             if (Math.abs(progress - startProgress) > 5) {
                 timer.cancel();
                 startProgress = progress;
