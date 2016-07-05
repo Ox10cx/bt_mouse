@@ -152,6 +152,16 @@ public class BleComService extends Service {
         public boolean readMouseRsp(String addr) throws RemoteException {
             return bleReadRsp(addr);
         }
+
+        @Override
+        public void setBatteryNoc(final String address) throws RemoteException {
+            myHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    setBtDeviceBatteryNoc(address);
+                }
+            });
+        }
     };
 
     private boolean bleReadRsp(String addr) {
@@ -378,6 +388,23 @@ public class BleComService extends Service {
             Lg.i(TAG, "device != null");
             mActiveDevices.remove(address);
             device.disconnect();
+            //lzg edit   不使用该链接之后，释放资源
+            device.close();
+        } else {
+            Lg.i(TAG, "device == null");
+        }
+    }
+
+    /**
+     * 设置电量通知
+     *
+     * @param address
+     */
+    void setBtDeviceBatteryNoc(String address) {
+        BluetoothAntiLostDevice device = mActiveDevices.get(address);
+        if (device != null) {
+            Lg.i(TAG, "setCharacteristicNotification");
+            device.setCharacteristicNotification(BluetoothAntiLostDevice.BATTERY_SERVICE_UUID, BluetoothAntiLostDevice.BATTERY_FUNC_UUID, true);
         } else {
             Lg.i(TAG, "device == null");
         }

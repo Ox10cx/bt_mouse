@@ -38,7 +38,7 @@ import java.util.UUID;
  * given Bluetooth LE device.
  */
 public class BluetoothLeClass {
-    private final static String TAG = "hjq";
+    private final static String TAG = "BluetoothLeClass";
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
@@ -160,9 +160,15 @@ public class BluetoothLeClass {
                 mOnDataAvailableListener.onCharacteristicRead(gatt, characteristic, status);
         }
 
+        /**
+         * 如果对一个特性启用通知,当远程蓝牙设备特性发送变化，回调函数onCharacteristicChanged( ))被触发。
+         * @param gatt
+         * @param characteristic
+         */
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
+            Lg.i(TAG, "onCharacteristicChanged");
             if (mOnDataAvailableListener != null)
                 mOnDataAvailableListener.onCharacteristicWrite(gatt, characteristic);
         }
@@ -289,6 +295,7 @@ public class BluetoothLeClass {
         return mBluetoothGatt.readCharacteristic(characteristic);
     }
 
+
     /**
      * Enables or disables notification on a give characteristic.
      */
@@ -302,12 +309,15 @@ public class BluetoothLeClass {
         BluetoothGattService gattService = mBluetoothGatt.getService(serviceUuid);
         if (gattService != null) {
             BluetoothGattCharacteristic characteristic = gattService.getCharacteristic(characteristicUuid);
-
             Log.e("hjq", "char = " + characteristic);
-
             mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
             BluetoothGattDescriptor descriptor = characteristic.getDescriptor(CHARACTERISTIC_UPDATE_NOTIFICATION_DESCRIPTOR_UUID);
-            descriptor.setValue(enabled ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : new byte[]{0x00, 0x00});
+            if (descriptor != null) {
+                Lg.i(TAG, "descriptor!=null");
+                descriptor.setValue(enabled ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : new byte[]{0x00, 0x00});
+            } else {
+                Lg.i(TAG, "descriptor==null");
+            }
             mBluetoothGatt.writeDescriptor(descriptor);
         } else {
             Log.e("hjq", "service id = " + serviceUuid + " is not support!");
@@ -318,20 +328,35 @@ public class BluetoothLeClass {
     }
 
     public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
-        int count = 0;
-        while (true) {
 //            characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-            characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-            boolean var = mBluetoothGatt.writeCharacteristic(characteristic);
-            Lg.e("time123", "sendrec_time_end->>>>" + var);
-            if (var == true) {
-                break;
-            }
-            count++;
-            if (count > 5) {
-                break;
+        characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+        boolean var = mBluetoothGatt.writeCharacteristic(characteristic);
+        Lg.e(TAG, "writeCharacteristic->>>>" + var);
+        //如果写入蓝牙设备失败(可能是上一次的命令还没有得到响应，等待0.5s之后,再发送一次)
+        if (!var) {
+            try {
+                Thread.sleep(500);
+                mBluetoothGatt.writeCharacteristic(characteristic);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
+
+        //之前的demo
+//        int count = 0;
+//        while (true) {
+////            characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+//            characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+//            boolean var = mBluetoothGatt.writeCharacteristic(characteristic);
+//            Lg.e(TAG, "writeCharacteristic->>>>" + var);
+//            if (var == true) {
+//                break;
+//            }
+//            count++;
+//            if (count > 5) {
+//                break;
+//            }
+//        }
     }
 
     /**

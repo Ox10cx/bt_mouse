@@ -159,6 +159,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             mService = IService.Stub.asInterface(service);
             try {
                 mService.registerCallback(mCallback);
+                mService.setBatteryNoc(device.getAddress());
+                //读电量
             } catch (RemoteException e) {
                 Lg.i(TAG, " " + e);
             }
@@ -194,8 +196,14 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
 
         @Override
-        public boolean onWrite(final String address, byte[] val) throws RemoteException {
+        public boolean onWrite(final String address, final byte[] val) throws RemoteException {
             Lg.i(TAG, "onWrite called");
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Lg.i(TAG, "onWrite->>" + val[0]);
+                }
+            });
             return true;
         }
 
