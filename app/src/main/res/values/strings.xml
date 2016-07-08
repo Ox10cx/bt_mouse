@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Pets Hunting</string>
-    <string name="app_versionName" translatable="false">1.6.0</string>
+    <string name="app_versionName" translatable="false">1.6.5</string>
     <string name="set_up">Setup</string>
     <string name="user_guide">User Guide</string>
     <string name="play">Play</string>
@@ -29,8 +29,8 @@
     <string name="sb_max">100</string>
     <string name="sb_min">0</string>
     <string name="play_title">Play:Remote Control</string>
-    <string name="bluetooth_switch_has_opened">蓝牙已打开</string>
-    <string name="bluetooth_switch_not_opened">蓝牙未打开</string>
+    <string name="bluetooth_switch_has_opened">Bluetooth On</string>
+    <string name="bluetooth_switch_not_opened">Bluetooth Off</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="open_bluetooth_switch">Turn on Bluetooth?</string>
@@ -48,23 +48,24 @@
     <string name="str_permission_denied">Some Permission is Denied</string>
 
 
-    <string name="cmd_sending">请稍后...</string>
-    <string name="connecting_device">连接中...</string>
-    <string name="data_loading">数据加载中...</string>
-    <string name="search_device_empty">搜索的设备为空</string>
-    <string name="search_device_over">搜索设备完成</string>
-    <string name="match_device_ok">连接设备成功</string>
-    <string name="match_device_fail">连接设备失败</string>
-    <string name="device_is_empty_not_match">设备为空,无法连接,请您重新搜索设备！</string>
-    <string name="exit_app_remind">您是否确定退出Pets Hunting应用</string>
-    <string name="crash_reminder">抱歉,程序异常,即将重启</string>
+    <string name="connecting_device">Waiting for Bluetooth...</string>
+    <string name="data_loading">Loading Data...</string>
+    <string name="search_device_empty">Bluetooth unable to be found</string>
+    <string name="search_device_over">Bluetooth searching finish</string>
+    <string name="match_device_ok">Bluetooth connection successful</string>
+    <string name="match_device_fail">Bluetooth connection unsuccessful</string>
+    <string name="device_is_empty_not_match">Bluetooth unable to be found. Please try again</string>
     <string name="stop">Stop</string>
     <string name="str_location">access my location</string>
-    <string name="device_service_not_match">您选择的设备服务与本服务不匹配</string>
-    <string name="check_device_switch">请您检查选择的设备开关</string>
-    <string name="bluetooth_has_breaked">手机与设备之间的蓝牙已断开</string>
-    <string name="bluetooth_service_break_restart">蓝牙服务已经断开,请您再次进入该界面</string>
-    <string name="moible_not_support_bluetooth4">该手机设备不支持蓝牙4.0</string>
+    <string name="device_service_not_match">Device not paired</string>
+    <string name="bluetooth_has_breaked">Bluetooth connection lost</string>
+    <string name="bluetooth_service_break_restart">Bluetooth connection lost.  Please try again</string>
+    <string name="moible_not_support_bluetooth4">This device does not support Bluetooth 4.0</string>
+    <string name="check_device_switch">Please check the device switch</string>
+    <string name="loading">Loading...</string>
 
-
+    <!--暂时不用-->
+    <!--<string name="cmd_sending">请稍后...</string>-->
+    <string name="crash_reminder">抱歉,程序异常,即将重启</string>
+    <string name="exit_app_remind">您是否确定退出Pets Hunting应用</string>
 </resources>

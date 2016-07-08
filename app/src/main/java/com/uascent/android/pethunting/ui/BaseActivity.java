@@ -48,7 +48,7 @@ public class BaseActivity extends FragmentActivity {
     }
 
     public void showLoadingDialog() {
-        dialog = LoadDialog.createLoadingDialog(this, "正在加载中..");
+        dialog = LoadDialog.createLoadingDialog(this, getString(R.string.loading));
         dialog.setCancelable(true);
         dialog.show();
     }

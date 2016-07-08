@@ -159,8 +159,8 @@
                     "startLine": 11,
                     "startColumn": 4,
                     "startOffset": 1921,
-                    "endColumn": 101,
-                    "endOffset": 2018
+                    "endColumn": 71,
+                    "endOffset": 1988
                 },
                 "from": {
                     "file": "D:\\UascentProjectCode\\PetsHunting_1.0\\bt_mouse\\library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
@@ -168,8 +168,8 @@
                         "startLine": 11,
                         "startColumn": 4,
                         "startOffset": 1921,
-                        "endColumn": 101,
-                        "endOffset": 2018
+                        "endColumn": 71,
+                        "endOffset": 1988
                     }
                 }
             },
@@ -177,18 +177,18 @@
                 "to": {
                     "startLine": 12,
                     "startColumn": 4,
-                    "startOffset": 2023,
-                    "endColumn": 113,
-                    "endOffset": 2132
+                    "startOffset": 1993,
+                    "endColumn": 69,
+                    "endOffset": 2058
                 },
                 "from": {
                     "file": "D:\\UascentProjectCode\\PetsHunting_1.0\\bt_mouse\\library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 12,
                         "startColumn": 4,
-                        "startOffset": 2023,
-                        "endColumn": 113,
-                        "endOffset": 2132
+                        "startOffset": 1993,
+                        "endColumn": 69,
+                        "endOffset": 2058
                     }
                 }
             },
@@ -196,75 +196,18 @@
                 "to": {
                     "startLine": 13,
                     "startColumn": 4,
-                    "startOffset": 2137,
-                    "endColumn": 107,
-                    "endOffset": 2240
+                    "startOffset": 2063,
+                    "endColumn": 77,
+                    "endOffset": 2136
                 },
                 "from": {
                     "file": "D:\\UascentProjectCode\\PetsHunting_1.0\\bt_mouse\\library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 13,
                         "startColumn": 4,
-                        "startOffset": 2137,
-                        "endColumn": 107,
-                        "endOffset": 2240
-                    }
-                }
-            },
-            {
-                "to": {
-                    "startLine": 14,
-                    "startColumn": 4,
-                    "startOffset": 2245,
-                    "endColumn": 71,
-                    "endOffset": 2312
-                },
-                "from": {
-                    "file": "D:\\UascentProjectCode\\PetsHunting_1.0\\bt_mouse\\library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
-                    "position": {
-                        "startLine": 14,
-                        "startColumn": 4,
-                        "startOffset": 2245,
-                        "endColumn": 71,
-                        "endOffset": 2312
-                    }
-                }
-            },
-            {
-                "to": {
-                    "startLine": 15,
-                    "startColumn": 4,
-                    "startOffset": 2317,
-                    "endColumn": 69,
-                    "endOffset": 2382
-                },
-                "from": {
-                    "file": "D:\\UascentProjectCode\\PetsHunting_1.0\\bt_mouse\\library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
-                    "position": {
-                        "startLine": 15,
-                        "startColumn": 4,
-                        "startOffset": 2317,
-                        "endColumn": 69,
-                        "endOffset": 2382
-                    }
-                }
-            },
-            {
-                "to": {
-                    "startLine": 16,
-                    "startColumn": 4,
-                    "startOffset": 2387,
-                    "endColumn": 77,
-                    "endOffset": 2460
-                },
-                "from": {
-                    "file": "D:\\UascentProjectCode\\PetsHunting_1.0\\bt_mouse\\library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
-                    "position": {
-                        "startLine": 16,
-                        "startColumn": 4,
-                        "startOffset": 2387,
+                        "startOffset": 2063,
                         "endColumn": 77,
-                        "endOffset": 2460
+                        "endOffset": 2136
                     }
                 }
             }

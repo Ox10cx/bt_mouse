@@ -28,39 +28,30 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onBackPressed() {
-        final ComReminderDialog dialog = new ComReminderDialog(this, getResources().getString(R.string.exit_app_remind)
-                , getResources().getString(R.string.yes), getResources().getString(R.string.no));
-        dialog.show();
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.dialog_cancel.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                dialog.cancel();
-                MainActivity.this.finish();
-            }
-        });
-
-        dialog.dialog_submit.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                dialog.cancel();
-            }
-        });
-    }
+//    @Override
+//    public void onBackPressed() {
+//        final ComReminderDialog dialog = new ComReminderDialog(this, getResources().getString(R.string.exit_app_remind)
+//                , getResources().getString(R.string.yes), getResources().getString(R.string.no));
+//        dialog.show();
+//        dialog.setCanceledOnTouchOutside(false);
+//        dialog.dialog_cancel.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//                dialog.cancel();
+//                MainActivity.this.finish();
+//            }
+//        });
+//
+//        dialog.dialog_submit.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//                dialog.cancel();
+//            }
+//        });
+//    }
 
     private void initViews() {
         bt_set_up = (Button) findViewById(R.id.bt_set_up);

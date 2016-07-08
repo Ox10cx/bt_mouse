@@ -7,8 +7,8 @@
                     "startLine": 2,
                     "startColumn": 4,
                     "startOffset": 55,
-                    "endColumn": 60,
-                    "endOffset": 111
+                    "endColumn": 71,
+                    "endOffset": 122
                 },
                 "from": {
                     "file": "D:\\UascentProjectCode\\PetsHunting_1.0\\bt_mouse\\library\\build\\intermediates\\bundles\\debug\\res\\values-zh\\values-zh.xml",
@@ -16,8 +16,8 @@
                         "startLine": 2,
                         "startColumn": 4,
                         "startOffset": 55,
-                        "endColumn": 60,
-                        "endOffset": 111
+                        "endColumn": 71,
+                        "endOffset": 122
                     }
                 }
             },
@@ -25,18 +25,18 @@
                 "to": {
                     "startLine": 3,
                     "startColumn": 4,
-                    "startOffset": 116,
-                    "endColumn": 66,
-                    "endOffset": 178
+                    "startOffset": 127,
+                    "endColumn": 69,
+                    "endOffset": 192
                 },
                 "from": {
                     "file": "D:\\UascentProjectCode\\PetsHunting_1.0\\bt_mouse\\library\\build\\intermediates\\bundles\\debug\\res\\values-zh\\values-zh.xml",
                     "position": {
                         "startLine": 3,
                         "startColumn": 4,
-                        "startOffset": 116,
-                        "endColumn": 66,
-                        "endOffset": 178
+                        "startOffset": 127,
+                        "endColumn": 69,
+                        "endOffset": 192
                     }
                 }
             },
@@ -44,18 +44,18 @@
                 "to": {
                     "startLine": 4,
                     "startColumn": 4,
-                    "startOffset": 183,
-                    "endColumn": 64,
-                    "endOffset": 243
+                    "startOffset": 197,
+                    "endColumn": 77,
+                    "endOffset": 270
                 },
                 "from": {
                     "file": "D:\\UascentProjectCode\\PetsHunting_1.0\\bt_mouse\\library\\build\\intermediates\\bundles\\debug\\res\\values-zh\\values-zh.xml",
                     "position": {
                         "startLine": 4,
                         "startColumn": 4,
-                        "startOffset": 183,
-                        "endColumn": 64,
-                        "endOffset": 243
+                        "startOffset": 197,
+                        "endColumn": 77,
+                        "endOffset": 270
                     }
                 }
             }
