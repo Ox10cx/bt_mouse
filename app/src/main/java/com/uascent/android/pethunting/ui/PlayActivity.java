@@ -38,6 +38,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     private static int dirValue = 0;
     private int startSpeed = 0;
     private int battery_status = 0;
+    private ImageView iv_battery;
 
 
     @Override
@@ -81,6 +82,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         iv_right_dir = (ImageView) findViewById(R.id.iv_right_dir);
         iv_right_dir.setOnClickListener(this);
         iv_right_dir.setOnTouchListener(this);
+
+        iv_battery = (ImageView) findViewById(R.id.iv_battery);
     }
 
     @Override
@@ -197,11 +200,17 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
         @Override
         public boolean onWrite(final String address, final byte[] val) throws RemoteException {
-            Lg.i(TAG, "onWrite called");
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     Lg.i(TAG, "onWrite->>" + val[0]);
+                    if (val[0]<=30) {
+                        iv_battery.setBackgroundResource(R.drawable.empty_battery);
+                    } else if (val[0]>=70) {
+                        iv_battery.setBackgroundResource(R.drawable.full_battery);
+                    } else {
+                        iv_battery.setBackgroundResource(R.drawable.half_battery);
+                    }
                 }
             });
             return true;
