@@ -28,6 +28,7 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.util.Log;
 
+import com.uascent.android.pethunting.MyApplication;
 import com.uascent.android.pethunting.tools.Lg;
 
 import java.util.List;
@@ -333,9 +334,10 @@ public class BluetoothLeClass {
         boolean var = mBluetoothGatt.writeCharacteristic(characteristic);
         Lg.e(TAG, "writeCharacteristic->>>>" + var);
         //如果写入蓝牙设备失败(可能是上一次的命令还没有得到响应，等待0.5s之后,再发送一次)
-        if (!var) {
+        if ((!var) && (!MyApplication.isCmdSendRepeat)) {
             try {
                 Thread.sleep(500);
+                Lg.i(TAG,"sleep");
                 mBluetoothGatt.writeCharacteristic(characteristic);
             } catch (InterruptedException e) {
                 e.printStackTrace();

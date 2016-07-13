@@ -37,8 +37,12 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     private static int speedValue = 0;
     private static int dirValue = 0;
     private int startSpeed = 0;
-    private int battery_status = 0;
+    //    private int battery_status = 0;
     private ImageView iv_battery;
+    //    private int dirCmdRepeatCount = 0;
+    private int preDirValue = 0;
+    private Long preTime;
+//    private boolean isSendCmd = false;
 
 
     @Override
@@ -135,7 +139,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 //        ver_sb_per.setText(progress + "%");
         speedValue = progress / 10;
-        Lg.i(TAG, "onProgressChanged_speedValue->>" + speedValue);
+//        Lg.i(TAG, "onProgressChanged_speedValue->>" + speedValue);
     }
 
     @Override
@@ -204,9 +208,10 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 @Override
                 public void run() {
                     Lg.i(TAG, "onWrite->>" + val[0]);
-                    if (val[0]<=30) {
+                    if (val[0] <= 30) {
                         iv_battery.setBackgroundResource(R.drawable.empty_battery);
-                    } else if (val[0]>=70) {
+                        showLongToast(getString(R.string.low_battery_remind));
+                    } else if (val[0] >= 70) {
                         iv_battery.setBackgroundResource(R.drawable.full_battery);
                     } else {
                         iv_battery.setBackgroundResource(R.drawable.half_battery);
@@ -341,7 +346,24 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:  //判断按下和抬起的时间间隔
                 Lg.i(TAG, "event.getAction()---ACTION_DOWN--" + dirValue);
+                if (dirValue == preDirValue && System.currentTimeMillis() - preTime < 500) {
+                    MyApplication.isCmdSendRepeat = true;
+//                    dirCmdRepeatCount++;
+//                    if (dirCmdRepeatCount % 3 == 0) {
+                    Lg.i(TAG, "event.getAction()---ACTION_DOWN--sendCmd--repeat" + dirValue);
+//                        sendMouseCmd(device.getAddress(), dirValue);
+//                        isSendCmd = true;
+//                    }
+//                } else {
+//                    Lg.i(TAG, "event.getAction()---ACTION_DOWN--sendCmd" + dirValue);
+//                    sendMouseCmd(device.getAddress(), dirValue);
+//                    isSendCmd = true;
+                } else {
+                    MyApplication.isCmdSendRepeat = false;
+                }
                 sendMouseCmd(device.getAddress(), dirValue);
+                preDirValue = dirValue;
+                preTime = System.currentTimeMillis();
                 break;
 
             case MotionEvent.ACTION_MOVE:
@@ -350,7 +372,10 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             case MotionEvent.ACTION_UP:
                 dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
                 Lg.i(TAG, "event.getAction()---ACTION_UP--" + dirValue);
+//                        if (isSendCmd) {
                 sendMouseCmd(device.getAddress(), dirValue);
+//                            isSendCmd = false;
+//                        }
                 break;
         }
         return false;
@@ -362,6 +387,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         if (speedValue != startSpeed) {
             startSpeed = speedValue;
             if (dirValue != 0) {
+                MyApplication.isCmdSendRepeat=false;
                 sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
             } else {  //方向键先松开
                 sendMouseCmd(device.getAddress(), dirValue);

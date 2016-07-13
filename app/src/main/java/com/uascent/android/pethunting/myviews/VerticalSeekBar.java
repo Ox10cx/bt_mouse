@@ -21,7 +21,8 @@ public class VerticalSeekBar extends SeekBar {
     private int mScaledTouchSlop;
     private boolean isInScrollingContainer = false;
     private Timer timer = null;
-    private float startProgress = 0;
+    private static float startProgress = 0;
+    private static float progress;
 
     public boolean isInScrollingContainer() {
         return isInScrollingContainer;
@@ -147,7 +148,7 @@ public class VerticalSeekBar extends SeekBar {
         final int available = height - top - bottom;
         int y = (int) event.getY();
         float scale;
-        float progress = 0;
+//        float progress = 0;
         if (y > height - bottom) {
             scale = 0.0f;
         } else if (y < top) {
@@ -160,22 +161,25 @@ public class VerticalSeekBar extends SeekBar {
         final int max = getMax();
         progress += scale * max;
         setProgress((int) progress);
-
+        if(progress>70){
+            progress=70;
+        }
         //停止滑动超过1.5s
         if (timer != null) {
             Lg.i(TAG, "progress->>" + progress + "  startProgress->>" + startProgress);
             if (Math.abs(progress - startProgress) > 5) {
                 timer.cancel();
-                startProgress = progress;
+//                startProgress = progress;
                 timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
                         if (onSeekBarStopTouchListener != null) {
                             onSeekBarStopTouchListener.onSeekBarStopTouch();
+                            startProgress = progress;
                         }
                     }
-                }, 500);
+                }, 200);
             }
         }
 
@@ -187,6 +191,7 @@ public class VerticalSeekBar extends SeekBar {
     void onStartTrackingTouch() {
         mIsDragging = true;
         timer = new Timer();
+        startProgress=0;
         Lg.i(TAG, "onStartTrackingTouch");
     }
 

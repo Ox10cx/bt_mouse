@@ -23,7 +23,7 @@
     <string name="user_guide_5">From the home page you \nwant to start control make the \ncat toy.Simply click the \"play\"  \nbutton icon.</string>
     <string name="user_guide_6">The remote control is \nhorizontal screen. \nManual rotation mobile \nphones is avaiable in this app.</string>
     <string name="user_guide_7">The Anione Mouse User Guide \nis always available by clicking \nthe \"User Guide\" icon \nbutton on the bottom of page. \nThis will take you to the User \nGuide menu and get help.</string>
-    <string name="user_guide_8">Congratulations!! You now \nknow how to use the App \nfor use with the product \nHava fun!</string>
+    <string name="user_guide_8">Congratulations!! You now \nknow how to use the App \nfor use with the pet products. \nHava fun!</string>
     <string name="speed">SPEED</string>
     <string name="direction">DIRECTION</string>
     <string name="sb_max">100</string>
@@ -63,6 +63,7 @@
     <string name="moible_not_support_bluetooth4">This device does not support Bluetooth 4.0</string>
     <string name="check_device_switch">Please check the device switch</string>
     <string name="loading">Loading...</string>
+    <string name="low_battery_remind">设备电量较低,请您及时充电</string>
 
     <!--暂时不用-->
     <!--<string name="cmd_sending">请稍后...</string>-->

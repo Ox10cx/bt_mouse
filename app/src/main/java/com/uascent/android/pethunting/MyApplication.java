@@ -18,6 +18,7 @@ public class MyApplication extends Application {
     private static MyApplication instance;
     public boolean isAutoBreak = false;
     public static Typeface typeFace;
+    public static boolean isCmdSendRepeat=false;
 
     @Override
     public void onCreate() {
