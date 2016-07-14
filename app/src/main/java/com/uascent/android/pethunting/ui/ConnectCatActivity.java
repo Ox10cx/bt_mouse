@@ -396,6 +396,14 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 
     public void doRefreshWork() {
         if (mService != null) {
+            if (device != null) {
+                try {
+                    mService.disconnect(device.getAddress());
+                    Lg.i(TAG, "refresh_disconnect_device_address = " + device.getAddress());
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
             index_checked = 0;
             count_device = 0;
             mListData.clear();

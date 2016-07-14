@@ -39,7 +39,7 @@ import java.util.UUID;
  * given Bluetooth LE device.
  */
 public class BluetoothLeClass {
-    private final static String TAG = "BluetoothLeClass";
+    private final static String TAG = "VerticalSeekBar";
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
@@ -332,13 +332,14 @@ public class BluetoothLeClass {
 //            characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
         characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
         boolean var = mBluetoothGatt.writeCharacteristic(characteristic);
-        Lg.e(TAG, "writeCharacteristic->>>>" + var);
+        Lg.e(TAG, "writeCharacteristic->>>>" + var + "    write time:" + System.currentTimeMillis());
         //如果写入蓝牙设备失败(可能是上一次的命令还没有得到响应，等待0.5s之后,再发送一次)
         if ((!var) && (!MyApplication.isCmdSendRepeat)) {
             try {
-                Thread.sleep(500);
-                Lg.i(TAG,"sleep");
-                mBluetoothGatt.writeCharacteristic(characteristic);
+                Thread.sleep(200);
+                Lg.i(TAG, "sleep");
+                boolean repeat_var = mBluetoothGatt.writeCharacteristic(characteristic);
+                Lg.e(TAG, "writeCharacteristic-repeat_var_>>>>" + repeat_var + "    write time:" + System.currentTimeMillis());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

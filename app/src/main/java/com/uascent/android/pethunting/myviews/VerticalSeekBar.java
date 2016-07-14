@@ -161,25 +161,26 @@ public class VerticalSeekBar extends SeekBar {
         final int max = getMax();
         progress += scale * max;
         setProgress((int) progress);
-        if(progress>70){
-            progress=70;
+        if (progress > 70) {
+            progress = 70;
         }
         //停止滑动超过1.5s
         if (timer != null) {
-            Lg.i(TAG, "progress->>" + progress + "  startProgress->>" + startProgress);
+//            Lg.i(TAG, "progress->>" + progress + "  startProgress->>" + startProgress);
             if (Math.abs(progress - startProgress) > 5) {
                 timer.cancel();
-//                startProgress = progress;
                 timer = new Timer();
+//                Lg.i(TAG,"pretime:"+System.currentTimeMillis());
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
                         if (onSeekBarStopTouchListener != null) {
                             onSeekBarStopTouchListener.onSeekBarStopTouch();
+                            Lg.i(TAG, "dotime:" + System.currentTimeMillis());
                             startProgress = progress;
                         }
                     }
-                }, 200);
+                }, 100);
             }
         }
 
@@ -191,8 +192,8 @@ public class VerticalSeekBar extends SeekBar {
     void onStartTrackingTouch() {
         mIsDragging = true;
         timer = new Timer();
-        startProgress=0;
-        Lg.i(TAG, "onStartTrackingTouch");
+        startProgress = 0;
+//        Lg.i(TAG, "onStartTrackingTouch");
     }
 
     /**

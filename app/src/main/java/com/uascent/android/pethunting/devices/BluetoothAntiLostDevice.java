@@ -13,7 +13,7 @@ import java.util.UUID;
  * Created by Administrator on 16-3-9.
  */
 public class BluetoothAntiLostDevice extends BluetoothLeClass {
-    private static final String TAG = "BluetoothAntiLostDevice123";
+    private static final String TAG = "VerticalSeekBar";
     public static final UUID POWER_SERVICE_UUID = UUID.fromString("00001804-0000-1000-8000-00805f9b34fb");
     public static final UUID POWER_FUNC_UUID = UUID.fromString("00002a07-0000-1000-8000-00805f9b34fb");
 
