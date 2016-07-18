@@ -1,6 +1,5 @@
 package com.uascent.android.pethunting.ui;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.ComponentName;
@@ -51,6 +50,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Lg.i(TAG, "onCreate");
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_play);
@@ -59,7 +59,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         mHandler = new Handler();
         device = (BtDevice) getIntent().getSerializableExtra("device");
         Intent i = new Intent(this, BleComService.class);
-        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+        getApplicationContext().bindService(i, mConnection, Context.BIND_AUTO_CREATE);
         BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         if (mBluetoothManager != null) {
             mBluetoothAdapter = mBluetoothManager.getAdapter();
@@ -190,10 +190,11 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        showShortToast(getString(R.string.bluetooth_has_breaked));
+//                        showShortToast(getString(R.string.bluetooth_has_breaked));
+                        relinkBlueTooth();
                     }
                 });
-                relinkBlueTooth();
+
             }
         }
 
@@ -237,12 +238,20 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
         @Override
         public void onAlertServiceDiscovery(final String btaddr, boolean support) throws RemoteException {
-
+            Lg.i(TAG, "onAlertServiceDiscovery");
         }
 
         @Override
         public void onMouseServiceDiscovery(String address, boolean support) throws RemoteException {
-
+            Lg.i(TAG, "onMouseServiceDiscovery_support" + support);
+            if (support) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        showShortToast(getString(R.string.relinked_bluetooth_ok));
+                    }
+                });
+            }
         }
     };
 
@@ -255,21 +264,45 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             Lg.i(TAG, "mBluetoothAdapter != null");
             if (mBluetoothAdapter.isEnabled()) {
                 Lg.i(TAG, "mBluetoothAdapter.isEnabled()");
+                showShortToast(getString(R.string.check_ble_switch));
                 if (device != null) {
                     Lg.i(TAG, "relink--->device != null");
                     relinkBleDevice();
                 }
             } else {
                 Lg.i(TAG, "!----mBluetoothAdapter.isEnabled()");
-                Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableIntent, REQUEST_ENABLE_CODE);
+                openBlueTooth();
+
+//                Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//                startActivityForResult(enableIntent, REQUEST_ENABLE_CODE);
             }
         } else {  //打开蓝牙开关之后，重新连接设备
             Lg.i(TAG, "mBluetoothAdapter = null");
             BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
             mBluetoothAdapter = mBluetoothManager.getAdapter();
-            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableIntent, REQUEST_ENABLE_CODE);
+            openBlueTooth();
+
+//            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//            startActivityForResult(enableIntent, REQUEST_ENABLE_CODE);
+        }
+    }
+
+    private void openBlueTooth() {
+        Lg.i(TAG, "openBlueTooth()");
+        Long temTime = System.currentTimeMillis();
+        mBluetoothAdapter.enable();
+        while (!mBluetoothAdapter.isEnabled()) {
+            if (System.currentTimeMillis() - temTime > (30 * 1000)) {
+                closeLoadingDialog();
+                return;
+            }
+            showLoadingDialog(getString(R.string.bluetooth_is_opening));
+        }
+        if (mBluetoothAdapter.isEnabled()) {
+            closeLoadingDialog();
+            relinkBleDevice();
+        } else {
+            showLoadingDialog(getString(R.string.bluetooth_switch_not_opened));
         }
     }
 
@@ -280,11 +313,9 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                showShortToast(getString(R.string.bluetooth_isconnecting));
+//                showShortToast(getString(R.string.bluetooth_isconnecting));
                 try {
-                    if (mService.connect(device.getAddress())) {
-                        showShortToast(getString(R.string.relinked_bluetooth_ok));
-                    } else {
+                    if (!mService.connect(device.getAddress())) {
                         showShortToast(getString(R.string.relinked_bluetooth_fail));
                     }
                 } catch (RemoteException e) {
@@ -382,7 +413,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                     e.printStackTrace();
                 }
             }
-            unbindService(mConnection);
+            getApplicationContext().unbindService(mConnection);
             Lg.i(TAG, "onDestroy->>unbindService");
         }
         super.onDestroy();
@@ -479,21 +510,21 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         super.onBackPressed();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Lg.i(TAG, "onActivityResult_result:" + requestCode);
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case REQUEST_ENABLE_CODE: {
-                if (resultCode == Activity.RESULT_OK) {
-                    relinkBleDevice();
-                } else {
-                    showShortToast(getResources().getString(R.string.bluetooth_switch_not_opened));
-                }
-                break;
-            }
-            default:
-                break;
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        Lg.i(TAG, "onActivityResult_result:" + requestCode);
+//        super.onActivityResult(requestCode, resultCode, data);
+//        switch (requestCode) {
+//            case REQUEST_ENABLE_CODE: {
+//                if (resultCode == Activity.RESULT_OK) {
+//                    relinkBleDevice();
+//                } else {
+//                    showShortToast(getResources().getString(R.string.bluetooth_switch_not_opened));
+//                }
+//                break;
+//            }
+//            default:
+//                break;
+//        }
+//    }
 }

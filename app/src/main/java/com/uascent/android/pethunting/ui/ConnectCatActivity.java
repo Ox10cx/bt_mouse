@@ -78,7 +78,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
             showShortToast(getString(R.string.moible_not_support_bluetooth4));
         }
         Intent i = new Intent(this, BleComService.class);
-        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+        getApplicationContext().bindService(i, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     private void initViews() {
@@ -153,9 +153,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                         showShortToast(getResources().getString(R.string.search_device_empty));
                         iv_load_null.setVisibility(View.VISIBLE);
                         Lg.i(TAG, "mListData的大小为0");
-                    } else {
                     }
-
                 }
             }, 10 * 1000);
 
@@ -197,13 +195,13 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 
         @Override
         public void onDisconnect(String address) throws RemoteException {
-            Lg.i(TAG, "onDisconnect called");
+            Lg.i(TAG, TAG + "  onDisconnect called");
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     closeLoadingDialog();
                     if (isConnecting == false && isClickMatch == true) {
-                        showShortToast(getString(R.string.check_device_switch));
+                        showShortToast(getString(R.string.check_ble_switch));
                         return;
                     }
                     isConnecting = false;
@@ -267,6 +265,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                             intent.putExtra("device", device);
                             startActivity(intent);
                             isConnecting = false;
+                            isClickMatch = false;
                         }
                     } else {
                         Lg.i(TAG, "onAlertServiceDiscovery_not_support");
@@ -390,7 +389,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                 e.printStackTrace();
             }
         }
-        unbindService(mConnection);
+        getApplicationContext().unbindService(mConnection);
         super.onDestroy();
     }
 

@@ -15,6 +15,7 @@ import com.uascent.android.pethunting.tools.StatusBarUtil;
 public class BaseActivity extends FragmentActivity {
     private final static String TAG = "BaseActivity";
     private Dialog dialog;
+    private String dialogMsg = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,16 +49,27 @@ public class BaseActivity extends FragmentActivity {
     }
 
     public void showLoadingDialog() {
-        dialog = LoadDialog.createLoadingDialog(this, getString(R.string.loading));
-        dialog.setCancelable(true);
+        if (!(dialog != null && (getString(R.string.loading).equals(dialogMsg)))) {
+            dialog = LoadDialog.createLoadingDialog(this, getString(R.string.loading));
+            dialog.setCancelable(true);
+        }
+//        if (isShowLoadingDialog()) {
+//            closeLoadingDialog();
+//        }
         dialog.show();
+        dialogMsg = getString(R.string.loading);
     }
 
     public void showLoadingDialog(String msg) {
-        dialog = LoadDialog.createLoadingDialog(this, msg);
-        dialog.setCancelable(true);
+        if (!(dialog != null && (dialogMsg.equals(msg)))) {
+            dialog = LoadDialog.createLoadingDialog(this, getString(R.string.loading));
+            dialog.setCancelable(true);
+        }
+//        if (isShowLoadingDialog()) {
+//            closeLoadingDialog();
+//        }
         dialog.show();
-
+        dialogMsg = msg;
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 
             @Override
@@ -72,8 +84,16 @@ public class BaseActivity extends FragmentActivity {
     }
 
     public boolean closeLoadingDialog() {
-        if (dialog != null && dialog.isShowing()) {
+        if (isShowLoadingDialog()) {
             dialog.dismiss();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isShowLoadingDialog() {
+        if (dialog != null && dialog.isShowing()) {
             return true;
         } else {
             return false;

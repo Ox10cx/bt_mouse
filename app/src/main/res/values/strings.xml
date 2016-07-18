@@ -58,16 +58,19 @@
     <string name="stop">Stop</string>
     <string name="str_location">access my location</string>
     <string name="device_service_not_match">Device not paired</string>
-    <string name="bluetooth_has_breaked">Bluetooth connection lost</string>
     <string name="bluetooth_service_break_restart">Bluetooth connection lost.  Please try again</string>
     <string name="moible_not_support_bluetooth4">This device does not support Bluetooth 4.0</string>
-    <string name="check_device_switch">Please check the device switch</string>
+
     <string name="loading">Loading...</string>
     <string name="low_battery_remind">设备电量较低,请您及时充电</string>
     <string name="bluetooth_isconnecting">蓝牙正在重连...</string>
     <string name="relinked_bluetooth_ok">重连设备成功</string>
     <string name="relinked_bluetooth_fail">重连设备失败</string>
 
+    <string name="check_phone_switch">蓝牙已断开连接,请您检查手机蓝牙开关是否打开</string>
+    <string name="check_ble_switch">蓝牙已断开连接,请您检查Ble设备开关是否打开</string>
+    <string name="bluetooth_has_breaked">蓝牙已断开连接</string>
+    <string name="bluetooth_is_opening">蓝牙正在打开中...</string>
 
     <!--暂时不用-->
     <!--<string name="cmd_sending">请稍后...</string>-->
