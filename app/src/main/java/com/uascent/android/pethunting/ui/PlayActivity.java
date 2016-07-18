@@ -1,5 +1,8 @@
 package com.uascent.android.pethunting.ui;
 
+import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +29,7 @@ import com.uascent.android.pethunting.tools.Lg;
 public class PlayActivity extends BaseActivity implements View.OnClickListener,
         SeekBar.OnSeekBarChangeListener, VerticalSeekBar.OnSeekBarStopListener
         , VerticalSeekBar.OnSeekBarStopTouchListener, View.OnTouchListener {
-    private static final String TAG = "VerticalSeekBar";
+    private static final String TAG = "PlayActivity";
     private VerticalSeekBar ver_sb;
     private TextView ver_sb_per, tv_empty;
     private ImageView iv_play_guide, iv_play_home;
@@ -37,12 +40,13 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     private static int speedValue = 0;
     private static int dirValue = 0;
     private static int startSpeed = 0;
-    //    private int battery_status = 0;
     private ImageView iv_battery;
     //    private int dirCmdRepeatCount = 0;
     private int preDirValue = 0;
     private Long preTime;
-//    private boolean isSendCmd = false;
+    private static int countBatteryLow = 0;
+    private BluetoothAdapter mBluetoothAdapter;
+    private static final int REQUEST_ENABLE_CODE = 111;
 
 
     @Override
@@ -56,6 +60,12 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         device = (BtDevice) getIntent().getSerializableExtra("device");
         Intent i = new Intent(this, BleComService.class);
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+        BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        if (mBluetoothManager != null) {
+            mBluetoothAdapter = mBluetoothManager.getAdapter();
+        } else {
+            showShortToast(getString(R.string.moible_not_support_bluetooth4));
+        }
     }
 
     private void initViews() {
@@ -92,7 +102,6 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onClick(View v) {
-        Lg.i(TAG, "onClick" + v.getId());
         Intent intent = null;
         switch (v.getId()) {
             case R.id.iv_play_guide:
@@ -110,12 +119,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
     void sendMouseCmd(String addr, int cmd) {
         Lg.i(TAG, "sendMouseCmd:" + cmd);
-//        return;
-
-        //有用
         controlMouseDir(addr, cmd);
         // getMouseRsp(addr);
-
     }
 
     /**
@@ -126,12 +131,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
      */
     void sendMouseSpeedCmd(String addr, int value, int cmd) {
         Lg.i(TAG, "sendMouseCmd:" + value + "  " + cmd);
-//        return;
-        //有用
         controlMouseSpeed(addr, value, cmd);
-        //没有改变
         // getMouseRsp(addr);
-
     }
 
 
@@ -185,13 +186,14 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         public void onDisconnect(String address) throws RemoteException {
             Lg.i(TAG, "onDisconnect called");
             //蓝牙意外断开，考虑重连接
-            if (!MyApplication.getInstance().isAutoBreak && device != null) {
+            if (!MyApplication.getInstance().isAutoBreak) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         showShortToast(getString(R.string.bluetooth_has_breaked));
                     }
                 });
+                relinkBlueTooth();
             }
         }
 
@@ -207,10 +209,13 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Lg.i(TAG, "onWrite->>" + val[0]);
+                    Lg.i(TAG, "电量onWrite->>" + val[0]);
                     if (val[0] <= 30) {
                         iv_battery.setBackgroundResource(R.drawable.empty_battery);
-                        showLongToast(getString(R.string.low_battery_remind));
+                        if (countBatteryLow % 3 == 0) {
+                            showLongToast(getString(R.string.low_battery_remind));
+                        }
+                        countBatteryLow++;
                     } else if (val[0] >= 70) {
                         iv_battery.setBackgroundResource(R.drawable.full_battery);
                     } else {
@@ -240,6 +245,54 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
         }
     };
+
+    /**
+     * 重新连接蓝牙
+     */
+    private void relinkBlueTooth() {
+        Lg.i(TAG, "relinkBlueTooth");
+        if (mBluetoothAdapter != null) {
+            Lg.i(TAG, "mBluetoothAdapter != null");
+            if (mBluetoothAdapter.isEnabled()) {
+                Lg.i(TAG, "mBluetoothAdapter.isEnabled()");
+                if (device != null) {
+                    Lg.i(TAG, "relink--->device != null");
+                    relinkBleDevice();
+                }
+            } else {
+                Lg.i(TAG, "!----mBluetoothAdapter.isEnabled()");
+                Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableIntent, REQUEST_ENABLE_CODE);
+            }
+        } else {  //打开蓝牙开关之后，重新连接设备
+            Lg.i(TAG, "mBluetoothAdapter = null");
+            BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+            mBluetoothAdapter = mBluetoothManager.getAdapter();
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableIntent, REQUEST_ENABLE_CODE);
+        }
+    }
+
+    /**
+     * 重新连接ble 设备
+     */
+    private void relinkBleDevice() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                showShortToast(getString(R.string.bluetooth_isconnecting));
+                try {
+                    if (mService.connect(device.getAddress())) {
+                        showShortToast(getString(R.string.relinked_bluetooth_ok));
+                    } else {
+                        showShortToast(getString(R.string.relinked_bluetooth_fail));
+                    }
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 
     /**
      * 控制方向
@@ -280,37 +333,58 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     }
 
     @Override
+    protected void onResume() {
+        Lg.i(TAG, "onResume");
+        MyApplication.getInstance().isAutoBreak = false;
+        super.onResume();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
+        Lg.i(TAG, "onPause");
         if (mConnection != null) {
             if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
                 controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
-                Lg.i(TAG, "onPause" + "direct exit");
             }
         }
     }
 
     @Override
-    protected void onDestroy() {
-        MyApplication.getInstance().isAutoBreak = true;
-        if (mConnection != null) {
-            try {
-                if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
-                    controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
-                }
-                Lg.i(TAG, "onDestroy->>unregisterCallback");
-                mService.unregisterCallback(mCallback);
-                if (device != null) {
-                    Lg.i(TAG, "disconnect_device_address = " + device.getAddress());
-                    mService.disconnect(device.getAddress());
-                    device = null;
-                }
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+    public void finish() {
+        Lg.i(TAG, "finish");
+        if (!MyApplication.getInstance().isAutoBreak) {
+            Lg.i(TAG, "finish_move");
+            moveTaskToBack(true);
+        } else {
+            Lg.i(TAG, "super_finish");
+            super.finish();
         }
-        unbindService(mConnection);
-        Lg.i(TAG, "onDestroy->>unbindService");
+    }
+
+    @Override
+    protected void onDestroy() {
+        Lg.i(TAG, "onDestroy--->" + MyApplication.getInstance().isAutoBreak);
+        if (MyApplication.getInstance().isAutoBreak) {
+            if (mConnection != null) {
+                try {
+                    if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
+                        controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
+                    }
+                    Lg.i(TAG, "onDestroy->>unregisterCallback");
+                    mService.unregisterCallback(mCallback);
+                    if (device != null) {
+                        Lg.i(TAG, "disconnect_device_address = " + device.getAddress());
+                        mService.disconnect(device.getAddress());
+                        device = null;
+                    }
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+            unbindService(mConnection);
+            Lg.i(TAG, "onDestroy->>unbindService");
+        }
         super.onDestroy();
     }
 
@@ -378,10 +452,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
                 MyApplication.isCmdSendRepeat = false;
                 Lg.i(TAG, "event.getAction()---ACTION_UP--" + dirValue);
-//                        if (isSendCmd) {
                 sendMouseCmd(device.getAddress(), dirValue);
-//                            isSendCmd = false;
-//                        }
                 break;
         }
         return false;
@@ -398,6 +469,31 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 sendMouseCmd(device.getAddress(), dirValue);
             }
             startSpeed = speedValue;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Lg.i(TAG, "onBackPressed");
+        MyApplication.getInstance().isAutoBreak = true;
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Lg.i(TAG, "onActivityResult_result:" + requestCode);
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_ENABLE_CODE: {
+                if (resultCode == Activity.RESULT_OK) {
+                    relinkBleDevice();
+                } else {
+                    showShortToast(getResources().getString(R.string.bluetooth_switch_not_opened));
+                }
+                break;
+            }
+            default:
+                break;
         }
     }
 }

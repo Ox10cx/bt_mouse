@@ -64,6 +64,10 @@
     <string name="check_device_switch">Please check the device switch</string>
     <string name="loading">Loading...</string>
     <string name="low_battery_remind">设备电量较低,请您及时充电</string>
+    <string name="bluetooth_isconnecting">蓝牙正在重连...</string>
+    <string name="relinked_bluetooth_ok">重连设备成功</string>
+    <string name="relinked_bluetooth_fail">重连设备失败</string>
+
 
     <!--暂时不用-->
     <!--<string name="cmd_sending">请稍后...</string>-->

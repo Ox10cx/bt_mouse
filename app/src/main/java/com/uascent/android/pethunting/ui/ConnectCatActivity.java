@@ -372,8 +372,8 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         mBluetoothAdapter.stopLeScan(mLeScanCallback);
+        super.onBackPressed();
     }
 
     @Override
