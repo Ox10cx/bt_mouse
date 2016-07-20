@@ -109,10 +109,14 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         Intent intent = null;
         switch (v.getId()) {
             case R.id.iv_play_guide:
+                MyApplication.getInstance().isAutoBreak = true;
+                autoBreakConnect();
                 intent = new Intent(this, UserGuideActivity.class);
                 startActivity(intent);
                 break;
             case R.id.iv_play_home:
+                MyApplication.getInstance().isAutoBreak = true;
+                autoBreakConnect();
                 intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
                 break;
@@ -400,26 +404,32 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     protected void onDestroy() {
         Lg.i(TAG, "onDestroy--->" + MyApplication.getInstance().isAutoBreak);
         if (MyApplication.getInstance().isAutoBreak) {
-            if (mConnection != null) {
-                try {
-                    if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
-                        controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
-                    }
-                    Lg.i(TAG, "onDestroy->>unregisterCallback");
+            autoBreakConnect();
+            Lg.i(TAG, "onDestroy->>unbindService");
+        }
+        super.onDestroy();
+    }
+
+    private void autoBreakConnect() {
+        if (mConnection != null) {
+            try {
+                if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
+                    controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);
+                }
+                Lg.i(TAG, "onDestroy->>unregisterCallback");
+                if (mService != null) {
                     mService.unregisterCallback(mCallback);
                     if (device != null) {
                         Lg.i(TAG, "disconnect_device_address = " + device.getAddress());
                         mService.disconnect(device.getAddress());
                         device = null;
                     }
-                } catch (RemoteException e) {
-                    e.printStackTrace();
                 }
+            } catch (RemoteException e) {
+                e.printStackTrace();
             }
-            getApplicationContext().unbindService(mConnection);
-            Lg.i(TAG, "onDestroy->>unbindService");
         }
-        super.onDestroy();
+        getApplicationContext().unbindService(mConnection);
     }
 
 
@@ -511,7 +521,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     public boolean onLongClick(View v) {
         if (!isCmd) {
             Lg.i(TAG, "onLongClick");
-            isCmd=true;
+            isCmd = true;
             if (speedValue != 0) {  //先滑动滑动条
                 sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
             } else {   //先按住方向键

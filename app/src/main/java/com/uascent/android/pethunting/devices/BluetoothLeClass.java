@@ -338,7 +338,10 @@ public class BluetoothLeClass {
     public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
 //            characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
         characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-        boolean var = mBluetoothGatt.writeCharacteristic(characteristic);
+        boolean var = false;
+        if (mBluetoothGatt != null) {
+            var = mBluetoothGatt.writeCharacteristic(characteristic);
+        }
         Lg.e(TAG, "writeCharacteristic->>>>" + var + "    write time:" + System.currentTimeMillis());
         //如果写入蓝牙设备失败(可能是上一次的命令还没有得到响应，等待轮训10次发送)
 //        if (!MyApplication.isCmdSendRepeat) {
@@ -347,7 +350,9 @@ public class BluetoothLeClass {
             try {
                 Thread.sleep(400 + 100 * var_count);
                 Lg.i(TAG, "sleep");
-                var = mBluetoothGatt.writeCharacteristic(characteristic);
+                if (mBluetoothGatt != null) {
+                    var = mBluetoothGatt.writeCharacteristic(characteristic);
+                }
                 Lg.e(TAG, "writeCharacteristic-repeat_var_>>>>" + var + "    write time:" + System.currentTimeMillis());
             } catch (InterruptedException e) {
                 e.printStackTrace();
