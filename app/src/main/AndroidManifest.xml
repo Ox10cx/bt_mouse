@@ -68,7 +68,7 @@
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ui.PlayActivity"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:screenOrientation="landscape"></activity>
         <activity
             android:name=".ui.ConnectCatActivity"

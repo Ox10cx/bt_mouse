@@ -110,15 +110,17 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         switch (v.getId()) {
             case R.id.iv_play_guide:
                 MyApplication.getInstance().isAutoBreak = true;
-                autoBreakConnect();
+//                autoBreakConnect();
                 intent = new Intent(this, UserGuideActivity.class);
                 startActivity(intent);
+                finish();
                 break;
             case R.id.iv_play_home:
                 MyApplication.getInstance().isAutoBreak = true;
-                autoBreakConnect();
+//                autoBreakConnect();
                 intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
+                finish();
                 break;
             default:
                 break;
@@ -128,7 +130,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     void sendMouseCmd(String addr, int cmd) {
         Lg.i(TAG, "sendMouseCmd:" + cmd);
         controlMouseDir(addr, cmd);
-        getMouseRsp(addr);
+//        getMouseRsp(addr);
     }
 
     /**
@@ -140,7 +142,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     void sendMouseSpeedCmd(String addr, int value, int cmd) {
         Lg.i(TAG, "sendMouseCmd:" + value + "  " + cmd);
         controlMouseSpeed(addr, value, cmd);
-        getMouseRsp(addr);
+//        getMouseRsp(addr);
     }
 
 
@@ -217,7 +219,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Lg.i(TAG, "电量onWrite->>" + val[0]);
+//                    Lg.i(TAG, "电量onWrite->>" + val[0]);
                     if (val[0] <= 30) {
                         iv_battery.setBackgroundResource(R.drawable.empty_battery);
                         if (countBatteryLow % 3 == 0) {
