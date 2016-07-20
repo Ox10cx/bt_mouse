@@ -27,25 +27,25 @@ import com.uascent.android.pethunting.tools.Lg;
 
 public class PlayActivity extends BaseActivity implements View.OnClickListener,
         SeekBar.OnSeekBarChangeListener, VerticalSeekBar.OnSeekBarStopListener
-        , VerticalSeekBar.OnSeekBarStopTouchListener, View.OnTouchListener {
+        , VerticalSeekBar.OnSeekBarStopTouchListener, View.OnTouchListener, View.OnLongClickListener {
     private static final String TAG = "PlayActivity";
     private VerticalSeekBar ver_sb;
     private TextView ver_sb_per, tv_empty;
     private ImageView iv_play_guide, iv_play_home;
     private ImageView iv_top_dir, iv_below_dir, iv_left_dir, iv_right_dir;
+    private ImageView iv_battery;
     private IService mService;
     private Handler mHandler;
     private BtDevice device;
     private static int speedValue = 0;
     private static int dirValue = 0;
     private static int startSpeed = 0;
-    private ImageView iv_battery;
-    //    private int dirCmdRepeatCount = 0;
     private int preDirValue = 0;
-    private Long preTime;
+    private Long preTime = 0l;
     private static int countBatteryLow = 0;
     private BluetoothAdapter mBluetoothAdapter;
-    private static final int REQUEST_ENABLE_CODE = 111;
+    //    private static final int REQUEST_ENABLE_CODE = 111;
+    private boolean isCmd = false;
 
 
     @Override
@@ -84,18 +84,22 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         iv_top_dir = (ImageView) findViewById(R.id.iv_top_dir);
         iv_top_dir.setOnTouchListener(this);
         iv_top_dir.setOnClickListener(this);
+        iv_top_dir.setOnLongClickListener(this);
 
         iv_below_dir = (ImageView) findViewById(R.id.iv_below_dir);
         iv_below_dir.setOnClickListener(this);
         iv_below_dir.setOnTouchListener(this);
+        iv_below_dir.setOnLongClickListener(this);
 
         iv_left_dir = (ImageView) findViewById(R.id.iv_left_dir);
         iv_left_dir.setOnClickListener(this);
         iv_left_dir.setOnTouchListener(this);
+        iv_left_dir.setOnLongClickListener(this);
 
         iv_right_dir = (ImageView) findViewById(R.id.iv_right_dir);
         iv_right_dir.setOnClickListener(this);
         iv_right_dir.setOnTouchListener(this);
+        iv_right_dir.setOnLongClickListener(this);
 
         iv_battery = (ImageView) findViewById(R.id.iv_battery);
     }
@@ -120,7 +124,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     void sendMouseCmd(String addr, int cmd) {
         Lg.i(TAG, "sendMouseCmd:" + cmd);
         controlMouseDir(addr, cmd);
-        // getMouseRsp(addr);
+        getMouseRsp(addr);
     }
 
     /**
@@ -132,7 +136,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     void sendMouseSpeedCmd(String addr, int value, int cmd) {
         Lg.i(TAG, "sendMouseCmd:" + value + "  " + cmd);
         controlMouseSpeed(addr, value, cmd);
-        // getMouseRsp(addr);
+        getMouseRsp(addr);
     }
 
 
@@ -167,8 +171,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             mService = IService.Stub.asInterface(service);
             try {
                 mService.registerCallback(mCallback);
-                mService.setBatteryNoc(device.getAddress());
                 //读电量
+                mService.setBatteryNoc(device.getAddress());
             } catch (RemoteException e) {
                 Lg.i(TAG, " " + e);
             }
@@ -190,7 +194,6 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-//                        showShortToast(getString(R.string.bluetooth_has_breaked));
                         relinkBlueTooth();
                     }
                 });
@@ -200,7 +203,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
         @Override
         public boolean onRead(String address, byte[] val) throws RemoteException {
-            Lg.i(TAG, "onRead called");
+            Lg.i(TAG, "onRead called:" + val[0]);
             return false;
         }
 
@@ -436,7 +439,6 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     public boolean onTouch(View v, MotionEvent event) {
         switch (v.getId()) {
             case R.id.iv_top_dir:
-//                Lg.i(TAG, "onTouch_iv_top_dir");
                 dirValue = BluetoothAntiLostDevice.MOUSE_UP;
                 break;
             case R.id.iv_below_dir:
@@ -452,27 +454,20 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:  //判断按下和抬起的时间间隔
                 Lg.i(TAG, "event.getAction()---ACTION_DOWN--" + dirValue);
-                if (dirValue == preDirValue && System.currentTimeMillis() - preTime < 500) {
-                    MyApplication.isCmdSendRepeat = true;
-//                    dirCmdRepeatCount++;
-//                    if (dirCmdRepeatCount % 3 == 0) {
-                    Lg.i(TAG, "event.getAction()---ACTION_DOWN--sendCmd--repeat" + dirValue);
-//                        sendMouseCmd(device.getAddress(), dirValue);
-//                        isSendCmd = true;
-//                    }
-//                } else {
-//                    Lg.i(TAG, "event.getAction()---ACTION_DOWN--sendCmd" + dirValue);
-//                    sendMouseCmd(device.getAddress(), dirValue);
-//                    isSendCmd = true;
+                if (System.currentTimeMillis() - preTime < 200) {
+//                    MyApplication.isCmdSendRepeat = true;
+                    isCmd = false;
+                    Lg.i(TAG, "event.getAction()---ACTION_DOWN--noSendCmd-time");
                 } else {
-                    MyApplication.isCmdSendRepeat = false;
+                    Lg.i(TAG, "event.getAction()---ACTION_DOWN--SendCmd");
+                    isCmd = true;
+//                    MyApplication.isCmdSendRepeat = false;
+                    if (speedValue != 0) {  //先滑动滑动条
+                        sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+                    } else {   //先按住方向键
+                        sendMouseCmd(device.getAddress(), dirValue);
+                    }
                 }
-                if (speedValue != 0) {  //先滑动滑动条
-                    sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
-                } else {   //先按住方向键
-                    sendMouseCmd(device.getAddress(), dirValue);
-                }
-                preDirValue = dirValue;
                 preTime = System.currentTimeMillis();
                 break;
 
@@ -481,9 +476,11 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
             case MotionEvent.ACTION_UP:
                 dirValue = BluetoothAntiLostDevice.MOUSE_STOP;
-                MyApplication.isCmdSendRepeat = false;
+//                MyApplication.isCmdSendRepeat = false;
                 Lg.i(TAG, "event.getAction()---ACTION_UP--" + dirValue);
-                sendMouseCmd(device.getAddress(), dirValue);
+                if (isCmd) {
+                    sendMouseCmd(device.getAddress(), dirValue);
+                }
                 break;
         }
         return false;
@@ -494,7 +491,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         Lg.i(TAG, "onSeekBarStopTouch_speedValue->>>" + speedValue + " startSpeed->>>" + startSpeed);
         if (speedValue != startSpeed) {
             if (dirValue != 0) {
-                MyApplication.isCmdSendRepeat = false;
+//                MyApplication.isCmdSendRepeat = false;
                 sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
             } else {  //方向键先松开
                 sendMouseCmd(device.getAddress(), dirValue);
@@ -508,6 +505,20 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         Lg.i(TAG, "onBackPressed");
         MyApplication.getInstance().isAutoBreak = true;
         super.onBackPressed();
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        if (!isCmd) {
+            Lg.i(TAG, "onLongClick");
+            isCmd=true;
+            if (speedValue != 0) {  //先滑动滑动条
+                sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+            } else {   //先按住方向键
+                sendMouseCmd(device.getAddress(), dirValue);
+            }
+        }
+        return false;
     }
 
 //    @Override

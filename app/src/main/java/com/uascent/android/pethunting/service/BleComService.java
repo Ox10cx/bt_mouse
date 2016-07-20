@@ -129,7 +129,7 @@ public class BleComService extends Service {
 
         @Override
         public void controlMouse(final String addr, final int dir) throws RemoteException {
-            myHandler.post(new Runnable() {
+            speedHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     bleControlMouse(addr, dir);
@@ -149,8 +149,14 @@ public class BleComService extends Service {
         }
 
         @Override
-        public boolean readMouseRsp(String addr) throws RemoteException {
-            return bleReadRsp(addr);
+        public void readMouseRsp(final String addr) throws RemoteException {
+            speedHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Lg.i(TAG, "readMouseRsp_run");
+                    bleDeviceCmdRsp(addr);
+                }
+            });
         }
 
         @Override
@@ -164,16 +170,6 @@ public class BleComService extends Service {
         }
     };
 
-    private boolean bleReadRsp(String addr) {
-        BluetoothAntiLostDevice device = mActiveDevices.get(addr);
-        if (device == null) {
-            Lg.i(TAG, "the device is null?");
-            return false;
-        }
-
-        Lg.i(TAG, "device != null");
-        return device.getMouseRsp();
-    }
 
     private boolean bleControlMouse(String addr, int dir) {
         BluetoothAntiLostDevice device = mActiveDevices.get(addr);
@@ -396,17 +392,32 @@ public class BleComService extends Service {
     }
 
     /**
+     * 命令回复通知
+     *
+     * @param addr
+     * @return
+     */
+    private boolean bleDeviceCmdRsp(String addr) {
+        BluetoothAntiLostDevice device = mActiveDevices.get(addr);
+        if (device == null) {
+            Lg.i(TAG, "the device is null?");
+            return false;
+        }
+        Lg.i(TAG, "device != null");
+        return device.getMouseRsp();
+    }
+
+
+    /**
      * 设置电量通知
      *
      * @param address
      */
-    void setBtDeviceBatteryNoc(String address) {
+    private void setBtDeviceBatteryNoc(String address) {
         BluetoothAntiLostDevice device = mActiveDevices.get(address);
         if (device != null) {
-            Lg.i(TAG, "setCharacteristicNotification");
+            Lg.i(TAG, "setCharacteristi_batterycNotification");
             device.setCharacteristicNotification(BluetoothAntiLostDevice.BATTERY_SERVICE_UUID, BluetoothAntiLostDevice.BATTERY_FUNC_UUID, true);
-        } else {
-            Lg.i(TAG, "device == null");
         }
     }
 

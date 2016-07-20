@@ -18,6 +18,6 @@ interface IService {
 
     void controlMouse(String addr, int index);
     void controlMouseSpeed(String addr,int value, int index);
-    boolean readMouseRsp(String addr);
+    void readMouseRsp(String addr);
     void setBatteryNoc(String address);
 }

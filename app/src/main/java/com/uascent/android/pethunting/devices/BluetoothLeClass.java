@@ -28,7 +28,6 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.util.Log;
 
-import com.uascent.android.pethunting.MyApplication;
 import com.uascent.android.pethunting.tools.Lg;
 
 import java.util.List;
@@ -39,7 +38,7 @@ import java.util.UUID;
  * given Bluetooth LE device.
  */
 public class BluetoothLeClass {
-    private final static String TAG = "VerticalSeekBar";
+    private final static String TAG = "BluetoothLeClass";
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
@@ -120,6 +119,7 @@ public class BluetoothLeClass {
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            Lg.i(TAG, "onConnectionStateChange");
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 if (mOnConnectListener != null)
                     mOnConnectListener.onConnect(gatt);
@@ -144,6 +144,7 @@ public class BluetoothLeClass {
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            Lg.i(TAG, "onServicesDiscovered");
             if (status == BluetoothGatt.GATT_SUCCESS && mOnServiceDiscoverListener != null) {
                 mOnServiceDiscoverListener.onServiceDiscover(gatt);
                 mBleStatus = BLE_STATE_CONNECTED;
@@ -157,8 +158,11 @@ public class BluetoothLeClass {
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
-            if (mOnDataAvailableListener != null)
+            Lg.i(TAG, "onCharacteristicRead");
+            if (mOnDataAvailableListener != null && characteristic.getUuid().equals(BluetoothAntiLostDevice.MOUSE_READCMDRSP_FUNC_UUID)) {
+                Lg.i(TAG, "onCharacteristicChanged_onCharacteristicRead");
                 mOnDataAvailableListener.onCharacteristicRead(gatt, characteristic, status);
+            }
         }
 
         /**
@@ -170,12 +174,15 @@ public class BluetoothLeClass {
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
             Lg.i(TAG, "onCharacteristicChanged");
-            if (mOnDataAvailableListener != null)
+            if (mOnDataAvailableListener != null && characteristic.getUuid().equals(BluetoothAntiLostDevice.BATTERY_FUNC_UUID)) {
+                Lg.i(TAG, "onCharacteristicChanged_onCharacteristicWrite");
                 mOnDataAvailableListener.onCharacteristicWrite(gatt, characteristic);
+            }
         }
 
         @Override
         public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
+            Lg.i(TAG, "onReadRemoteRssi");
             if (mOnReadRemoteRssiListener != null) {
                 mOnReadRemoteRssiListener.onReadRemoteRssi(gatt, rssi, status);
             }
@@ -333,32 +340,21 @@ public class BluetoothLeClass {
         characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
         boolean var = mBluetoothGatt.writeCharacteristic(characteristic);
         Lg.e(TAG, "writeCharacteristic->>>>" + var + "    write time:" + System.currentTimeMillis());
-        //如果写入蓝牙设备失败(可能是上一次的命令还没有得到响应，等待0.5s之后,再发送一次)
-        if ((!var) && (!MyApplication.isCmdSendRepeat)) {
+        //如果写入蓝牙设备失败(可能是上一次的命令还没有得到响应，等待轮训10次发送)
+//        if (!MyApplication.isCmdSendRepeat) {
+        int var_count = 0;
+        while (!var) {
             try {
-                Thread.sleep(200);
+                Thread.sleep(400 + 100 * var_count);
                 Lg.i(TAG, "sleep");
-                boolean repeat_var = mBluetoothGatt.writeCharacteristic(characteristic);
-                Lg.e(TAG, "writeCharacteristic-repeat_var_>>>>" + repeat_var + "    write time:" + System.currentTimeMillis());
+                var = mBluetoothGatt.writeCharacteristic(characteristic);
+                Lg.e(TAG, "writeCharacteristic-repeat_var_>>>>" + var + "    write time:" + System.currentTimeMillis());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            var_count++;
+            if (var_count == 10) return;
         }
-
-        //之前的demo
-//        int count = 0;
-//        while (true) {
-////            characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-//            characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-//            boolean var = mBluetoothGatt.writeCharacteristic(characteristic);
-//            Lg.e(TAG, "writeCharacteristic->>>>" + var);
-//            if (var == true) {
-//                break;
-//            }
-//            count++;
-//            if (count > 5) {
-//                break;
-//            }
 //        }
     }
 

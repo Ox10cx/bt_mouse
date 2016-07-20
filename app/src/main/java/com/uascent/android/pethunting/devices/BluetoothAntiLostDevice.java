@@ -13,7 +13,7 @@ import java.util.UUID;
  * Created by Administrator on 16-3-9.
  */
 public class BluetoothAntiLostDevice extends BluetoothLeClass {
-    private static final String TAG = "VerticalSeekBar";
+    private static final String TAG = "BluetoothAntiLostDevice";
     public static final UUID POWER_SERVICE_UUID = UUID.fromString("00001804-0000-1000-8000-00805f9b34fb");
     public static final UUID POWER_FUNC_UUID = UUID.fromString("00002a07-0000-1000-8000-00805f9b34fb");
 
@@ -33,6 +33,8 @@ public class BluetoothAntiLostDevice extends BluetoothLeClass {
     public static final UUID MOUSE_WRITE_FUNC_UUID = UUID.fromString("0000fff2-0000-1000-8000-00805f9b34fb");
     public static final UUID MOUSE_READ_FUNC_UUID = UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb");
     public static final UUID MOUSE_SERVICE_UUID = UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb");
+    public static final UUID MOUSE_READCMDRSP_FUNC_UUID = UUID.fromString("0000fff3-0000-1000-8000-00805f9b34fb");
+
 
     public static final int MOUSE_STOP = 0;
     public static final int MOUSE_UP = 1;
@@ -130,12 +132,14 @@ public class BluetoothAntiLostDevice extends BluetoothLeClass {
         if (!checkBleStatus()) {
             return false;
         }
-        BluetoothGattCharacteristic characteristic = mBluetoothGatt.getService(MOUSE_SERVICE_UUID).getCharacteristic(MOUSE_READ_FUNC_UUID);
+        BluetoothGattCharacteristic characteristic = null;
+        if (mBluetoothGatt != null && mBluetoothGatt.getService(MOUSE_SERVICE_UUID) != null) {
+            characteristic = mBluetoothGatt.getService(MOUSE_SERVICE_UUID).getCharacteristic(MOUSE_READCMDRSP_FUNC_UUID);
+        }
         if (characteristic == null) {
             Log.e(TAG, "not support the readback service?");
             return false;
         }
-
         return readCharacteristic(characteristic);
     }
 
@@ -145,13 +149,6 @@ public class BluetoothAntiLostDevice extends BluetoothLeClass {
         if (!checkBleStatus()) {
             return false;
         }
-
-////        //接受Characteristic被写的通知,收到蓝牙模块的数据后会触发mOnDataAvailable.onCharacteristicWrite()
-//      if (!setCharacteristicNotification(MOUSE_SERVICE_UUID, MOUSE_READ_FUNC_UUID, true)) {
-//            Log.e(TAG, "setCharacteristicNotification() failed!");
-//            return false;
-//        }
-
         BluetoothGattService service = mBluetoothGatt.getService(MOUSE_SERVICE_UUID);
         if (service == null) {
             return false;
