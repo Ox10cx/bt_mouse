@@ -11,10 +11,10 @@ interface IService {
     boolean connect(String addr);
     void disconnect(String addr);
 
-    void turnOnImmediateAlert(String addr,int index);
-    void turnOffImmediateAlert(String addr,int index);
-
-    void setAntiLost(boolean enable);
+//    void turnOnImmediateAlert(String addr,int index);
+//    void turnOffImmediateAlert(String addr,int index);
+//
+//    void setAntiLost(boolean enable);
 
     void controlMouse(String addr, int index);
     void controlMouseSpeed(String addr,int value, int index);

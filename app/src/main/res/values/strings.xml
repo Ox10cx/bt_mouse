@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Pets Hunting</string>
-    <string name="app_versionName" translatable="false">1.9.5</string>
+    <string name="app_versionName" translatable="false">2.0.0</string>
     <string name="set_up">Setup</string>
     <string name="user_guide">User Guide</string>
     <string name="play">Play</string>
@@ -62,6 +62,7 @@
     <string name="moible_not_support_bluetooth4">This device does not support Bluetooth 4.0</string>
 
     <string name="loading">Loading...</string>
+
     <string name="low_battery_remind">设备电量较低,请您及时充电</string>
     <string name="bluetooth_isconnecting">蓝牙正在重连...</string>
     <string name="relinked_bluetooth_ok">重连设备成功</string>

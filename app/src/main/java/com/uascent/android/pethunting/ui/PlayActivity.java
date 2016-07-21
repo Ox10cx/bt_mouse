@@ -51,8 +51,10 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Lg.i(TAG, "onCreate");
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        if (android.os.Build.VERSION.SDK_INT >= 20) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
         setContentView(R.layout.activity_play);
         super.onCreate(savedInstanceState);
         initViews();
@@ -130,7 +132,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     void sendMouseCmd(String addr, int cmd) {
         Lg.i(TAG, "sendMouseCmd:" + cmd);
         controlMouseDir(addr, cmd);
-//        getMouseRsp(addr);
+        getMouseRsp(addr);
     }
 
     /**
@@ -142,7 +144,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     void sendMouseSpeedCmd(String addr, int value, int cmd) {
         Lg.i(TAG, "sendMouseCmd:" + value + "  " + cmd);
         controlMouseSpeed(addr, value, cmd);
-//        getMouseRsp(addr);
+        getMouseRsp(addr);
     }
 
 
@@ -209,7 +211,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
         @Override
         public boolean onRead(String address, byte[] val) throws RemoteException {
-            Lg.i(TAG, "onRead called:" + val[0]);
+            Lg.i(TAG, "onRead called:");
             return false;
         }
 
@@ -236,19 +238,19 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             return true;
         }
 
-        @Override
-        public void onSignalChanged(String address, int rssi) throws RemoteException {
-            Lg.i(TAG, "onSignalChanged called address = " + address + " rssi = " + rssi);
-        }
-
-        public void onPositionChanged(String address, int position) throws RemoteException {
-            Lg.i(TAG, "onPositionChanged called address = " + address + " newpos = " + position);
-        }
-
-        @Override
-        public void onAlertServiceDiscovery(final String btaddr, boolean support) throws RemoteException {
-            Lg.i(TAG, "onAlertServiceDiscovery");
-        }
+//        @Override
+//        public void onSignalChanged(String address, int rssi) throws RemoteException {
+//            Lg.i(TAG, "onSignalChanged called address = " + address + " rssi = " + rssi);
+//        }
+//
+//        public void onPositionChanged(String address, int position) throws RemoteException {
+//            Lg.i(TAG, "onPositionChanged called address = " + address + " newpos = " + position);
+//        }
+//
+//        @Override
+//        public void onAlertServiceDiscovery(final String btaddr, boolean support) throws RemoteException {
+//            Lg.i(TAG, "onAlertServiceDiscovery");
+//        }
 
         @Override
         public void onMouseServiceDiscovery(String address, boolean support) throws RemoteException {

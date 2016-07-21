@@ -7,10 +7,12 @@ interface ICallback {
        void onDisconnect(String address);
        boolean onRead(String address, in byte[] val);
        boolean onWrite(String address, out byte[] val);
-       //蓝牙设备信号改变
-       void onSignalChanged(String address, int rssi);
-       void onPositionChanged(String address, int position);
-       void onAlertServiceDiscovery(String address, boolean support);
-
        void onMouseServiceDiscovery(String address, boolean support);
+
+       //蓝牙设备信号改变
+//       void onSignalChanged(String address, int rssi);
+//       void onPositionChanged(String address, int position);
+//       void onAlertServiceDiscovery(String address, boolean support);
+
+
 }

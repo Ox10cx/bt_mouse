@@ -38,25 +38,42 @@ import java.util.UUID;
  * given Bluetooth LE device.
  */
 public class BluetoothLeClass {
-    private final static String TAG = "BluetoothLeClass";
+    private final static String TAG = "ConnectCatActivity";
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
     private String mBluetoothDeviceAddress;
     protected BluetoothGatt mBluetoothGatt;
 
-    static public final int BLE_STATE_INIT = 0;
-    static public final int BLE_STATE_CONNECTED = 1;
-    static public final int BLE_STATE_CONNECTING = 2;
-    static public final int BLE_STATE_ERROR = 3;
+    /**
+     * 初始状态或者断开连接状态
+     */
+    public static final int BLE_STATE_INIT = 0;
 
+    /**
+     * 连上Ble状态,但没有发现服务
+     */
+    public static final int BLE_STATE_CONNECTED = 1;
+
+    /**
+     * 连上Ble之后，没有发现服务，迅速断开
+     */
+    public static final int BLE_STATE_ERROR = 3;
+
+    /**
+     * 连上Ble并且发现服务，没有断开
+     */
+    public static final int BLE_STATE_CON_SERVICE = 5;
+
+    public static int mBleStatus = 0;
 
 //    static public final int BLE_STATE_ALERTING = 4;
 
-    protected int mBleStatus = BLE_STATE_INIT;
+    //    static public final int BLE_STATE_CONNECTING = 2;
+
 
     protected static final UUID CHARACTERISTIC_UPDATE_NOTIFICATION_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
-    private long currentTime = 0;
+//    private long currentTime = 0;
 
     public interface OnConnectListener {
         public void onConnect(BluetoothGatt gatt);
@@ -128,12 +145,12 @@ public class BluetoothLeClass {
                 // Attempts to discover services after successful connection.
                 if (mBluetoothGatt != null) {
                     boolean ret = mBluetoothGatt.discoverServices();
-                    Log.i(TAG, "Attempting to start service discovery:" + ret);
+                    Lg.i(TAG, "Attempting to start service discovery:" + ret);
                 }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 if (mOnDisconnectListener != null)
                     mOnDisconnectListener.onDisconnect(gatt);
-                Log.i(TAG, "Disconnected from GATT server.");
+                Lg.i(TAG, "Disconnected from GATT server.");
                 mBleStatus = BLE_STATE_INIT;
                 if (mBluetoothGatt != null) {
                     mBluetoothGatt.close();
@@ -148,8 +165,9 @@ public class BluetoothLeClass {
             if (status == BluetoothGatt.GATT_SUCCESS && mOnServiceDiscoverListener != null) {
                 mOnServiceDiscoverListener.onServiceDiscover(gatt);
                 mBleStatus = BLE_STATE_CONNECTED;
+//                mBleStatus = BLE_STATE_CON_SERVICE;
             } else {
-                Log.w(TAG, "onServicesDiscovered received: " + status);
+                Lg.i(TAG, "onServicesDiscovered received: " + status);
                 mBleStatus = BLE_STATE_ERROR;
             }
         }
@@ -159,7 +177,7 @@ public class BluetoothLeClass {
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
             Lg.i(TAG, "onCharacteristicRead");
-            if (mOnDataAvailableListener != null && characteristic.getUuid().equals(BluetoothAntiLostDevice.MOUSE_READCMDRSP_FUNC_UUID)) {
+            if (mOnDataAvailableListener != null && characteristic.getUuid().equals(BluetoothAntiLostDevice.MOUSE_WRITE_FUNC_UUID)) {
                 Lg.i(TAG, "onCharacteristicChanged_onCharacteristicRead");
                 mOnDataAvailableListener.onCharacteristicRead(gatt, characteristic, status);
             }
@@ -200,7 +218,7 @@ public class BluetoothLeClass {
         if (mBluetoothManager == null) {
             mBluetoothManager = (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);
             if (mBluetoothManager == null) {
-                Log.e(TAG, "Unable to initialize BluetoothManager.");
+                Lg.i(TAG, "Unable to initialize BluetoothManager.");
                 return false;
             }
         }

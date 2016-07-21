@@ -228,27 +228,27 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         }
 
 
-        @Override
-        public void onSignalChanged(String address, int rssi) throws RemoteException {
-//            synchronized (mListData) {
-            Lg.i(TAG, "onSignalChanged called address = " + address + " rssi = " + rssi);
-//                for (int i = 0; i < mListData.size(); i++) {
-//                    BtDevice d = mListData.get(i);
-//                    if (d.getAddress().equals(address)) {
-//                        d.setRssi(rssi);
-//                    }
-//                }
-//            }
-        }
-
-        public void onPositionChanged(String address, int position) throws RemoteException {
-            Lg.i(TAG, "onPositionChanged called address = " + address + " newpos = " + position);
-        }
-
-        @Override
-        public void onAlertServiceDiscovery(final String btaddr, final boolean support) throws RemoteException {
-            Lg.i(TAG, "onAlertServiceDiscovery");
-        }
+//        @Override
+//        public void onSignalChanged(String address, int rssi) throws RemoteException {
+////            synchronized (mListData) {
+//            Lg.i(TAG, "onSignalChanged called address = " + address + " rssi = " + rssi);
+////                for (int i = 0; i < mListData.size(); i++) {
+////                    BtDevice d = mListData.get(i);
+////                    if (d.getAddress().equals(address)) {
+////                        d.setRssi(rssi);
+////                    }
+////                }
+////            }
+//        }
+//
+//        public void onPositionChanged(String address, int position) throws RemoteException {
+//            Lg.i(TAG, "onPositionChanged called address = " + address + " newpos = " + position);
+//        }
+//
+//        @Override
+//        public void onAlertServiceDiscovery(final String btaddr, final boolean support) throws RemoteException {
+//            Lg.i(TAG, "onAlertServiceDiscovery");
+//        }
 
         @Override
         public void onMouseServiceDiscovery(final String address, final boolean support) throws RemoteException {
@@ -340,10 +340,10 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                     return;
                 }
                 Lg.i(TAG, "index_checked——>>>>>" + index_checked);
+                isClickMatch = true;
                 if (!connectBLE(index_checked)) {
                     showShortToast(getResources().getString(R.string.match_device_fail));
                 }
-                isClickMatch = true;
                 break;
             default:
                 break;
@@ -358,7 +358,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 //        int status = device.getStatus();
 //        Lg.i(TAG, "device_status = " + status);
         if (device != null && device.getAddress() != null) {
-            Lg.i(TAG, "device_address = " + device.getAddress());
+            Lg.i(TAG, "device_address = " + device.getAddress()+"   device_name:"+device.getName());
             try {
                 ret = mService.connect(device.getAddress());
             } catch (RemoteException e) {

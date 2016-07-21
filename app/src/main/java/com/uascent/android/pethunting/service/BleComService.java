@@ -4,7 +4,6 @@ import android.app.Service;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Intent;
 import android.os.Binder;
@@ -13,18 +12,14 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
-import android.util.Log;
 
 import com.uascent.android.pethunting.devices.BluetoothAntiLostDevice;
 import com.uascent.android.pethunting.devices.BluetoothLeClass;
-import com.uascent.android.pethunting.model.BtDevice;
 import com.uascent.android.pethunting.tools.Lg;
-import com.uascent.android.pethunting.tools.PreventAntiLostCore;
 import com.uascent.android.pethunting.tools.Utils;
 import com.uascent.android.pethunting.ui.ICallback;
 import com.uascent.android.pethunting.ui.IService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,16 +30,16 @@ import java.util.UUID;
  */
 public class BleComService extends Service {
     private static final String TAG = "BleComService";
-    private static final int SCAN_PERIOD = 10000;
-    private static final long LIVE_PERIOD = 1000 * 7;       //点击开始扫描后的10秒停止扫描
+//    private static final int SCAN_PERIOD = 10000;
+//    private static final long LIVE_PERIOD = 1000 * 7;       //点击开始扫描后的10秒停止扫描
 
     private Map<String, BluetoothAntiLostDevice> mActiveDevices = new HashMap<String, BluetoothAntiLostDevice>();
     private Map<String, Integer> mScaningRssi = new HashMap<String, Integer>();
-    private Map<String, List<Integer>> mlivingRssiData = new HashMap<String, List<Integer>>();
+//    private Map<String, List<Integer>> mlivingRssiData = new HashMap<String, List<Integer>>();
 
     private RemoteCallbackList<ICallback> mCallbacks = new RemoteCallbackList<ICallback>();
-    private boolean antiLostEnabled;
-    private final Object mSync = new Object();
+    //    private boolean antiLostEnabled;
+//    private final Object mSync = new Object();
     private HandlerThread mHandlerThread;
     private HandlerThread speedHandlerThread;
     private Handler speedHandler;
@@ -109,24 +104,24 @@ public class BleComService extends Service {
             }
         }
 
-        public void turnOffImmediateAlert(String addr, int index) {
-            bleTurnOffImmediateAlert(addr, index);
-        }
-
-        /**
-         * 发送方向指令
-         * @param addr
-         * @param index
-         */
-        public void turnOnImmediateAlert(String addr, int index) {
-            bleTurnOnImmediateAlert(addr, index);
-        }
-
-
-        public void setAntiLost(boolean enable) {
-            setBleAntiLost(enable);
-        }
-
+        //        public void turnOffImmediateAlert(String addr, int index) {
+//            bleTurnOffImmediateAlert(addr, index);
+//        }
+//
+//        /**
+//         * 发送方向指令
+//         * @param addr
+//         * @param index
+//         */
+//        public void turnOnImmediateAlert(String addr, int index) {
+//            bleTurnOnImmediateAlert(addr, index);
+//        }
+//
+//
+//        public void setAntiLost(boolean enable) {
+//            setBleAntiLost(enable);
+//        }
+//
         @Override
         public void controlMouse(final String addr, final int dir) throws RemoteException {
             speedHandler.post(new Runnable() {
@@ -195,135 +190,6 @@ public class BleComService extends Service {
         }
     }
 
-    private void bleTurnOnImmediateAlert(String addr, int index) {
-        BluetoothAntiLostDevice device = mActiveDevices.get(addr);
-        if (device != null) {
-            Lg.i(TAG, "device != null");
-            device.turnOnImmediateAlert(index);
-        } else {
-            Lg.i(TAG, "the device is null?");
-        }
-    }
-
-    private void bleTurnOffImmediateAlert(String addr, int index) {
-        BluetoothAntiLostDevice device = mActiveDevices.get(addr);
-        if (device != null) {
-            device.turnOffImmediateAlert(index);
-        } else {
-            Lg.i("hjq", "the device is null?");
-        }
-    }
-
-    // 15秒获取一次连接的rssi值并进行判断，是否掉线了。
-    void setBleAntiLost(boolean enable) {
-
-        Lg.i("hjq", "set antilost enable = " + enable);
-        if (antiLostEnabled == enable) {
-            return;
-        }
-
-        antiLostEnabled = enable;
-
-        if (enable) {
-            Thread th = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (antiLostEnabled) {
-                        mScaningRssi.clear();
-                        boolean bleok = false;
-                        for (String k : mActiveDevices.keySet()) {
-                            BluetoothAntiLostDevice d = mActiveDevices.get(k);
-
-                            bleok = (d != null && d.getBleStatus() == BluetoothLeClass.BLE_STATE_CONNECTED);
-                            if (bleok) {
-                                d.readRemoteRssi();
-                                // 必须在此处同步回调函数，否则蓝牙协议栈会出错
-                                synchronized (mScaningRssi) {
-                                    try {
-                                        mScaningRssi.wait();
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }
-
-                        Lg.i("hjq", "ble status = " + bleok);
-                        if (!bleok) {
-                            try {
-                                Thread.sleep(6000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            continue;
-                        }
-
-                        // 判断蓝牙设备是否丢失
-                        for (String k : mlivingRssiData.keySet()) {
-                            int val = -130;    // 蓝牙设备已经丢失的信号值
-                            if (mScaningRssi.get(k) != null) {
-                                val = mScaningRssi.get(k);
-                                mScaningRssi.remove(k);
-                            }
-                            List<Integer> list = mlivingRssiData.get(k);
-                            if (list.size() > 20) {
-                                list.remove(0);
-                            }
-                            list.add(val);
-                        }
-
-                        for (String key : mScaningRssi.keySet()) {
-                            List<Integer> list = new ArrayList<Integer>();
-                            list.add(mScaningRssi.get(key));
-
-                            mlivingRssiData.put(key, list);
-                        }
-
-                        Map<String, Double> rssidata = PreventAntiLostCore.getDeviceState(mlivingRssiData);
-                        for (String key : rssidata.keySet()) {
-                            int rssi = rssidata.get(key).intValue();
-                            int pos;
-
-                            Lg.i("hjq", "rssi = " + rssi);
-                            if (rssi < -100) {
-                                pos = BtDevice.LOST;
-                            } else {
-                                pos = BtDevice.OK;
-                            }
-
-                            synchronized (mActiveDevices) {
-                                if (mActiveDevices.get(key) == null) {
-                                    continue;
-                                }
-                            }
-
-                            synchronized (mCallbacks) {
-                                int n = mCallbacks.beginBroadcast();
-                                try {
-                                    int i;
-                                    for (i = 0; i < n; i++) {
-                                        mCallbacks.getBroadcastItem(i).onPositionChanged(key, pos);
-                                        mCallbacks.getBroadcastItem(i).onSignalChanged(key, rssi);
-                                    }
-                                } catch (RemoteException e) {
-                                    Lg.i(TAG, "remote call exception->>>" + e);
-                                }
-                                mCallbacks.finishBroadcast();
-                            }
-                        }
-
-                        try {
-                            Thread.sleep(6000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            });
-
-            th.start();
-        }
-    }
 
     /**
      * Connects to the GATT server hosted on the Bluetooth LE device.
@@ -347,29 +213,28 @@ public class BleComService extends Service {
 
         BluetoothAntiLostDevice device = new BluetoothAntiLostDevice(this);
         device.initialize();
-        Lg.i(TAG, "mOnServiceDiscover");
+        //连接Ble设备的监听事情
+        device.setOnConnectListener(mOnConnectListener);
+
+        //断开Ble设备的监听事情
+        device.setOnDisconnectListener(mOnDisconnectListener);
+
         //发现服务端是否支持该服务
         device.setOnServiceDiscoverListener(mOnServiceDiscover);
 
         //收到BLE终端数据交互的事件
         device.setOnDataAvailableListener(mOnDataAvailable);
 
-        device.setOnConnectListener(mOnConnectListener);
-        device.setOnDisconnectListener(mOnDisconnectListener);
-
         //服务端信号监听
         device.setOnReadRemoteRssiListener(mOnReadRemoteRssiListener);
-
         mActiveDevices.put(address, device);
-
         ret = device.connect(address);
         if (ret) {
             Lg.i(TAG, "connect to " + address + " success");
         } else {
             Lg.i(TAG, "connect to " + address + " failed");
         }
-
-        return true;
+        return ret;
     }
 
     /**
@@ -489,7 +354,7 @@ public class BleComService extends Service {
             BluetoothAntiLostDevice leDevice = mActiveDevices.get(device.getAddress());
             if (leDevice != null) {
                 Lg.i(TAG, "leDevice != null");
-                displayGattServices(leDevice.getSupportedGattServices());
+//                displayGattServices(leDevice.getSupportedGattServices());
                 boolean supported = checkMouseService(leDevice.getSupportedGattServices());
                 synchronized (mCallbacks) {
                     int n = mCallbacks.beginBroadcast();
@@ -510,42 +375,67 @@ public class BleComService extends Service {
     };
 
     boolean checkMouseService(List<BluetoothGattService> gattServices) {
-        Log.e(TAG, "checkCon_MouseService");
         boolean bWriteFn = false;
-        boolean bReadFn = false;
-
         if (gattServices == null) {
             return false;
         }
-
+        Lg.e(TAG, "checkCon_MouseService" + "    gattServices length:" + gattServices.size());
         for (BluetoothGattService gattService : gattServices) {
             final UUID serviceUUID = gattService.getUuid();
             Lg.i(TAG, "-->service uuid:" + gattService.getUuid());
-
             if (!serviceUUID.equals(BluetoothAntiLostDevice.MOUSE_SERVICE_UUID)) {
                 continue;
             }
-
             List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
             for (final BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
-
                 Lg.i(TAG, "---->char uuid:" + gattCharacteristic.getUuid());
                 if (!bWriteFn) {
                     bWriteFn = gattCharacteristic.getUuid().equals(BluetoothAntiLostDevice.MOUSE_WRITE_FUNC_UUID);
                 }
-
-                if (!bReadFn) {
-                    bReadFn = gattCharacteristic.getUuid().equals(BluetoothAntiLostDevice.MOUSE_READ_FUNC_UUID);
-                }
-
-                if (bWriteFn && bReadFn) {
+                if (bWriteFn) {
                     return true;
                 }
             }
         }
-
         return false;
     }
+
+
+//    boolean checkMouseService(List<BluetoothGattService> gattServices) {
+//        boolean bWriteFn = false;
+////        boolean bReadFn = false;
+//        if (gattServices == null) {
+//            return false;
+//        }
+//        Lg.e(TAG, "checkCon_MouseService" + "    gattServices length:" + gattServices.size());
+//
+//        for (BluetoothGattService gattService : gattServices) {
+//            final UUID serviceUUID = gattService.getUuid();
+//            Lg.i(TAG, "-->service uuid:" + gattService.getUuid());
+//            if (!serviceUUID.equals(BluetoothAntiLostDevice.MOUSE_SERVICE_UUID)) {
+//                continue;
+//            }
+//            List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
+//            for (final BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
+//                Lg.i(TAG, "---->char uuid:" + gattCharacteristic.getUuid());
+//                if (!bWriteFn) {
+//                    bWriteFn = gattCharacteristic.getUuid().equals(BluetoothAntiLostDevice.MOUSE_WRITE_FUNC_UUID);
+//                }
+//                if (bWriteFn) {
+//                    return true;
+//                }
+//
+////                if (!bReadFn) {
+////                    bReadFn = gattCharacteristic.getUuid().equals(BluetoothAntiLostDevice.MOUSE_READ_FUNC_UUID);
+////                }
+////                if (bWriteFn && bReadFn) {
+////                    return true;
+////                }
+//            }
+//        }
+//
+//        return false;
+//    }
 
     /**
      * 收到BLE终端数据交互的事件
@@ -609,48 +499,179 @@ public class BleComService extends Service {
         }
     };
 
-    private void displayGattServices(List<BluetoothGattService> gattServices) {
-        if (gattServices == null) {
-            return;
-        }
+//    private void displayGattServices(List<BluetoothGattService> gattServices) {
+//        if (gattServices == null) {
+//            return;
+//        }
+//
+//        for (BluetoothGattService gattService : gattServices) {
+//            //-----Service的字段信息-----//
+//            int type = gattService.getType();
+//            final UUID serviceUUID = gattService.getUuid();
+//            Lg.i(TAG, "-->service type:" + Utils.getServiceType(type));
+//            Lg.i(TAG, "-->includedServices size:" + gattService.getIncludedServices().size());
+//            Lg.i(TAG, "-->service uuid:" + gattService.getUuid());
+//
+//            //-----Characteristics的字段信息-----//
+//            List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
+//            for (final BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
+//                Lg.i(TAG, "---->char uuid:" + gattCharacteristic.getUuid());
+//
+//                int permission = gattCharacteristic.getPermissions();
+//                Lg.i(TAG, "---->char permission:" + Utils.getCharPermission(permission));
+//
+//                int property = gattCharacteristic.getProperties();
+//                Lg.i(TAG, "---->char property:" + Utils.getCharPropertie(property));
+//
+//                byte[] data = gattCharacteristic.getValue();
+//                if (data != null && data.length > 0) {
+//                    Lg.i(TAG, "---->char value:" + new String(data));
+//                }
+//
+//                //-----Descriptors的字段信息-----//
+//                List<BluetoothGattDescriptor> gattDescriptors = gattCharacteristic.getDescriptors();
+//                for (BluetoothGattDescriptor gattDescriptor : gattDescriptors) {
+//                    Lg.i(TAG, "-------->desc uuid:" + gattDescriptor.getUuid());
+//                    int descPermission = gattDescriptor.getPermissions();
+//                    Lg.i(TAG, "-------->desc permission:" + Utils.getDescPermission(descPermission));
+//
+//                    byte[] desData = gattDescriptor.getValue();
+//                    if (desData != null && desData.length > 0) {
+//                        Lg.i(TAG, "-------->desc value:" + new String(desData));
+//                    }
+//                }
+//            }
+//        }
+//    }
 
-        for (BluetoothGattService gattService : gattServices) {
-            //-----Service的字段信息-----//
-            int type = gattService.getType();
-            final UUID serviceUUID = gattService.getUuid();
-            Lg.i(TAG, "-->service type:" + Utils.getServiceType(type));
-            Lg.i(TAG, "-->includedServices size:" + gattService.getIncludedServices().size());
-            Lg.i(TAG, "-->service uuid:" + gattService.getUuid());
 
-            //-----Characteristics的字段信息-----//
-            List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
-            for (final BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
-                Lg.i(TAG, "---->char uuid:" + gattCharacteristic.getUuid());
+    //    private void bleTurnOnImmediateAlert(String addr, int index) {
+//        BluetoothAntiLostDevice device = mActiveDevices.get(addr);
+//        if (device != null) {
+//            Lg.i(TAG, "device != null");
+//            device.turnOnImmediateAlert(index);
+//        } else {
+//            Lg.i(TAG, "the device is null?");
+//        }
+//    }
+//
+//    private void bleTurnOffImmediateAlert(String addr, int index) {
+//        BluetoothAntiLostDevice device = mActiveDevices.get(addr);
+//        if (device != null) {
+//            device.turnOffImmediateAlert(index);
+//        } else {
+//            Lg.i("hjq", "the device is null?");
+//        }
+//    }
 
-                int permission = gattCharacteristic.getPermissions();
-                Lg.i(TAG, "---->char permission:" + Utils.getCharPermission(permission));
-
-                int property = gattCharacteristic.getProperties();
-                Lg.i(TAG, "---->char property:" + Utils.getCharPropertie(property));
-
-                byte[] data = gattCharacteristic.getValue();
-                if (data != null && data.length > 0) {
-                    Lg.i(TAG, "---->char value:" + new String(data));
-                }
-
-                //-----Descriptors的字段信息-----//
-                List<BluetoothGattDescriptor> gattDescriptors = gattCharacteristic.getDescriptors();
-                for (BluetoothGattDescriptor gattDescriptor : gattDescriptors) {
-                    Lg.i(TAG, "-------->desc uuid:" + gattDescriptor.getUuid());
-                    int descPermission = gattDescriptor.getPermissions();
-                    Lg.i(TAG, "-------->desc permission:" + Utils.getDescPermission(descPermission));
-
-                    byte[] desData = gattDescriptor.getValue();
-                    if (desData != null && desData.length > 0) {
-                        Lg.i(TAG, "-------->desc value:" + new String(desData));
-                    }
-                }
-            }
-        }
-    }
+    // 15秒获取一次连接的rssi值并进行判断，是否掉线了。
+//    void setBleAntiLost(boolean enable) {
+//
+//        Lg.i("hjq", "set antilost enable = " + enable);
+//        if (antiLostEnabled == enable) {
+//            return;
+//        }
+//
+//        antiLostEnabled = enable;
+//
+//        if (enable) {
+//            Thread th = new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    while (antiLostEnabled) {
+//                        mScaningRssi.clear();
+//                        boolean bleok = false;
+//                        for (String k : mActiveDevices.keySet()) {
+//                            BluetoothAntiLostDevice d = mActiveDevices.get(k);
+//
+//                            bleok = (d != null && d.getBleStatus() == BluetoothLeClass.BLE_STATE_CONNECTED);
+//                            if (bleok) {
+//                                d.readRemoteRssi();
+//                                // 必须在此处同步回调函数，否则蓝牙协议栈会出错
+//                                synchronized (mScaningRssi) {
+//                                    try {
+//                                        mScaningRssi.wait();
+//                                    } catch (InterruptedException e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                }
+//                            }
+//                        }
+//
+//                        Lg.i("hjq", "ble status = " + bleok);
+//                        if (!bleok) {
+//                            try {
+//                                Thread.sleep(6000);
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+//                            continue;
+//                        }
+//
+//                        // 判断蓝牙设备是否丢失
+//                        for (String k : mlivingRssiData.keySet()) {
+//                            int val = -130;    // 蓝牙设备已经丢失的信号值
+//                            if (mScaningRssi.get(k) != null) {
+//                                val = mScaningRssi.get(k);
+//                                mScaningRssi.remove(k);
+//                            }
+//                            List<Integer> list = mlivingRssiData.get(k);
+//                            if (list.size() > 20) {
+//                                list.remove(0);
+//                            }
+//                            list.add(val);
+//                        }
+//
+//                        for (String key : mScaningRssi.keySet()) {
+//                            List<Integer> list = new ArrayList<Integer>();
+//                            list.add(mScaningRssi.get(key));
+//
+//                            mlivingRssiData.put(key, list);
+//                        }
+//
+//                        Map<String, Double> rssidata = PreventAntiLostCore.getDeviceState(mlivingRssiData);
+//                        for (String key : rssidata.keySet()) {
+//                            int rssi = rssidata.get(key).intValue();
+//                            int pos;
+//
+//                            Lg.i("hjq", "rssi = " + rssi);
+//                            if (rssi < -100) {
+//                                pos = BtDevice.LOST;
+//                            } else {
+//                                pos = BtDevice.OK;
+//                            }
+//
+//                            synchronized (mActiveDevices) {
+//                                if (mActiveDevices.get(key) == null) {
+//                                    continue;
+//                                }
+//                            }
+//
+//                            synchronized (mCallbacks) {
+//                                int n = mCallbacks.beginBroadcast();
+//                                try {
+//                                    int i;
+//                                    for (i = 0; i < n; i++) {
+//                                        mCallbacks.getBroadcastItem(i).onPositionChanged(key, pos);
+//                                        mCallbacks.getBroadcastItem(i).onSignalChanged(key, rssi);
+//                                    }
+//                                } catch (RemoteException e) {
+//                                    Lg.i(TAG, "remote call exception->>>" + e);
+//                                }
+//                                mCallbacks.finishBroadcast();
+//                            }
+//                        }
+//
+//                        try {
+//                            Thread.sleep(6000);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            });
+//
+//            th.start();
+//        }
+//    }
 }
