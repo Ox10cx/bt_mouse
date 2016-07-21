@@ -383,6 +383,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     protected void onPause() {
         super.onPause();
         Lg.i(TAG, "onPause");
+        ver_sb.setProgress(0);
         if (mConnection != null) {
             if (dirValue != BluetoothAntiLostDevice.MOUSE_STOP) {
                 controlMouseDir(device.getAddress(), BluetoothAntiLostDevice.MOUSE_STOP);

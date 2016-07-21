@@ -72,6 +72,7 @@
             android:screenOrientation="landscape"></activity>
         <activity
             android:name=".ui.ConnectCatActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"></activity>
 
         <service
