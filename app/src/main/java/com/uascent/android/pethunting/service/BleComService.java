@@ -13,7 +13,6 @@ import android.os.IBinder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 
-import com.uascent.android.pethunting.devices.BluetoothAntiLostDevice;
 import com.uascent.android.pethunting.devices.BluetoothLeClass;
 import com.uascent.android.pethunting.tools.Lg;
 import com.uascent.android.pethunting.tools.Utils;
@@ -33,7 +32,7 @@ public class BleComService extends Service {
 //    private static final int SCAN_PERIOD = 10000;
 //    private static final long LIVE_PERIOD = 1000 * 7;       //点击开始扫描后的10秒停止扫描
 
-    private Map<String, BluetoothAntiLostDevice> mActiveDevices = new HashMap<String, BluetoothAntiLostDevice>();
+    private Map<String, BluetoothLeClass> mActiveDevices = new HashMap<String, BluetoothLeClass>();
     private Map<String, Integer> mScaningRssi = new HashMap<String, Integer>();
 //    private Map<String, List<Integer>> mlivingRssiData = new HashMap<String, List<Integer>>();
 
@@ -104,24 +103,6 @@ public class BleComService extends Service {
             }
         }
 
-        //        public void turnOffImmediateAlert(String addr, int index) {
-//            bleTurnOffImmediateAlert(addr, index);
-//        }
-//
-//        /**
-//         * 发送方向指令
-//         * @param addr
-//         * @param index
-//         */
-//        public void turnOnImmediateAlert(String addr, int index) {
-//            bleTurnOnImmediateAlert(addr, index);
-//        }
-//
-//
-//        public void setAntiLost(boolean enable) {
-//            setBleAntiLost(enable);
-//        }
-//
         @Override
         public void controlMouse(final String addr, final int dir) throws RemoteException {
             speedHandler.post(new Runnable() {
@@ -145,7 +126,7 @@ public class BleComService extends Service {
 
         @Override
         public void readMouseRsp(final String addr) throws RemoteException {
-            speedHandler.post(new Runnable() {
+            myHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     Lg.i(TAG, "readMouseRsp_run");
@@ -167,7 +148,7 @@ public class BleComService extends Service {
 
 
     private boolean bleControlMouse(String addr, int dir) {
-        BluetoothAntiLostDevice device = mActiveDevices.get(addr);
+        BluetoothLeClass device = mActiveDevices.get(addr);
         if (device != null) {
             Lg.i(TAG, "device != null");
             return device.mouseControl(dir);
@@ -179,7 +160,7 @@ public class BleComService extends Service {
     }
 
     private boolean bleControlMouseSpeed(String addr, int value, int dir) {
-        BluetoothAntiLostDevice device = mActiveDevices.get(addr);
+        BluetoothLeClass device = mActiveDevices.get(addr);
         if (device != null) {
             Lg.i(TAG, "device != null");
             return device.mouseControlSpeed(value, dir);
@@ -203,7 +184,7 @@ public class BleComService extends Service {
     boolean connectBtDevice(String address) {
         boolean ret;
 
-        BluetoothAntiLostDevice d = mActiveDevices.get(address);
+        BluetoothLeClass d = mActiveDevices.get(address);
         if (d != null) {
             Lg.i(TAG, "warning the address: " + address + " is not disconnected");
             d.disconnect();
@@ -211,7 +192,7 @@ public class BleComService extends Service {
             mActiveDevices.remove(address);
         }
 
-        BluetoothAntiLostDevice device = new BluetoothAntiLostDevice(this);
+        BluetoothLeClass device = new BluetoothLeClass(this);
         device.initialize();
         //连接Ble设备的监听事情
         device.setOnConnectListener(mOnConnectListener);
@@ -244,7 +225,7 @@ public class BleComService extends Service {
      * callback.
      */
     void disconnectBtDevice(String address) {
-        BluetoothAntiLostDevice device = mActiveDevices.get(address);
+        BluetoothLeClass device = mActiveDevices.get(address);
         if (device != null) {
             Lg.i(TAG, "device != null");
             mActiveDevices.remove(address);
@@ -263,7 +244,7 @@ public class BleComService extends Service {
      * @return
      */
     private boolean bleDeviceCmdRsp(String addr) {
-        BluetoothAntiLostDevice device = mActiveDevices.get(addr);
+        BluetoothLeClass device = mActiveDevices.get(addr);
         if (device == null) {
             Lg.i(TAG, "the device is null?");
             return false;
@@ -279,10 +260,10 @@ public class BleComService extends Service {
      * @param address
      */
     private void setBtDeviceBatteryNoc(String address) {
-        BluetoothAntiLostDevice device = mActiveDevices.get(address);
+        BluetoothLeClass device = mActiveDevices.get(address);
         if (device != null) {
             Lg.i(TAG, "setCharacteristi_batterycNotification");
-            device.setCharacteristicNotification(BluetoothAntiLostDevice.BATTERY_SERVICE_UUID, BluetoothAntiLostDevice.BATTERY_FUNC_UUID, true);
+            device.setCharacteristicNotification(BluetoothLeClass.BATTERY_SERVICE_UUID, BluetoothLeClass.BATTERY_FUNC_UUID, true);
         }
     }
 
@@ -290,7 +271,7 @@ public class BleComService extends Service {
         @Override
         public void onDisconnect(BluetoothGatt gatt) {
             BluetoothDevice device = gatt.getDevice();
-            BluetoothAntiLostDevice leDevice = mActiveDevices.get(device.getAddress());
+            BluetoothLeClass leDevice = mActiveDevices.get(device.getAddress());
             if (leDevice != null) {
                 mActiveDevices.remove(device.getAddress());
             } else {
@@ -316,7 +297,7 @@ public class BleComService extends Service {
         @Override
         public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
             BluetoothDevice device = gatt.getDevice();
-            Lg.i("hjq", "read remote " + device.getAddress() + " rssi = " + rssi + " status = " + status);
+            Lg.i(TAG, "read remote " + device.getAddress() + " rssi = " + rssi + " status = " + status);
             synchronized (mScaningRssi) {
                 mScaningRssi.put(gatt.getDevice().getAddress(), rssi);
                 mScaningRssi.notify();
@@ -351,7 +332,7 @@ public class BleComService extends Service {
         public void onServiceDiscover(BluetoothGatt gatt) {
             Lg.i(TAG, "onServiceDiscover");
             BluetoothDevice device = gatt.getDevice();
-            BluetoothAntiLostDevice leDevice = mActiveDevices.get(device.getAddress());
+            BluetoothLeClass leDevice = mActiveDevices.get(device.getAddress());
             if (leDevice != null) {
                 Lg.i(TAG, "leDevice != null");
 //                displayGattServices(leDevice.getSupportedGattServices());
@@ -383,14 +364,14 @@ public class BleComService extends Service {
         for (BluetoothGattService gattService : gattServices) {
             final UUID serviceUUID = gattService.getUuid();
             Lg.i(TAG, "-->service uuid:" + gattService.getUuid());
-            if (!serviceUUID.equals(BluetoothAntiLostDevice.MOUSE_SERVICE_UUID)) {
+            if (!serviceUUID.equals(BluetoothLeClass.MOUSE_SERVICE_UUID)) {
                 continue;
             }
             List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
             for (final BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
                 Lg.i(TAG, "---->char uuid:" + gattCharacteristic.getUuid());
                 if (!bWriteFn) {
-                    bWriteFn = gattCharacteristic.getUuid().equals(BluetoothAntiLostDevice.MOUSE_WRITE_FUNC_UUID);
+                    bWriteFn = gattCharacteristic.getUuid().equals(BluetoothLeClass.MOUSE_WRITE_FUNC_UUID);
                 }
                 if (bWriteFn) {
                     return true;
@@ -412,21 +393,21 @@ public class BleComService extends Service {
 //        for (BluetoothGattService gattService : gattServices) {
 //            final UUID serviceUUID = gattService.getUuid();
 //            Lg.i(TAG, "-->service uuid:" + gattService.getUuid());
-//            if (!serviceUUID.equals(BluetoothAntiLostDevice.MOUSE_SERVICE_UUID)) {
+//            if (!serviceUUID.equals(BluetoothLeClass.MOUSE_SERVICE_UUID)) {
 //                continue;
 //            }
 //            List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
 //            for (final BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
 //                Lg.i(TAG, "---->char uuid:" + gattCharacteristic.getUuid());
 //                if (!bWriteFn) {
-//                    bWriteFn = gattCharacteristic.getUuid().equals(BluetoothAntiLostDevice.MOUSE_WRITE_FUNC_UUID);
+//                    bWriteFn = gattCharacteristic.getUuid().equals(BluetoothLeClass.MOUSE_WRITE_FUNC_UUID);
 //                }
 //                if (bWriteFn) {
 //                    return true;
 //                }
 //
 ////                if (!bReadFn) {
-////                    bReadFn = gattCharacteristic.getUuid().equals(BluetoothAntiLostDevice.MOUSE_READ_FUNC_UUID);
+////                    bReadFn = gattCharacteristic.getUuid().equals(BluetoothLeClass.MOUSE_READ_FUNC_UUID);
 ////                }
 ////                if (bWriteFn && bReadFn) {
 ////                    return true;
@@ -545,25 +526,6 @@ public class BleComService extends Service {
 //    }
 
 
-    //    private void bleTurnOnImmediateAlert(String addr, int index) {
-//        BluetoothAntiLostDevice device = mActiveDevices.get(addr);
-//        if (device != null) {
-//            Lg.i(TAG, "device != null");
-//            device.turnOnImmediateAlert(index);
-//        } else {
-//            Lg.i(TAG, "the device is null?");
-//        }
-//    }
-//
-//    private void bleTurnOffImmediateAlert(String addr, int index) {
-//        BluetoothAntiLostDevice device = mActiveDevices.get(addr);
-//        if (device != null) {
-//            device.turnOffImmediateAlert(index);
-//        } else {
-//            Lg.i("hjq", "the device is null?");
-//        }
-//    }
-
     // 15秒获取一次连接的rssi值并进行判断，是否掉线了。
 //    void setBleAntiLost(boolean enable) {
 //
@@ -582,7 +544,7 @@ public class BleComService extends Service {
 //                        mScaningRssi.clear();
 //                        boolean bleok = false;
 //                        for (String k : mActiveDevices.keySet()) {
-//                            BluetoothAntiLostDevice d = mActiveDevices.get(k);
+//                            BluetoothLeClass d = mActiveDevices.get(k);
 //
 //                            bleok = (d != null && d.getBleStatus() == BluetoothLeClass.BLE_STATE_CONNECTED);
 //                            if (bleok) {

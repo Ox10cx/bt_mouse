@@ -36,7 +36,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     private static final String TAG = "ConnectCatActivity";
 
     private ArrayList<BtDevice> mListData = new ArrayList<>();
-    private IService mService;
+//    private IService MyApplication.mService;
     private Handler mHandler;
     boolean mScanningStopped;
     private ImageView iv_load_null;
@@ -114,15 +114,15 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Lg.i(TAG, "onServiceDisconnected");
-            mService = null;
+            MyApplication.mService = null;
         }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Lg.i(TAG, "onServiceConnected");
-            mService = IService.Stub.asInterface(service);
+            MyApplication.mService = IService.Stub.asInterface(service);
             try {
-                mService.registerCallback(mCallback);
+                MyApplication.mService.registerCallback(mCallback);
             } catch (RemoteException e) {
                 Lg.i(TAG, " " + e);
             }
@@ -272,7 +272,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                         closeLoadingDialog();
                         showShortToast(getString(R.string.device_service_not_match));
                         try {
-                            mService.disconnect(address);
+                            MyApplication.mService.disconnect(address);
                         } catch (RemoteException e) {
                             e.printStackTrace();
                         }
@@ -360,7 +360,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         if (device != null && device.getAddress() != null) {
             Lg.i(TAG, "device_address = " + device.getAddress()+"   device_name:"+device.getName());
             try {
-                ret = mService.connect(device.getAddress());
+                ret = MyApplication.mService.connect(device.getAddress());
             } catch (RemoteException e) {
                 e.printStackTrace();
                 return ret;
@@ -381,10 +381,10 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         if (mConnection != null) {
             try {
                 if (device != null) {
-                    mService.disconnect(device.getAddress());
+                    MyApplication.mService.disconnect(device.getAddress());
                     Lg.i(TAG, "disconnect_device_address = " + device.getAddress());
                 }
-                mService.unregisterCallback(mCallback);
+                MyApplication.mService.unregisterCallback(mCallback);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -394,10 +394,10 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     }
 
     public void doRefreshWork() {
-        if (mService != null) {
+        if (MyApplication.mService != null) {
             if (device != null) {
                 try {
-                    mService.disconnect(device.getAddress());
+                    MyApplication.mService.disconnect(device.getAddress());
                     Lg.i(TAG, "refresh_disconnect_device_address = " + device.getAddress());
                 } catch (RemoteException e) {
                     e.printStackTrace();
