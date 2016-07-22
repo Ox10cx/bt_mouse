@@ -38,7 +38,7 @@ import java.util.UUID;
  * given Bluetooth LE device.
  */
 public class BluetoothLeClass {
-    private final static String TAG = "ConnectCatActivity";
+    private final static String TAG = "BluetoothLeClass";
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
@@ -177,10 +177,8 @@ public class BluetoothLeClass {
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
             Lg.i(TAG, "onCharacteristicRead");
-            if (mOnDataAvailableListener != null && characteristic.getUuid().equals(BluetoothAntiLostDevice.MOUSE_WRITE_FUNC_UUID)) {
-                Lg.i(TAG, "onCharacteristicChanged_onCharacteristicRead");
-                mOnDataAvailableListener.onCharacteristicRead(gatt, characteristic, status);
-            }
+            if (status == BluetoothGatt.GATT_SUCCESS)
+                Lg.i(TAG, "onCharacteristicRead" + characteristic.getValue()[0]);
         }
 
         /**
@@ -204,6 +202,21 @@ public class BluetoothLeClass {
             if (mOnReadRemoteRssiListener != null) {
                 mOnReadRemoteRssiListener.onReadRemoteRssi(gatt, rssi, status);
             }
+        }
+
+        @Override
+        public void onReliableWriteCompleted(BluetoothGatt gatt, int status) {
+            super.onReliableWriteCompleted(gatt, status);
+            Lg.i(TAG, "onReliableWriteCompleted");
+        }
+
+        @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            super.onCharacteristicWrite(gatt, characteristic, status);
+            Lg.i(TAG, "onCharacteristicWrite");
+            if (status == BluetoothGatt.GATT_SUCCESS)
+                Lg.i(TAG, "onCharacteristicWrite_ok" + characteristic.getValue()[0]);
+
         }
     };
 
