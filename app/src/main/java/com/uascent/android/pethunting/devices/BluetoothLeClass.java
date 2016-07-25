@@ -86,6 +86,8 @@ public class BluetoothLeClass {
     public static final int MOUSE_LEFT = 3;
     public static final int MOUSE_RIGHT = 4;
     public static final byte SPEED_ID = 5;
+    private static boolean isRealWrite = false;
+//    private static boolean isFristWritePerCmd = false;
 
     public interface OnConnectListener {
         public void onConnect(BluetoothGatt gatt);
@@ -202,6 +204,7 @@ public class BluetoothLeClass {
             super.onCharacteristicWrite(gatt, characteristic, status);
             Lg.i(TAG, "onCharacteristicWrite");
             if (status == BluetoothGatt.GATT_SUCCESS) {
+                isRealWrite = true;
                 Lg.i(TAG, "onCharacteristicWrite_ok" + characteristic.getValue()[0]);
                 getMouseRsp();
             }
@@ -385,27 +388,33 @@ public class BluetoothLeClass {
 
     public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
         characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+        isRealWrite = false;
         boolean var = false;
+//        isFristWritePerCmd = true;
         if (mBluetoothGatt != null) {
             var = mBluetoothGatt.writeCharacteristic(characteristic);
         }
         Lg.e(TAG, "writeCharacteristic->>>>" + var + "    write time:" + System.currentTimeMillis());
         //如果写入蓝牙设备失败(可能是上一次的命令还没有得到响应，等待轮训10次发送)
-        int var_count = 0;
-        while (!var) {
-            try {
-                Thread.sleep(400 + 300 * var_count);
-                Lg.i(TAG, "sleep");
-                if (mBluetoothGatt != null) {
-                    var = mBluetoothGatt.writeCharacteristic(characteristic);
+//        if (isFristWritePerCmd) {
+            int var_count = 0;
+            while (!var || !isRealWrite) {
+                try {
+//                    isFristWritePerCmd=false;
+                    Thread.sleep(300 + 300 * var_count);
+                    Lg.i(TAG, "sleep");
+                    if (mBluetoothGatt != null) {
+                        var = mBluetoothGatt.writeCharacteristic(characteristic);
+                    }
+                    Lg.e(TAG, "writeCharacteristic-repeat_var_>>>>" + var + "    write time:" + System.currentTimeMillis());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-                Lg.e(TAG, "writeCharacteristic-repeat_var_>>>>" + var + "    write time:" + System.currentTimeMillis());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                var_count++;
+                if (var_count == 10) return;
             }
-            var_count++;
-            if (var_count == 10) return;
-        }
+//        }
+
     }
 
     /**

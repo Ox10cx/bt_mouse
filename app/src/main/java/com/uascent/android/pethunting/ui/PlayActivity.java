@@ -34,19 +34,19 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     private ImageView iv_play_guide, iv_play_home;
     private ImageView iv_top_dir, iv_below_dir, iv_left_dir, iv_right_dir;
     private ImageView iv_battery;
-//    private IService MyApplication.mService;
+    //    private IService MyApplication.mService;
     private Handler mHandler;
     private BtDevice device;
     private static int speedValue = 0;
     private static int dirValue = 0;
     private static int startSpeed = 0;
-//    private int preDirValue = 0;
+    //    private int preDirValue = 0;
     private Long preTime = 0l;
     private static int countBatteryLow = 0;
     private BluetoothAdapter mBluetoothAdapter;
     //    private static final int REQUEST_ENABLE_CODE = 111;
     private boolean isCmd = false;
-
+    private int curProgress = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,6 +152,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 //        ver_sb_per.setText(progress + "%");
         speedValue = progress / 10;
+        curProgress = progress;
 //        Lg.i(TAG, "onProgressChanged_speedValue->>" + speedValue);
     }
 
@@ -378,19 +379,41 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     protected void onResume() {
         Lg.i(TAG, "onResume");
         MyApplication.getInstance().isAutoBreak = false;
+        if (curProgress != 0) {
+            ver_sb.setProgress(0);
+        }
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        super.onPause();
         Lg.i(TAG, "onPause");
         ver_sb.setProgress(0);
-        if (mConnection != null) {
-            if (dirValue != BluetoothLeClass.MOUSE_STOP) {
-                controlMouseDir(device.getAddress(), BluetoothLeClass.MOUSE_STOP);
+        Lg.i(TAG, "onPause_setProgress(0)");
+        dirValue = BluetoothLeClass.MOUSE_STOP;
+
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        Lg.i(TAG, "onStop");
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                Lg.i(TAG, "onStop_run()");
+                if (mConnection != null) {
+                    Lg.i(TAG, "mConnection != null");
+                    if (device != null) {
+                        controlMouseDir(device.getAddress(), BluetoothLeClass.MOUSE_STOP);
+                    }
+                }
             }
-        }
+        }.start();
+
+
+        super.onStop();
     }
 
     @Override
@@ -419,7 +442,9 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         if (mConnection != null) {
             try {
                 if (dirValue != BluetoothLeClass.MOUSE_STOP) {
-                    controlMouseDir(device.getAddress(), BluetoothLeClass.MOUSE_STOP);
+                    if (device != null) {
+                        controlMouseDir(device.getAddress(), BluetoothLeClass.MOUSE_STOP);
+                    }
                 }
                 Lg.i(TAG, "onDestroy->>unregisterCallback");
                 if (MyApplication.mService != null) {
@@ -442,10 +467,12 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     public void onSeekBarStop() {
         Lg.i(TAG, "onSeekBarStop_滑动到底部-->>" + "   speedValue:" + 0 + "  dirValue: " + dirValue);
         ver_sb.setProgress(0);
-        if (dirValue != 0) {
-            sendMouseSpeedCmd(device.getAddress(), 0, dirValue);
-        } else {  //方向键先松开  dirvalue=0
-            sendMouseCmd(device.getAddress(), dirValue);
+        if (device != null) {
+            if (dirValue != 0) {
+                sendMouseSpeedCmd(device.getAddress(), 0, dirValue);
+            } else {  //方向键先松开  dirvalue=0
+                sendMouseCmd(device.getAddress(), dirValue);
+            }
         }
         startSpeed = 0;
     }
@@ -477,10 +504,12 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                     Lg.i(TAG, "event.getAction()---ACTION_DOWN--SendCmd");
                     isCmd = true;
 //                    MyApplication.isCmdSendRepeat = false;
-                    if (speedValue != 0) {  //先滑动滑动条
-                        sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
-                    } else {   //先按住方向键
-                        sendMouseCmd(device.getAddress(), dirValue);
+                    if (device != null) {
+                        if (speedValue != 0) {  //先滑动滑动条
+                            sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+                        } else {   //先按住方向键
+                            sendMouseCmd(device.getAddress(), dirValue);
+                        }
                     }
                 }
                 preTime = System.currentTimeMillis();
@@ -493,7 +522,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 dirValue = BluetoothLeClass.MOUSE_STOP;
 //                MyApplication.isCmdSendRepeat = false;
                 Lg.i(TAG, "event.getAction()---ACTION_UP--" + dirValue);
-                if (isCmd) {
+                if (isCmd && device != null) {
                     sendMouseCmd(device.getAddress(), dirValue);
                 }
                 break;
@@ -504,7 +533,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     @Override
     public void onSeekBarStopTouch() {
         Lg.i(TAG, "onSeekBarStopTouch_speedValue->>>" + speedValue + " startSpeed->>>" + startSpeed);
-        if (speedValue != startSpeed) {
+        if (device != null && speedValue != startSpeed) {
             if (dirValue != 0) {
 //                MyApplication.isCmdSendRepeat = false;
                 sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
@@ -527,10 +556,12 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         if (!isCmd) {
             Lg.i(TAG, "onLongClick");
             isCmd = true;
-            if (speedValue != 0) {  //先滑动滑动条
-                sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
-            } else {   //先按住方向键
-                sendMouseCmd(device.getAddress(), dirValue);
+            if (device != null) {
+                if (speedValue != 0) {  //先滑动滑动条
+                    sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+                } else {   //先按住方向键
+                    sendMouseCmd(device.getAddress(), dirValue);
+                }
             }
         }
         return false;
