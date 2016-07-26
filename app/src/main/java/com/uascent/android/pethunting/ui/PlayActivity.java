@@ -284,18 +284,12 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             } else {
                 Lg.i(TAG, "!----mBluetoothAdapter.isEnabled()");
                 openBlueTooth();
-
-//                Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//                startActivityForResult(enableIntent, REQUEST_ENABLE_CODE);
             }
         } else {  //打开蓝牙开关之后，重新连接设备
             Lg.i(TAG, "mBluetoothAdapter = null");
             BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
             mBluetoothAdapter = mBluetoothManager.getAdapter();
             openBlueTooth();
-
-//            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//            startActivityForResult(enableIntent, REQUEST_ENABLE_CODE);
         }
     }
 
@@ -388,31 +382,29 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     @Override
     protected void onPause() {
         Lg.i(TAG, "onPause");
-        ver_sb.setProgress(0);
-        Lg.i(TAG, "onPause_setProgress(0)");
-        dirValue = BluetoothLeClass.MOUSE_STOP;
-
+        if (!MyApplication.getInstance().isAutoBreak) {
+            ver_sb.setProgress(0);
+            Lg.i(TAG, "onPause_setProgress(0)");
+            dirValue = BluetoothLeClass.MOUSE_STOP;
+        }
         super.onPause();
     }
 
     @Override
     protected void onStop() {
         Lg.i(TAG, "onStop");
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                Lg.i(TAG, "onStop_run()");
-                if (mConnection != null) {
-                    Lg.i(TAG, "mConnection != null");
-                    if (device != null) {
+        if (!MyApplication.getInstance().isAutoBreak) {
+            new Thread() {
+                @Override
+                public void run() {
+                    super.run();
+                    Lg.i(TAG, "onStop_run()");
+                    if (mConnection != null && device != null) {
                         controlMouseDir(device.getAddress(), BluetoothLeClass.MOUSE_STOP);
                     }
                 }
-            }
-        }.start();
-
-
+            }.start();
+        }
         super.onStop();
     }
 
@@ -432,13 +424,16 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     protected void onDestroy() {
         Lg.i(TAG, "onDestroy--->" + MyApplication.getInstance().isAutoBreak);
         if (MyApplication.getInstance().isAutoBreak) {
-            autoBreakConnect();
+            breakConnect();
             Lg.i(TAG, "onDestroy->>unbindService");
         }
         super.onDestroy();
     }
 
-    private void autoBreakConnect() {
+    /**
+     * 断开连接
+     */
+    private void breakConnect() {
         if (mConnection != null) {
             try {
                 if (dirValue != BluetoothLeClass.MOUSE_STOP) {
@@ -497,13 +492,11 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             case MotionEvent.ACTION_DOWN:  //判断按下和抬起的时间间隔
                 Lg.i(TAG, "event.getAction()---ACTION_DOWN--" + dirValue);
                 if (System.currentTimeMillis() - preTime < 200) {
-//                    MyApplication.isCmdSendRepeat = true;
                     isCmd = false;
                     Lg.i(TAG, "event.getAction()---ACTION_DOWN--noSendCmd-time");
                 } else {
                     Lg.i(TAG, "event.getAction()---ACTION_DOWN--SendCmd");
                     isCmd = true;
-//                    MyApplication.isCmdSendRepeat = false;
                     if (device != null) {
                         if (speedValue != 0) {  //先滑动滑动条
                             sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
@@ -520,7 +513,6 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
             case MotionEvent.ACTION_UP:
                 dirValue = BluetoothLeClass.MOUSE_STOP;
-//                MyApplication.isCmdSendRepeat = false;
                 Lg.i(TAG, "event.getAction()---ACTION_UP--" + dirValue);
                 if (isCmd && device != null) {
                     sendMouseCmd(device.getAddress(), dirValue);
@@ -535,7 +527,6 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         Lg.i(TAG, "onSeekBarStopTouch_speedValue->>>" + speedValue + " startSpeed->>>" + startSpeed);
         if (device != null && speedValue != startSpeed) {
             if (dirValue != 0) {
-//                MyApplication.isCmdSendRepeat = false;
                 sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
             } else {  //方向键先松开
                 sendMouseCmd(device.getAddress(), dirValue);
@@ -567,21 +558,4 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         return false;
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        Lg.i(TAG, "onActivityResult_result:" + requestCode);
-//        super.onActivityResult(requestCode, resultCode, data);
-//        switch (requestCode) {
-//            case REQUEST_ENABLE_CODE: {
-//                if (resultCode == Activity.RESULT_OK) {
-//                    relinkBleDevice();
-//                } else {
-//                    showShortToast(getResources().getString(R.string.bluetooth_switch_not_opened));
-//                }
-//                break;
-//            }
-//            default:
-//                break;
-//        }
-//    }
 }

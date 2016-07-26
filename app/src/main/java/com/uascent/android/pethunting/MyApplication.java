@@ -17,11 +17,12 @@ public class MyApplication extends Application {
     private static final String TAG = "MyApplication";
     public LinkedList<Activity> activityList = new LinkedList<Activity>();
     private static MyApplication instance;
+    /**
+     * 是否手动断开（点击返回键）
+     */
     public boolean isAutoBreak = false;
     public static Typeface typeFace;
-    //    public static boolean isCmdSendRepeat=false;
     public static IService mService;
-//    public static boolean isReadySendReceive = true;
 
     @Override
     public void onCreate() {

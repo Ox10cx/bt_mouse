@@ -31,6 +31,8 @@ import android.util.Log;
 import com.uascent.android.pethunting.tools.Lg;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 /**
@@ -87,6 +89,7 @@ public class BluetoothLeClass {
     public static final int MOUSE_RIGHT = 4;
     public static final byte SPEED_ID = 5;
     private static boolean isRealWrite = false;
+    private Timer timer = null;
 //    private static boolean isFristWritePerCmd = false;
 
     public interface OnConnectListener {
@@ -205,6 +208,7 @@ public class BluetoothLeClass {
             Lg.i(TAG, "onCharacteristicWrite");
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 isRealWrite = true;
+                timer.cancel();
                 Lg.i(TAG, "onCharacteristicWrite_ok" + characteristic.getValue()[0]);
                 getMouseRsp();
             }
@@ -386,34 +390,48 @@ public class BluetoothLeClass {
         return true;
     }
 
-    public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
+    public synchronized void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
         characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
         isRealWrite = false;
         boolean var = false;
-//        isFristWritePerCmd = true;
         if (mBluetoothGatt != null) {
             var = mBluetoothGatt.writeCharacteristic(characteristic);
         }
-        Lg.e(TAG, "writeCharacteristic->>>>" + var + "    write time:" + System.currentTimeMillis());
+        Lg.e(TAG, "writeCharacteristic->>>>" + var);
         //如果写入蓝牙设备失败(可能是上一次的命令还没有得到响应，等待轮训10次发送)
-//        if (isFristWritePerCmd) {
-            int var_count = 0;
-            while (!var || !isRealWrite) {
+        int var_count = 0;
+        if (!var) {
+            while (!var) {
                 try {
-//                    isFristWritePerCmd=false;
-                    Thread.sleep(300 + 300 * var_count);
+                    Thread.sleep(150 + 200 * var_count);
                     Lg.i(TAG, "sleep");
                     if (mBluetoothGatt != null) {
                         var = mBluetoothGatt.writeCharacteristic(characteristic);
                     }
-                    Lg.e(TAG, "writeCharacteristic-repeat_var_>>>>" + var + "    write time:" + System.currentTimeMillis());
+                    Lg.e(TAG, "writeCharacteristic-repeat_var_>>>>" + var);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 var_count++;
-                if (var_count == 10) return;
+                if (var_count == 10) {
+                    mouseControl(MOUSE_STOP);
+                    return;
+                }
             }
-//        }
+        } else {
+            if (timer != null) {
+                timer.cancel();
+            }
+            timer = new Timer();
+//                Lg.i(TAG,"pretime:"+System.currentTimeMillis());
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    mouseControl(MOUSE_STOP);
+                    Lg.i(TAG, "timer.schedule->>>run");
+                }
+            }, 1500);
+        }
 
     }
 
@@ -470,7 +488,6 @@ public class BluetoothLeClass {
      */
     public boolean mouseControl(int direction) {
         Lg.i(TAG, "mouseControl");
-
         if (!checkBleStatus()) {
             return false;
         }
@@ -478,7 +495,6 @@ public class BluetoothLeClass {
         if (service == null) {
             return false;
         }
-
         BluetoothGattCharacteristic characteristic = mBluetoothGatt.getService(MOUSE_SERVICE_UUID).getCharacteristic(MOUSE_WRITE_FUNC_UUID);
         if (characteristic != null) {
             characteristic.setValue(new byte[]{(byte) direction});
@@ -486,7 +502,6 @@ public class BluetoothLeClass {
             Lg.i(TAG, "value:" + direction);
             writeCharacteristic(characteristic);
         }
-
         return true;
     }
 
@@ -502,12 +517,10 @@ public class BluetoothLeClass {
         if (!checkBleStatus()) {
             return false;
         }
-
         BluetoothGattService service = mBluetoothGatt.getService(MOUSE_SERVICE_UUID);
         if (service == null) {
             return false;
         }
-
         BluetoothGattCharacteristic characteristic = mBluetoothGatt.getService(MOUSE_SERVICE_UUID).getCharacteristic(MOUSE_WRITE_FUNC_UUID);
         if (characteristic != null) {
             characteristic.setValue(new byte[]{SPEED_ID, (byte) speed, (byte) direction});
