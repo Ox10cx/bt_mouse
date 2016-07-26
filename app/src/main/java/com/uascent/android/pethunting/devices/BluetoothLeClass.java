@@ -32,7 +32,6 @@ import com.uascent.android.pethunting.tools.Lg;
 
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 
 /**
@@ -202,17 +201,17 @@ public class BluetoothLeClass {
             }
         }
 
-        @Override
-        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            super.onCharacteristicWrite(gatt, characteristic, status);
-            Lg.i(TAG, "onCharacteristicWrite");
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                isRealWrite = true;
-                timer.cancel();
-                Lg.i(TAG, "onCharacteristicWrite_ok" + characteristic.getValue()[0]);
-                getMouseRsp();
-            }
-        }
+//        @Override
+//        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+//            super.onCharacteristicWrite(gatt, characteristic, status);
+//            Lg.i(TAG, "onCharacteristicWrite");
+//            if (status == BluetoothGatt.GATT_SUCCESS) {
+//                isRealWrite = true;
+//                timer.cancel();
+//                Lg.i(TAG, "onCharacteristicWrite_ok" + characteristic.getValue()[0]);
+//                getMouseRsp();
+//            }
+//        }
 
         /**
          * 如果对一个特性启用通知,当远程蓝牙设备特性发送变化，回调函数onCharacteristicChanged( ))被触发。
@@ -400,25 +399,25 @@ public class BluetoothLeClass {
         Lg.e(TAG, "writeCharacteristic->>>>" + var);
         //如果写入蓝牙设备失败(可能是上一次的命令还没有得到响应，等待轮训10次发送)
         int var_count = 0;
-        if (!var) {
-            while (!var) {
-                try {
-                    Thread.sleep(150 + 200 * var_count);
-                    Lg.i(TAG, "sleep");
-                    if (mBluetoothGatt != null) {
-                        var = mBluetoothGatt.writeCharacteristic(characteristic);
-                    }
-                    Lg.e(TAG, "writeCharacteristic-repeat_var_>>>>" + var);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+//        if (!var) {
+        while (!var) {
+            try {
+                Thread.sleep(150 + 200 * var_count);
+                Lg.i(TAG, "sleep");
+                if (mBluetoothGatt != null) {
+                    var = mBluetoothGatt.writeCharacteristic(characteristic);
                 }
-                var_count++;
-                if (var_count == 10) {
-                    mouseControl(MOUSE_STOP);
-                    return;
-                }
+                Lg.e(TAG, "writeCharacteristic-repeat_var_>>>>" + var);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } else {
+            var_count++;
+            if (var_count == 10) {
+                mouseControl(MOUSE_STOP);
+                return;
+            }
+        }
+/*       }else {
             if (timer != null) {
                 timer.cancel();
             }
@@ -431,7 +430,7 @@ public class BluetoothLeClass {
                     Lg.i(TAG, "timer.schedule->>>run");
                 }
             }, 1500);
-        }
+        }*/
 
     }
 
