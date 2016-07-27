@@ -191,7 +191,7 @@ public class BluetoothLeClass {
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
-            Lg.i(TAG, "onCharacteristicRead");
+//            Lg.i(TAG, "onCharacteristicRead");
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Lg.i(TAG, "onCharacteristicRead" + characteristic.getValue()[0]);
                 if (mOnDataAvailableListener != null && characteristic.getUuid().equals(BluetoothLeClass.MOUSE_READCMDRSP_FUNC_UUID)) {
@@ -200,17 +200,17 @@ public class BluetoothLeClass {
             }
         }
 
-//        @Override
-//        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-//            super.onCharacteristicWrite(gatt, characteristic, status);
-//            Lg.i(TAG, "onCharacteristicWrite");
+        //        @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            super.onCharacteristicWrite(gatt, characteristic, status);
+            Lg.i(TAG, "onCharacteristicWrite");
 //            if (status == BluetoothGatt.GATT_SUCCESS) {
 //                isRealWrite = true;
 //                timer.cancel();
 //                Lg.i(TAG, "onCharacteristicWrite_ok" + characteristic.getValue()[0]);
 //                getMouseRsp();
 //            }
-//        }
+        }
 
         /**
          * 如果对一个特性启用通知,当远程蓝牙设备特性发送变化，回调函数onCharacteristicChanged( ))被触发。
@@ -220,7 +220,7 @@ public class BluetoothLeClass {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
-            Lg.i(TAG, "onCharacteristicChanged");
+//            Lg.i(TAG, "onCharacteristicChanged");
             if (mOnDataAvailableListener != null && characteristic.getUuid().equals(BluetoothLeClass.BATTERY_FUNC_UUID)) {
                 Lg.i(TAG, "onCharacteristicChanged_onCharacteristicWrite");
                 mOnDataAvailableListener.onCharacteristicWrite(gatt, characteristic);
@@ -401,7 +401,8 @@ public class BluetoothLeClass {
 //        if (!var) {
         while (!var) {
             try {
-                Thread.sleep(150 + 150 * var_count);
+//                Thread.sleep(150 + 150 * var_count);
+                Thread.sleep(150);
                 Lg.i(TAG, "sleep");
                 if (mBluetoothGatt != null) {
                     var = mBluetoothGatt.writeCharacteristic(characteristic);

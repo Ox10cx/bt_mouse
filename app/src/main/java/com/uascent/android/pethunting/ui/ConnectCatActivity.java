@@ -9,7 +9,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.RemoteException;
 import android.text.format.DateUtils;
 import android.view.View;
@@ -36,9 +38,9 @@ import java.util.ArrayList;
 public class ConnectCatActivity extends BaseActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
     private static final String TAG = "ConnectCatActivity";
 
-    private ArrayList<BtDevice> mListData = new ArrayList<>();
+    private static ArrayList<BtDevice> mListData = new ArrayList<>();
     private IService mService;
-    private Handler mHandler;
+    //    private Handler mHandler;
     boolean mScanningStopped;
     private ImageView iv_load_null;
     private Button bt_match;
@@ -64,13 +66,26 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     private boolean isClickMatch = false;
     private boolean isCheckServicee = false;
 
+    /**
+     * 非主线程用于扫描设备
+     */
+    private HandlerThread scanDeviceHandlerThread;
+    private Handler scanDeviceHandler;
+
+    private static final int SCANDEVICEMSG = 2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_connect_cat);
         super.onCreate(savedInstanceState);
         initViews();
-        mHandler = new Handler();
+
+//        mHandler = new Handler();
+        scanDeviceHandlerThread = new HandlerThread("scandevice");
+        scanDeviceHandlerThread.start();
+        scanDeviceHandler = new Handler(scanDeviceHandlerThread.getLooper());
+
         showLoadingDialog();
         BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         if (mBluetoothManager != null) {
@@ -127,14 +142,8 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
             } catch (RemoteException e) {
                 Lg.i(TAG, " " + e);
             }
-
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    scanLeDevice(true);
-                    Lg.i(TAG, "scanLeDevice(true)");
-                }
-            });
+            scanLeDevice(true);
+            Lg.i(TAG, "scanLeDevice(true)");
         }
     };
 
@@ -181,8 +190,13 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
             new BluetoothAdapter.LeScanCallback() {
                 @Override
                 public void onLeScan(final BluetoothDevice device, final int rssi, byte[] scanRecord) {
-//                    closeLoadingDialog();
-                    addDevice(device.getAddress(), device.getName(), rssi);
+                    closeLoadingDialog();
+                    scanDeviceHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            addDevice(device.getAddress(), device.getName(), rssi);
+                        }
+                    });
                 }
             };
 
@@ -283,32 +297,31 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         }
     };
 
+    /**
+     * 用非主线程添加扫描设备
+     *
+     * @param address
+     * @param name
+     * @param rssi
+     */
     public void addDevice(final String address, final String name, final int rssi) {
         Lg.i(TAG, "addDevice called:" + address + "   " + name + "  " + rssi);
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                //避免重复添加
-                for (BtDevice ele : mListData) {
-                    if (ele.getAddress().equalsIgnoreCase(address)) {
-                        return;
-                    }
-                }
-                BtDevice device = new BtDevice();
-                device.setName(name);
-                device.setAddress(address);
-                device.setRssi(rssi);
-                if (count_device == 0) {
-                    device.setChecked(true);
-                }
-                mListData.add(device);
-                iv_load_null.setVisibility(View.GONE);
-                count_device = count_device + 1;
-                Lg.i(TAG, "add_device_ok");
-                adpater.notifyDataSetChanged();
+        //避免重复添加
+        for (BtDevice ele : mListData) {
+            if (ele.getAddress().equalsIgnoreCase(address)) {
+                return;
             }
-        });
+        }
+        BtDevice device = new BtDevice();
+        device.setName(name);
+        device.setAddress(address);
+//                device.setRssi(rssi);
+        Message message = new Message();
+        message.arg1 = SCANDEVICEMSG;
+        message.obj = device;
+        mHandler.sendMessage(message);
     }
+
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -416,4 +429,24 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         }
     }
 
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.arg1 == SCANDEVICEMSG) {
+                BtDevice device = (BtDevice) msg.obj;
+                if (device != null) {
+                    if (count_device == 0) {
+                        device.setChecked(true);
+                    }
+                    mListData.add(device);
+                }
+                iv_load_null.setVisibility(View.GONE);
+                count_device = count_device + 1;
+                Lg.i(TAG, "add_device_ok");
+                adpater.notifyDataSetChanged();
+            }
+        }
+    };
 }
