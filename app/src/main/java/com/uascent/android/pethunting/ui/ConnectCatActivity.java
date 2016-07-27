@@ -23,6 +23,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.uascent.android.pethunting.MyApplication;
 import com.uascent.android.pethunting.R;
 import com.uascent.android.pethunting.adapter.DeviceListAdapter;
+import com.uascent.android.pethunting.devices.BluetoothLeClass;
 import com.uascent.android.pethunting.model.BtDevice;
 import com.uascent.android.pethunting.service.BleComService;
 import com.uascent.android.pethunting.tools.Lg;
@@ -36,7 +37,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     private static final String TAG = "ConnectCatActivity";
 
     private ArrayList<BtDevice> mListData = new ArrayList<>();
-//    private IService MyApplication.mService;
+    private IService mService;
     private Handler mHandler;
     boolean mScanningStopped;
     private ImageView iv_load_null;
@@ -114,15 +115,15 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Lg.i(TAG, "onServiceDisconnected");
-            MyApplication.mService = null;
+            mService = null;
         }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Lg.i(TAG, "onServiceConnected");
-            MyApplication.mService = IService.Stub.asInterface(service);
+            mService = IService.Stub.asInterface(service);
             try {
-                MyApplication.mService.registerCallback(mCallback);
+                mService.registerCallback(mCallback);
             } catch (RemoteException e) {
                 Lg.i(TAG, " " + e);
             }
@@ -272,7 +273,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                         closeLoadingDialog();
                         showShortToast(getString(R.string.device_service_not_match));
                         try {
-                            MyApplication.mService.disconnect(address);
+                            mService.disconnect(address);
                         } catch (RemoteException e) {
                             e.printStackTrace();
                         }
@@ -358,9 +359,9 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 //        int status = device.getStatus();
 //        Lg.i(TAG, "device_status = " + status);
         if (device != null && device.getAddress() != null) {
-            Lg.i(TAG, "device_address = " + device.getAddress()+"   device_name:"+device.getName());
+            Lg.i(TAG, "device_address = " + device.getAddress() + "   device_name:" + device.getName());
             try {
-                ret = MyApplication.mService.connect(device.getAddress());
+                ret = mService.connect(device.getAddress());
             } catch (RemoteException e) {
                 e.printStackTrace();
                 return ret;
@@ -381,10 +382,10 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         if (mConnection != null) {
             try {
                 if (device != null) {
-                    MyApplication.mService.disconnect(device.getAddress());
+                    mService.disconnect(device.getAddress());
                     Lg.i(TAG, "disconnect_device_address = " + device.getAddress());
                 }
-                MyApplication.mService.unregisterCallback(mCallback);
+                mService.unregisterCallback(mCallback);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -394,11 +395,13 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     }
 
     public void doRefreshWork() {
-        if (MyApplication.mService != null) {
+        if (mService != null) {
             if (device != null) {
                 try {
-                    MyApplication.mService.disconnect(device.getAddress());
-                    Lg.i(TAG, "refresh_disconnect_device_address = " + device.getAddress());
+                    if (BluetoothLeClass.mBleStatus == BluetoothLeClass.BLE_STATE_CONNECTED) {
+                        mService.disconnect(device.getAddress());
+                        Lg.i(TAG, "refresh_disconnect_device_address = " + device.getAddress());
+                    }
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }

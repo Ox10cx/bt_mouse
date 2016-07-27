@@ -31,7 +31,6 @@ import android.util.Log;
 import com.uascent.android.pethunting.tools.Lg;
 
 import java.util.List;
-import java.util.Timer;
 import java.util.UUID;
 
 /**
@@ -52,7 +51,7 @@ public class BluetoothLeClass {
     public static final int BLE_STATE_INIT = 0;
 
     /**
-     * 连上Ble状态,但没有发现服务
+     * 连上Ble状态
      */
     public static final int BLE_STATE_CONNECTED = 1;
 
@@ -64,7 +63,7 @@ public class BluetoothLeClass {
     /**
      * 连上Ble并且发现服务，没有断开
      */
-    public static final int BLE_STATE_CON_SERVICE = 5;
+//    public static final int BLE_STATE_CON_SERVICE = 5;
 
     public static int mBleStatus = 0;
 
@@ -87,8 +86,8 @@ public class BluetoothLeClass {
     public static final int MOUSE_LEFT = 3;
     public static final int MOUSE_RIGHT = 4;
     public static final byte SPEED_ID = 5;
-    private static boolean isRealWrite = false;
-    private Timer timer = null;
+//    private static boolean isRealWrite = false;
+//    private Timer timer = null;
 //    private static boolean isFristWritePerCmd = false;
 
     public interface OnConnectListener {
@@ -391,7 +390,7 @@ public class BluetoothLeClass {
 
     public synchronized void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
         characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-        isRealWrite = false;
+//        isRealWrite = false;
         boolean var = false;
         if (mBluetoothGatt != null) {
             var = mBluetoothGatt.writeCharacteristic(characteristic);
@@ -402,7 +401,7 @@ public class BluetoothLeClass {
 //        if (!var) {
         while (!var) {
             try {
-                Thread.sleep(150 + 200 * var_count);
+                Thread.sleep(150 + 150 * var_count);
                 Lg.i(TAG, "sleep");
                 if (mBluetoothGatt != null) {
                     var = mBluetoothGatt.writeCharacteristic(characteristic);

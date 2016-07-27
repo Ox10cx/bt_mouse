@@ -5,7 +5,6 @@ import android.app.Application;
 import android.graphics.Typeface;
 
 import com.uascent.android.pethunting.tools.Lg;
-import com.uascent.android.pethunting.ui.IService;
 
 import java.lang.reflect.Field;
 import java.util.LinkedList;
@@ -22,7 +21,7 @@ public class MyApplication extends Application {
      */
     public boolean isAutoBreak = false;
     public static Typeface typeFace;
-    public static IService mService;
+//    public static IService mService;
 
     @Override
     public void onCreate() {

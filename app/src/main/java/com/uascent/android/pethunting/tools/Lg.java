@@ -2,8 +2,10 @@ package com.uascent.android.pethunting.tools;
 
 import android.util.Log;
 
+import com.uascent.android.pethunting.BuildConfig;
+
 public class Lg {
-    private static boolean debug = true;
+//    private static boolean BuildConfig.debug = true;
     private final static String TAG = "PetHunting";
 
     /**
@@ -12,7 +14,7 @@ public class Lg {
      * @param msg
      */
     public static void i(String msg) {
-        if (debug) {
+        if (BuildConfig.debug) {
             Log.i(TAG, msg);
         }
     }
@@ -24,7 +26,7 @@ public class Lg {
      * @param msg
      */
     public static void i(String tag, String msg) {
-        if (debug) {
+        if (BuildConfig.debug) {
             if (tag == null) {
                 tag = TAG;
             }
@@ -36,7 +38,7 @@ public class Lg {
     }
 
     public static void e(String tag, String msg) {
-        if (debug) {
+        if (BuildConfig.debug) {
             if (tag == null) {
                 tag = TAG;
             }
@@ -48,7 +50,7 @@ public class Lg {
     }
 
     public static void v(String tag, String msg) {
-        if (debug) {
+        if (BuildConfig.debug) {
             if (tag == null) {
                 tag = TAG;
             }
@@ -61,7 +63,7 @@ public class Lg {
 
 
     public static void w(String tag, String msg) {
-        if (debug) {
+        if (BuildConfig.debug) {
             if (tag == null) {
                 tag = TAG;
             }

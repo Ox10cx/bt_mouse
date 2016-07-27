@@ -34,19 +34,24 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     private ImageView iv_play_guide, iv_play_home;
     private ImageView iv_top_dir, iv_below_dir, iv_left_dir, iv_right_dir;
     private ImageView iv_battery;
-    //    private IService MyApplication.mService;
+    private IService mService;
     private Handler mHandler;
     private BtDevice device;
     private static int speedValue = 0;
     private static int dirValue = 0;
     private static int startSpeed = 0;
-    //    private int preDirValue = 0;
     private Long preTime = 0l;
-    private static int countBatteryLow = 0;
+    private int countBatteryLow = 0;
+
     private BluetoothAdapter mBluetoothAdapter;
-    //    private static final int REQUEST_ENABLE_CODE = 111;
     private boolean isCmd = false;
+    private boolean isDownUp = false;
     private int curProgress = 0;
+
+    //求电量的平均值
+    private byte[] batteryArray = new byte[5];
+    private byte batteryIndex = 0;
+    private boolean isFrist = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,17 +176,17 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Lg.i(TAG, "onServiceDisconnected");
-            MyApplication.mService = null;
+            mService = null;
         }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Lg.i(TAG, "onServiceConnected");
-            MyApplication.mService = IService.Stub.asInterface(service);
+            mService = IService.Stub.asInterface(service);
             try {
-                MyApplication.mService.registerCallback(mCallback);
+                mService.registerCallback(mCallback);
                 //读电量
-                MyApplication.mService.setBatteryNoc(device.getAddress());
+                mService.setBatteryNoc(device.getAddress());
             } catch (RemoteException e) {
                 Lg.i(TAG, " " + e);
             }
@@ -203,10 +208,10 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
+                        showShortToast(getString(R.string.bluetooth_has_breaked));
                         relinkBlueTooth();
                     }
                 });
-
             }
         }
 
@@ -219,17 +224,18 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
         @Override
         public boolean onWrite(final String address, final byte[] val) throws RemoteException {
+            Lg.i(TAG, "电量onWrite->>" + val[0]);
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-//                    Lg.i(TAG, "电量onWrite->>" + val[0]);
-                    if (val[0] <= 30) {
+                    //求平均值
+                    if (batteryAver(val[0]) <= 30) {
                         iv_battery.setBackgroundResource(R.drawable.empty_battery);
                         if (countBatteryLow % 3 == 0) {
                             showLongToast(getString(R.string.low_battery_remind));
                         }
                         countBatteryLow++;
-                    } else if (val[0] >= 70) {
+                    } else if (batteryAver(val[0]) >= 70) {
                         iv_battery.setBackgroundResource(R.drawable.full_battery);
                     } else {
                         iv_battery.setBackgroundResource(R.drawable.half_battery);
@@ -321,7 +327,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             public void run() {
 //                showShortToast(getString(R.string.bluetooth_isconnecting));
                 try {
-                    if (!MyApplication.mService.connect(device.getAddress())) {
+                    if (!mService.connect(device.getAddress())) {
                         showShortToast(getString(R.string.relinked_bluetooth_fail));
                     }
                 } catch (RemoteException e) {
@@ -339,7 +345,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
      */
     public void controlMouseDir(String addr, int dir) {
         try {
-            MyApplication.mService.controlMouse(addr, dir);
+            mService.controlMouse(addr, dir);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -353,7 +359,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
      */
     public void controlMouseSpeed(String addr, int value, int dir) {
         try {
-            MyApplication.mService.controlMouseSpeed(addr, value, dir);
+            mService.controlMouseSpeed(addr, value, dir);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -362,7 +368,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
 
     public void getMouseRsp(String addr) {
         try {
-            MyApplication.mService.readMouseRsp(addr);
+            mService.readMouseRsp(addr);
             Lg.i(TAG, "readMouseRsp->>" + addr);
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -434,6 +440,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
      * 断开连接
      */
     private void breakConnect() {
+        Lg.i(TAG, "onDestroy->>breakConnect");
         if (mConnection != null) {
             try {
                 if (dirValue != BluetoothLeClass.MOUSE_STOP) {
@@ -442,13 +449,13 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                     }
                 }
                 Lg.i(TAG, "onDestroy->>unregisterCallback");
-                if (MyApplication.mService != null) {
-                    MyApplication.mService.unregisterCallback(mCallback);
+                if (mService != null) {
                     if (device != null) {
                         Lg.i(TAG, "disconnect_device_address = " + device.getAddress());
-                        MyApplication.mService.disconnect(device.getAddress());
+                        mService.disconnect(device.getAddress());
                         device = null;
                     }
+                    mService.unregisterCallback(mCallback);
                 }
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -491,7 +498,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:  //判断按下和抬起的时间间隔
                 Lg.i(TAG, "event.getAction()---ACTION_DOWN--" + dirValue);
-                if (System.currentTimeMillis() - preTime < 200) {
+                if (System.currentTimeMillis() - preTime < 200 && isDownUp) {
                     isCmd = false;
                     Lg.i(TAG, "event.getAction()---ACTION_DOWN--noSendCmd-time");
                 } else {
@@ -505,6 +512,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                         }
                     }
                 }
+                isDownUp = false;
                 preTime = System.currentTimeMillis();
                 break;
 
@@ -517,6 +525,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 if (isCmd && device != null) {
                     sendMouseCmd(device.getAddress(), dirValue);
                 }
+                isDownUp = true;
                 break;
         }
         return false;
@@ -556,6 +565,34 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             }
         }
         return false;
+    }
+
+    /**
+     * 电量的平均值
+     *
+     * @return
+     */
+    private byte batteryAver(byte value) {
+        batteryArray[batteryIndex] = value;
+        byte tem = 0;
+        int countBattery = 0;
+        if (isFrist) {
+            for (int i = 0; i <= batteryIndex; i++) {
+                countBattery = countBattery + batteryArray[batteryIndex];
+            }
+            tem = (byte) (countBattery / (batteryIndex + 1));
+        } else {
+            for (int i = 0; i < batteryArray.length; i++) {
+                countBattery = countBattery + batteryArray[batteryIndex];
+            }
+            tem = (byte) (countBattery / batteryArray.length);
+        }
+        batteryIndex++;
+        if (batteryIndex == batteryArray.length) {
+            isFrist = false;
+            batteryIndex = 0;
+        }
+        return tem;
     }
 
 }

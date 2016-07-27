@@ -16,6 +16,7 @@ public class BaseActivity extends FragmentActivity {
     private final static String TAG = "BaseActivity";
     private Dialog dialog;
     private String dialogMsg = "";
+    private Toast toast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +42,19 @@ public class BaseActivity extends FragmentActivity {
     }
 
     public void showLongToast(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+        if (toast != null) {
+            toast.cancel();
+        }
+        toast = Toast.makeText(this, text, Toast.LENGTH_LONG);
+        toast.show();
     }
 
     public void showShortToast(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+        if (toast != null) {
+            toast.cancel();
+        }
+        toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     public void showLoadingDialog() {
