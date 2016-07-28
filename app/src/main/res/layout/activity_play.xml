@@ -12,7 +12,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="@dimen/layout_size_50"
+            android:layout_marginTop="@dimen/layout_size_5">
 
             <TextView
                 android:id="@+id/bt_title"
@@ -29,9 +30,9 @@
                 android:id="@+id/iv_battery"
                 android:layout_width="@dimen/layout_size_50"
                 android:layout_height="@dimen/layout_size_25"
-                android:scaleType="centerCrop"
                 android:layout_alignParentRight="true"
-                android:background="@drawable/full_battery" />
+                android:background="@drawable/full_battery"
+                android:scaleType="centerCrop" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -43,8 +44,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_centerHorizontal="true"
-                android:layout_marginBottom="@dimen/layout_size_20"
-                android:layout_marginTop="@dimen/default_margin"
+                android:layout_marginBottom="@dimen/layout_size_25"
+                android:layout_marginTop="@dimen/layout_size_5"
                 android:focusable="true"
                 android:max="70"
                 android:progress="0"
@@ -81,17 +82,17 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/layout_size_5"
         android:layout_weight="3"
         android:orientation="vertical">
 
         <Button
             android:id="@+id/play_title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/layout_size_50"
             android:layout_gravity="center"
             android:layout_marginLeft="@dimen/layout_size_20"
             android:layout_marginRight="@dimen/layout_size_20"
-            android:layout_marginTop="@dimen/layout_size_5"
             android:background="@drawable/title_button_shape"
             android:gravity="center"
             android:text="@string/play_title"
@@ -170,7 +171,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/default_margin">
+            android:layout_marginBottom="@dimen/layout_size_20">
 
             <ImageView
                 android:id="@+id/iv_play_guide"

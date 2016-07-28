@@ -16,6 +16,8 @@ import java.util.TimerTask;
 
 public class VerticalSeekBar extends SeekBar {
     private final static String TAG = "VerticalSeekBar";
+
+    private static final int STOPMOVETIME = 100;
     private boolean mIsDragging;
     private float mTouchDownY;
     private int mScaledTouchSlop;
@@ -23,6 +25,7 @@ public class VerticalSeekBar extends SeekBar {
     private Timer timer = null;
     private static float startProgress = 0;
     private static float progress;
+
 
     public boolean isInScrollingContainer() {
         return isInScrollingContainer;
@@ -180,7 +183,7 @@ public class VerticalSeekBar extends SeekBar {
                             startProgress = progress;
                         }
                     }
-                }, 100);
+                }, STOPMOVETIME);
             }
         }
 

@@ -27,7 +27,7 @@
     <string name="speed">SPEED</string>
     <string name="direction">DIRECTION</string>
     <string name="sb_max">100</string>
-    <string name="sb_min">0</string>
+    <string name="sb_min">30</string>
     <string name="play_title">Play:Remote Control</string>
     <string name="bluetooth_switch_has_opened">Bluetooth On</string>
     <string name="bluetooth_switch_not_opened">Bluetooth Off</string>

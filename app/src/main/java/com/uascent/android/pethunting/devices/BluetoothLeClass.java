@@ -40,6 +40,16 @@ import java.util.UUID;
 public class BluetoothLeClass {
     private final static String TAG = "BluetoothLeClass";
 
+    /**
+     * 接受数据周期
+     */
+/*
+    private static final int TIMEPERCMD = 300;
+*/
+    private static long preCmdTime = 0;
+    private static long preConnectTime = 0;
+
+    private static final int TIMEPERCONNECT = 1000;
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
     private String mBluetoothDeviceAddress;
@@ -91,28 +101,28 @@ public class BluetoothLeClass {
 //    private static boolean isFristWritePerCmd = false;
 
     public interface OnConnectListener {
-        public void onConnect(BluetoothGatt gatt);
+        void onConnect(BluetoothGatt gatt);
     }
 
     public interface OnDisconnectListener {
-        public void onDisconnect(BluetoothGatt gatt);
+        void onDisconnect(BluetoothGatt gatt);
     }
 
     public interface OnServiceDiscoverListener {
-        public void onServiceDiscover(BluetoothGatt gatt);
+        void onServiceDiscover(BluetoothGatt gatt);
     }
 
     public interface OnDataAvailableListener {
-        public void onCharacteristicRead(BluetoothGatt gatt,
-                                         BluetoothGattCharacteristic characteristic,
-                                         int status);
+        void onCharacteristicRead(BluetoothGatt gatt,
+                                  BluetoothGattCharacteristic characteristic,
+                                  int status);
 
-        public void onCharacteristicWrite(BluetoothGatt gatt,
-                                          BluetoothGattCharacteristic characteristic);
+        void onCharacteristicWrite(BluetoothGatt gatt,
+                                   BluetoothGattCharacteristic characteristic);
     }
 
     public interface OnReadRemoteRssiListener {
-        public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status);
+        void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status);
     }
 
     private OnConnectListener mOnConnectListener;
@@ -171,6 +181,8 @@ public class BluetoothLeClass {
                     mBluetoothGatt.close();
                 }
                 mBluetoothGatt = null;
+                preConnectTime = System.currentTimeMillis();
+                Lg.i(TAG, "close from GATT server.");
             }
         }
 
@@ -281,10 +293,18 @@ public class BluetoothLeClass {
             return false;
         }
 
+        long tem = System.currentTimeMillis() - preConnectTime;
+        if (tem < TIMEPERCONNECT) {
+            try {
+                Thread.sleep(TIMEPERCONNECT - tem);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         // Previously connected device.  Try to reconnect.
         if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress)
                 && mBluetoothGatt != null) {
-            Log.d(TAG, "Trying to use an existing mBluetoothGatt for connection.");
+            Lg.i(TAG, "Trying to use an existing mBluetoothGatt for connection.");
             if (mBluetoothGatt.connect()) {
                 return true;
             } else {
@@ -301,10 +321,10 @@ public class BluetoothLeClass {
         // parameter to false.
         try {
             mBluetoothGatt = device.connectGatt(mContext, false, mGattCallback);
-            Log.d(TAG, "Trying to create a new connection.");
+            Lg.i(TAG, "Trying to create a new connection.");
             mBluetoothDeviceAddress = address;
         } catch (Exception e) {
-            Log.d(TAG, "device.connectGatt fail");
+            Lg.i(TAG, "device.connectGatt fail");
             return false;
         }
         return true;
@@ -332,7 +352,7 @@ public class BluetoothLeClass {
         if (mBluetoothGatt == null) {
             return;
         }
-        //     mBluetoothGatt.close();
+        mBluetoothGatt.close();
         mBluetoothGatt = null;
     }
 
@@ -390,6 +410,25 @@ public class BluetoothLeClass {
 
     public synchronized void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
         characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+        boolean var = false;
+        if (mBluetoothGatt != null) {
+//            long tmp = System.currentTimeMillis() - preTime;
+//            if (tmp < TIMEPERCMD) {
+//                try {
+//                    Thread.sleep(TIMEPERCMD - tmp);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+            var = mBluetoothGatt.writeCharacteristic(characteristic);
+            preCmdTime = System.currentTimeMillis();
+        }
+        Lg.e(TAG, "writeCharacteristic->>>>" + var);
+    }
+
+
+ /*   public synchronized void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
+        characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
 //        isRealWrite = false;
         boolean var = false;
         if (mBluetoothGatt != null) {
@@ -417,7 +456,7 @@ public class BluetoothLeClass {
                 return;
             }
         }
-/*       }else {
+*//*       }else {
             if (timer != null) {
                 timer.cancel();
             }
@@ -430,9 +469,9 @@ public class BluetoothLeClass {
                     Lg.i(TAG, "timer.schedule->>>run");
                 }
             }, 1500);
-        }*/
+        }*//*
 
-    }
+    }*/
 
     /**
      * Retrieves a list of supported GATT services on the connected device. This should be
@@ -499,6 +538,14 @@ public class BluetoothLeClass {
             characteristic.setValue(new byte[]{(byte) direction});
             //往蓝牙模块写入数据
             Lg.i(TAG, "value:" + direction);
+            if (direction == BluetoothLeClass.MOUSE_STOP) {
+                try {
+                    Thread.sleep(50);
+                    writeCharacteristic(characteristic);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             writeCharacteristic(characteristic);
         }
         return true;

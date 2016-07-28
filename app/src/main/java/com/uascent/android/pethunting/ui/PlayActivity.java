@@ -29,6 +29,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         SeekBar.OnSeekBarChangeListener, VerticalSeekBar.OnSeekBarStopListener
         , VerticalSeekBar.OnSeekBarStopTouchListener, View.OnTouchListener, View.OnLongClickListener {
     private static final String TAG = "PlayActivity";
+
+    //    private static final int TIMEPERCMD = 300;
     private VerticalSeekBar ver_sb;
     private TextView ver_sb_per, tv_empty;
     private ImageView iv_play_guide, iv_play_home;
@@ -498,22 +500,26 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:  //判断按下和抬起的时间间隔
                 Lg.i(TAG, "event.getAction()---ACTION_DOWN--" + dirValue);
-                if (System.currentTimeMillis() - preTime < 200 && isDownUp) {
-                    isCmd = false;
-                    Lg.i(TAG, "event.getAction()---ACTION_DOWN--noSendCmd-time");
-                } else {
-                    Lg.i(TAG, "event.getAction()---ACTION_DOWN--SendCmd");
-                    isCmd = true;
-                    if (device != null) {
-                        if (speedValue != 0) {  //先滑动滑动条
-                            sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
-                        } else {   //先按住方向键
-                            sendMouseCmd(device.getAddress(), dirValue);
-                        }
+
+                //有用
+//                if ((System.currentTimeMillis() - preTime < TIMEPERCMD * 2) && isDownUp) {
+//                    isCmd = false;
+//                    Lg.i(TAG, "event.getAction()---ACTION_DOWN--noSendCmd-time");
+//                } else {
+//                    Lg.i(TAG, "event.getAction()---ACTION_DOWN--SendCmd");
+//                    isCmd = true;
+                if (device != null) {
+                    if (speedValue != 0) {  //先滑动滑动条
+                        sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+                    } else {   //先按住方向键
+                        sendMouseCmd(device.getAddress(), dirValue);
                     }
                 }
-                isDownUp = false;
-                preTime = System.currentTimeMillis();
+//                }
+//                isDownUp = false;
+//                preTime = System.currentTimeMillis();
+
+
                 break;
 
             case MotionEvent.ACTION_MOVE:
@@ -522,10 +528,11 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             case MotionEvent.ACTION_UP:
                 dirValue = BluetoothLeClass.MOUSE_STOP;
                 Lg.i(TAG, "event.getAction()---ACTION_UP--" + dirValue);
-                if (isCmd && device != null) {
+
+                if (/*isCmd &&*/ device != null) {
                     sendMouseCmd(device.getAddress(), dirValue);
                 }
-                isDownUp = true;
+//                isDownUp = true;
                 break;
         }
         return false;

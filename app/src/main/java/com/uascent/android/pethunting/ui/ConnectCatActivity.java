@@ -1,5 +1,6 @@
 package com.uascent.android.pethunting.ui;
 
+import android.app.ActivityManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -31,6 +32,7 @@ import com.uascent.android.pethunting.service.BleComService;
 import com.uascent.android.pethunting.tools.Lg;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by lenovo001 on 2016/5/28.
@@ -73,6 +75,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     private Handler scanDeviceHandler;
 
     private static final int SCANDEVICEMSG = 2;
+    private boolean isFirstResume = true;
 
 
     @Override
@@ -124,6 +127,15 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     @Override
     protected void onResume() {
         super.onResume();
+        if (!isFirstResume) {
+            doRefreshWork();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isFirstResume = false;
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -161,12 +173,13 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                     mScanningStopped = true;
                     if (mListData == null || mListData.size() == 0) {
                         showShortToast(getResources().getString(R.string.search_device_empty));
+                        adpater.notifyDataSetChanged();
                         iv_load_null.setVisibility(View.VISIBLE);
                         Lg.i(TAG, "mListData的大小为0");
                     }
                 }
             }, 10 * 1000);
-
+            Lg.i(TAG, "mBleStatus->>>>" + BluetoothLeClass.mBleStatus);
             mBluetoothAdapter.startLeScan(mLeScanCallback);
 //            mBluetoothAdapter.startLeScan(new UUID[]{BluetoothAntiLostDevice.MOUSE_SERVICE_UUID,
 //                    BluetoothAntiLostDevice.ALERT_SERVICE_UUID,BluetoothAntiLostDevice.LOSS_SERVICE_UUID,
@@ -204,8 +217,18 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         @Override
         public void onConnect(String address) throws RemoteException {
             Lg.i(TAG, "onConnect calll");
-            isConnecting = true;
-            isCheckServicee = false;
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    //               if (getTopActivity() != null) {
+//                if (getTopActivity().contains("ConnectCatActivity")) {
+                    isConnecting = true;
+                    isCheckServicee = false;
+                    Lg.i(TAG, "onConnect calll  do");
+//                }
+//            }
+                }
+            });
         }
 
         @Override
@@ -224,6 +247,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                         showShortToast(getString(R.string.device_service_not_match));
                         isClickMatch = false;
                     }
+                    Lg.i(TAG, "onDisconnect calll  do");
                 }
             });
 
@@ -267,13 +291,14 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 
         @Override
         public void onMouseServiceDiscovery(final String address, final boolean support) throws RemoteException {
-            isCheckServicee = true;
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
+                    isCheckServicee = true;
                     if (support) {
                         Lg.i(TAG, "onAlertServiceDiscovery_support");
                         closeLoadingDialog();
+                        Lg.i(TAG, "onMouseServiceDiscovery_isConnecting->>>" + isConnecting);
                         if (isConnecting) {
                             //判断服务
                             Intent intent = new Intent(ConnectCatActivity.this, PlayActivity.class);
@@ -449,4 +474,15 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
             }
         }
     };
+
+
+    private String getTopActivity() {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> runningTaskInfos = manager.getRunningTasks(1);
+        if (runningTaskInfos != null) {
+            return (runningTaskInfos.get(0).topActivity).toString();
+        } else {
+            return null;
+        }
+    }
 }
