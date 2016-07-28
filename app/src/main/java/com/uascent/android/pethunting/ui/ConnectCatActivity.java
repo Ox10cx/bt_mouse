@@ -304,6 +304,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                             Intent intent = new Intent(ConnectCatActivity.this, PlayActivity.class);
                             intent.putExtra("device", device);
                             startActivity(intent);
+                            Lg.i(TAG,"startActivity");
                             isConnecting = false;
                             isClickMatch = false;
                         }

@@ -190,8 +190,9 @@ public class BluetoothLeClass {
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             Lg.i(TAG, "onServicesDiscovered");
             if (status == BluetoothGatt.GATT_SUCCESS && mOnServiceDiscoverListener != null) {
-                mOnServiceDiscoverListener.onServiceDiscover(gatt);
                 mBleStatus = BLE_STATE_CONNECTED;
+                mOnServiceDiscoverListener.onServiceDiscover(gatt);
+                Lg.i(TAG, "onServicesDiscovered received: " + status);
 //                mBleStatus = BLE_STATE_CON_SERVICE;
             } else {
                 Lg.i(TAG, "onServicesDiscovered received: " + status);
@@ -408,7 +409,7 @@ public class BluetoothLeClass {
         return true;
     }
 
-    public synchronized void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
+/*    public synchronized void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
         characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
         boolean var = false;
         if (mBluetoothGatt != null) {
@@ -424,10 +425,10 @@ public class BluetoothLeClass {
             preCmdTime = System.currentTimeMillis();
         }
         Lg.e(TAG, "writeCharacteristic->>>>" + var);
-    }
+    }*/
 
 
- /*   public synchronized void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
+    public synchronized void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
         characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
 //        isRealWrite = false;
         boolean var = false;
@@ -437,11 +438,10 @@ public class BluetoothLeClass {
         Lg.e(TAG, "writeCharacteristic->>>>" + var);
         //如果写入蓝牙设备失败(可能是上一次的命令还没有得到响应，等待轮训10次发送)
         int var_count = 0;
-//        if (!var) {
         while (!var) {
             try {
-//                Thread.sleep(150 + 150 * var_count);
-                Thread.sleep(150);
+                Thread.sleep(150 + 150 * var_count);
+//                Thread.sleep(150);
                 Lg.i(TAG, "sleep");
                 if (mBluetoothGatt != null) {
                     var = mBluetoothGatt.writeCharacteristic(characteristic);
@@ -456,22 +456,7 @@ public class BluetoothLeClass {
                 return;
             }
         }
-*//*       }else {
-            if (timer != null) {
-                timer.cancel();
-            }
-            timer = new Timer();
-//                Lg.i(TAG,"pretime:"+System.currentTimeMillis());
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    mouseControl(MOUSE_STOP);
-                    Lg.i(TAG, "timer.schedule->>>run");
-                }
-            }, 1500);
-        }*//*
-
-    }*/
+    }
 
     /**
      * Retrieves a list of supported GATT services on the connected device. This should be
@@ -538,14 +523,14 @@ public class BluetoothLeClass {
             characteristic.setValue(new byte[]{(byte) direction});
             //往蓝牙模块写入数据
             Lg.i(TAG, "value:" + direction);
-            if (direction == BluetoothLeClass.MOUSE_STOP) {
-                try {
-                    Thread.sleep(50);
-                    writeCharacteristic(characteristic);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+//            if (direction == BluetoothLeClass.MOUSE_STOP) {
+//                try {
+//                    Thread.sleep(50);
+//                    writeCharacteristic(characteristic);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
             writeCharacteristic(characteristic);
         }
         return true;

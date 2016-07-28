@@ -25,12 +25,15 @@ import com.uascent.android.pethunting.myviews.VerticalSeekBar;
 import com.uascent.android.pethunting.service.BleComService;
 import com.uascent.android.pethunting.tools.Lg;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class PlayActivity extends BaseActivity implements View.OnClickListener,
         SeekBar.OnSeekBarChangeListener, VerticalSeekBar.OnSeekBarStopListener
-        , VerticalSeekBar.OnSeekBarStopTouchListener, View.OnTouchListener, View.OnLongClickListener {
+        , VerticalSeekBar.OnSeekBarStopTouchListener, View.OnTouchListener/*, View.OnLongClickListener */ {
     private static final String TAG = "PlayActivity";
 
-    //    private static final int TIMEPERCMD = 300;
+    private static final int TIMEPERCMD = 100;
     private VerticalSeekBar ver_sb;
     private TextView ver_sb_per, tv_empty;
     private ImageView iv_play_guide, iv_play_home;
@@ -46,14 +49,16 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     private int countBatteryLow = 0;
 
     private BluetoothAdapter mBluetoothAdapter;
-    private boolean isCmd = false;
-    private boolean isDownUp = false;
+    //    private boolean isCmd = false;
+    private boolean isDownUp = true;
     private int curProgress = 0;
 
     //求电量的平均值
     private byte[] batteryArray = new byte[5];
     private byte batteryIndex = 0;
     private boolean isFrist = true;
+
+    private Timer timer = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +80,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         } else {
             showShortToast(getString(R.string.moible_not_support_bluetooth4));
         }
+        timer = new Timer();
     }
 
     private void initViews() {
@@ -93,22 +99,22 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         iv_top_dir = (ImageView) findViewById(R.id.iv_top_dir);
         iv_top_dir.setOnTouchListener(this);
         iv_top_dir.setOnClickListener(this);
-        iv_top_dir.setOnLongClickListener(this);
+//        iv_top_dir.setOnLongClickListener(this);
 
         iv_below_dir = (ImageView) findViewById(R.id.iv_below_dir);
         iv_below_dir.setOnClickListener(this);
         iv_below_dir.setOnTouchListener(this);
-        iv_below_dir.setOnLongClickListener(this);
+//        iv_below_dir.setOnLongClickListener(this);
 
         iv_left_dir = (ImageView) findViewById(R.id.iv_left_dir);
         iv_left_dir.setOnClickListener(this);
         iv_left_dir.setOnTouchListener(this);
-        iv_left_dir.setOnLongClickListener(this);
+//        iv_left_dir.setOnLongClickListener(this);
 
         iv_right_dir = (ImageView) findViewById(R.id.iv_right_dir);
         iv_right_dir.setOnClickListener(this);
         iv_right_dir.setOnTouchListener(this);
-        iv_right_dir.setOnLongClickListener(this);
+//        iv_right_dir.setOnLongClickListener(this);
 
         iv_battery = (ImageView) findViewById(R.id.iv_battery);
     }
@@ -500,25 +506,28 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:  //判断按下和抬起的时间间隔
                 Lg.i(TAG, "event.getAction()---ACTION_DOWN--" + dirValue);
-
-                //有用
-//                if ((System.currentTimeMillis() - preTime < TIMEPERCMD * 2) && isDownUp) {
-//                    isCmd = false;
-//                    Lg.i(TAG, "event.getAction()---ACTION_DOWN--noSendCmd-time");
-//                } else {
-//                    Lg.i(TAG, "event.getAction()---ACTION_DOWN--SendCmd");
-//                    isCmd = true;
-                if (device != null) {
-                    if (speedValue != 0) {  //先滑动滑动条
-                        sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
-                    } else {   //先按住方向键
-                        sendMouseCmd(device.getAddress(), dirValue);
+                if (isDownUp) {
+                    if (timer != null) {
+                        timer.cancel();
                     }
+                    timer = new Timer();
+                    preTime = System.currentTimeMillis();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            if (device != null) {
+                                if (speedValue != BluetoothLeClass.MOUSE_STOP) {  //先滑动滑动条
+                                    sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+                                } else {   //先按住方向键
+                                    sendMouseCmd(device.getAddress(), dirValue);
+                                }
+                            }
+                        }
+                    }, TIMEPERCMD);
+                } else {
+                    showShortToast(getString(R.string.only_click_button));
                 }
-//                }
-//                isDownUp = false;
-//                preTime = System.currentTimeMillis();
-
+                isDownUp = false;
 
                 break;
 
@@ -526,15 +535,21 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 break;
 
             case MotionEvent.ACTION_UP:
-                dirValue = BluetoothLeClass.MOUSE_STOP;
-                Lg.i(TAG, "event.getAction()---ACTION_UP--" + dirValue);
-
-                if (/*isCmd &&*/ device != null) {
-                    sendMouseCmd(device.getAddress(), dirValue);
+//                dirValue = BluetoothLeClass.MOUSE_STOP;
+                Lg.i(TAG, "event.getAction()---ACTION_UP--" + BluetoothLeClass.MOUSE_STOP);
+                if (System.currentTimeMillis() - preTime < TIMEPERCMD) {
+                    timer.cancel();
+                } else {
+                    if (device != null) {
+                        sendMouseCmd(device.getAddress(), BluetoothLeClass.MOUSE_STOP);
+                    }
                 }
-//                isDownUp = true;
+                isDownUp = true;
+
                 break;
+
         }
+
         return false;
     }
 
@@ -558,21 +573,21 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         super.onBackPressed();
     }
 
-    @Override
-    public boolean onLongClick(View v) {
-        if (!isCmd) {
-            Lg.i(TAG, "onLongClick");
-            isCmd = true;
-            if (device != null) {
-                if (speedValue != 0) {  //先滑动滑动条
-                    sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
-                } else {   //先按住方向键
-                    sendMouseCmd(device.getAddress(), dirValue);
-                }
-            }
-        }
-        return false;
-    }
+//    @Override
+//    public boolean onLongClick(View v) {
+//        if (!isCmd) {
+//            Lg.i(TAG, "onLongClick");
+//            isCmd = true;
+//            if (device != null) {
+//                if (speedValue != 0) {  //先滑动滑动条
+//                    sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+//                } else {   //先按住方向键
+//                    sendMouseCmd(device.getAddress(), dirValue);
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
     /**
      * 电量的平均值

@@ -27,7 +27,7 @@
     <string name="speed">SPEED</string>
     <string name="direction">DIRECTION</string>
     <string name="sb_max">100</string>
-    <string name="sb_min">30</string>
+    <string name="sb_min">60</string>
     <string name="play_title">Play:Remote Control</string>
     <string name="bluetooth_switch_has_opened">Bluetooth On</string>
     <string name="bluetooth_switch_not_opened">Bluetooth Off</string>
@@ -72,6 +72,7 @@
     <string name="check_ble_switch">蓝牙已断开连接,请您检查Ble设备开关是否打开</string>
     <string name="bluetooth_has_breaked">蓝牙已断开连接</string>
     <string name="bluetooth_is_opening">蓝牙正在打开中...</string>
+    <string name="only_click_button">每次只能按住一个方向键</string>
 
     <!--暂时不用-->
     <!--<string name="cmd_sending">请稍后...</string>-->
