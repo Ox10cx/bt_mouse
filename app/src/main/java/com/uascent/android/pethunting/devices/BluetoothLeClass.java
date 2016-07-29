@@ -90,12 +90,12 @@ public class BluetoothLeClass {
 
     protected static final UUID CHARACTERISTIC_UPDATE_NOTIFICATION_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
-    public static final int MOUSE_STOP = 0;
+
+    public static final byte SPEED_ID = 5;public static final int MOUSE_STOP = 0;
     public static final int MOUSE_UP = 1;
     public static final int MOUSE_DOWN = 2;
     public static final int MOUSE_LEFT = 3;
     public static final int MOUSE_RIGHT = 4;
-    public static final byte SPEED_ID = 5;
 //    private static boolean isRealWrite = false;
 //    private Timer timer = null;
 //    private static boolean isFristWritePerCmd = false;

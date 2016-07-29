@@ -502,6 +502,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             case R.id.iv_right_dir:
                 dirValue = BluetoothLeClass.MOUSE_RIGHT;
                 break;
+            default:
+                break;
         }
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:  //判断按下和抬起的时间间隔
@@ -535,7 +537,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 break;
 
             case MotionEvent.ACTION_UP:
-//                dirValue = BluetoothLeClass.MOUSE_STOP;
+                dirValue = BluetoothLeClass.MOUSE_STOP;
                 Lg.i(TAG, "event.getAction()---ACTION_UP--" + BluetoothLeClass.MOUSE_STOP);
                 if (System.currentTimeMillis() - preTime < TIMEPERCMD) {
                     timer.cancel();
@@ -546,6 +548,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 }
                 isDownUp = true;
 
+                break;
+            default:
                 break;
 
         }
