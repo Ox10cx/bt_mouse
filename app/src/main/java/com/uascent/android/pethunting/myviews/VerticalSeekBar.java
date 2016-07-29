@@ -17,7 +17,20 @@ import java.util.TimerTask;
 public class VerticalSeekBar extends SeekBar {
     private final static String TAG = "VerticalSeekBar";
 
-    private static final int STOPMOVETIME = 100;
+    /**
+     * 悬停滑块STOPMOVETIME时间->发送命令   ms
+     */
+    private static final int STOPMOVETIME = 50;
+    /**
+     * 前后发送命令的移动距离MOVESPACE ->发送命令
+     */
+    private static final byte MOVESPACE = 10;
+
+    /**
+     * 进度条的最进度值
+     */
+    private static final byte sb_max_progress_value = 70;
+
     private boolean mIsDragging;
     private float mTouchDownY;
     private int mScaledTouchSlop;
@@ -151,7 +164,6 @@ public class VerticalSeekBar extends SeekBar {
         final int available = height - top - bottom;
         int y = (int) event.getY();
         float scale;
-//        float progress = 0;
         if (y > height - bottom) {
             scale = 0.0f;
         } else if (y < top) {
@@ -164,13 +176,12 @@ public class VerticalSeekBar extends SeekBar {
         final int max = getMax();
         progress += scale * max;
         setProgress((int) progress);
-        if (progress > 70) {
-            progress = 70;
+        if (progress > sb_max_progress_value) {
+            progress = sb_max_progress_value;
         }
-        //停止滑动超过1.5s
         if (timer != null) {
 //            Lg.i(TAG, "progress->>" + progress + "  startProgress->>" + startProgress);
-            if (Math.abs(progress - startProgress) > 5) {
+            if (Math.abs(progress - startProgress) > MOVESPACE) {
                 timer.cancel();
                 timer = new Timer();
 //                Lg.i(TAG,"pretime:"+System.currentTimeMillis());
