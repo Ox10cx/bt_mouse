@@ -91,7 +91,8 @@ public class BluetoothLeClass {
     protected static final UUID CHARACTERISTIC_UPDATE_NOTIFICATION_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
 
-    public static final byte SPEED_ID = 5;public static final int MOUSE_STOP = 0;
+    public static final byte SPEED_ID = 5;
+    public static final int MOUSE_STOP = 0;
     public static final int MOUSE_UP = 1;
     public static final int MOUSE_DOWN = 2;
     public static final int MOUSE_LEFT = 3;
@@ -409,39 +410,19 @@ public class BluetoothLeClass {
         return true;
     }
 
-/*    public synchronized void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
-        characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-        boolean var = false;
-        if (mBluetoothGatt != null) {
-//            long tmp = System.currentTimeMillis() - preTime;
-//            if (tmp < TIMEPERCMD) {
-//                try {
-//                    Thread.sleep(TIMEPERCMD - tmp);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-            var = mBluetoothGatt.writeCharacteristic(characteristic);
-            preCmdTime = System.currentTimeMillis();
-        }
-        Lg.e(TAG, "writeCharacteristic->>>>" + var);
-    }*/
-
-
     public synchronized void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
         characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-//        isRealWrite = false;
         boolean var = false;
         if (mBluetoothGatt != null) {
             var = mBluetoothGatt.writeCharacteristic(characteristic);
         }
         Lg.e(TAG, "writeCharacteristic->>>>" + var);
-        //如果写入蓝牙设备失败(可能是上一次的命令还没有得到响应，等待轮训10次发送)
+
+        //如果写入蓝牙设备失败(可能是上一次的命令还没有得到响应，等待轮训5次发送，5次还没有成功，发送停止命令)
         int var_count = 0;
         while (!var) {
             try {
                 Thread.sleep(150 + 150 * var_count);
-//                Thread.sleep(150);
                 Lg.i(TAG, "sleep");
                 if (mBluetoothGatt != null) {
                     var = mBluetoothGatt.writeCharacteristic(characteristic);
@@ -451,7 +432,7 @@ public class BluetoothLeClass {
                 e.printStackTrace();
             }
             var_count++;
-            if (var_count == 10) {
+            if (var_count == 5) {
                 mouseControl(MOUSE_STOP);
                 return;
             }
@@ -523,6 +504,8 @@ public class BluetoothLeClass {
             characteristic.setValue(new byte[]{(byte) direction});
             //往蓝牙模块写入数据
             Lg.i(TAG, "value:" + direction);
+
+            //重复写两次停止命令
 //            if (direction == BluetoothLeClass.MOUSE_STOP) {
 //                try {
 //                    Thread.sleep(50);
@@ -531,6 +514,7 @@ public class BluetoothLeClass {
 //                    e.printStackTrace();
 //                }
 //            }
+
             writeCharacteristic(characteristic);
         }
         return true;

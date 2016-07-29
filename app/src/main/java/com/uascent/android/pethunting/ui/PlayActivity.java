@@ -26,16 +26,15 @@ import com.uascent.android.pethunting.service.BleComService;
 import com.uascent.android.pethunting.tools.Lg;
 
 import java.util.Timer;
-import java.util.TimerTask;
 
 public class PlayActivity extends BaseActivity implements View.OnClickListener,
         SeekBar.OnSeekBarChangeListener, VerticalSeekBar.OnSeekBarStopListener
         , VerticalSeekBar.OnSeekBarStopTouchListener, View.OnTouchListener/*, View.OnLongClickListener */ {
     private static final String TAG = "PlayActivity";
 
-    private static final int TIMEPERCMD = 100;
+    //    private static final int TIMEPERCMD = 100;
     private VerticalSeekBar ver_sb;
-    private TextView ver_sb_per, tv_empty;
+    private TextView tv_empty;
     private ImageView iv_play_guide, iv_play_home;
     private ImageView iv_top_dir, iv_below_dir, iv_left_dir, iv_right_dir;
     private ImageView iv_battery;
@@ -45,7 +44,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     private static int speedValue = 0;
     private static int dirValue = 0;
     private static int startSpeed = 0;
-    private Long preTime = 0l;
+    //    private Long preTime = 0l;
     private int countBatteryLow = 0;
 
     private BluetoothAdapter mBluetoothAdapter;
@@ -84,7 +83,6 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
     }
 
     private void initViews() {
-        ver_sb_per = (TextView) findViewById(R.id.ver_sb_per);
         ver_sb = (VerticalSeekBar) findViewById(R.id.ver_sb);
         VerticalSeekBar.setSeekBarStopListener(this);
         VerticalSeekBar.setSeekBarStopTouchListener(this);
@@ -509,23 +507,23 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             case MotionEvent.ACTION_DOWN:  //判断按下和抬起的时间间隔
                 Lg.i(TAG, "event.getAction()---ACTION_DOWN--" + dirValue);
                 if (isDownUp) {
-                    if (timer != null) {
-                        timer.cancel();
-                    }
-                    timer = new Timer();
-                    preTime = System.currentTimeMillis();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            if (device != null) {
-                                if (speedValue != BluetoothLeClass.MOUSE_STOP) {  //先滑动滑动条
-                                    sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
-                                } else {   //先按住方向键
-                                    sendMouseCmd(device.getAddress(), dirValue);
-                                }
-                            }
+//                    if (timer != null) {
+//                        timer.cancel();
+//                    }
+//                    timer = new Timer();
+//                    preTime = System.currentTimeMillis();
+//                    timer.schedule(new TimerTask() {
+//                        @Override
+//                        public void run() {
+                    if (device != null) {
+                        if (speedValue != BluetoothLeClass.MOUSE_STOP) {  //先滑动滑动条
+                            sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
+                        } else {   //先按住方向键
+                            sendMouseCmd(device.getAddress(), dirValue);
                         }
-                    }, TIMEPERCMD);
+                    }
+//                        }
+//                    }, TIMEPERCMD);
                 } else {
                     showShortToast(getString(R.string.only_click_button));
                 }
@@ -539,13 +537,13 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
             case MotionEvent.ACTION_UP:
                 dirValue = BluetoothLeClass.MOUSE_STOP;
                 Lg.i(TAG, "event.getAction()---ACTION_UP--" + BluetoothLeClass.MOUSE_STOP);
-                if (System.currentTimeMillis() - preTime < TIMEPERCMD) {
-                    timer.cancel();
-                } else {
-                    if (device != null) {
-                        sendMouseCmd(device.getAddress(), BluetoothLeClass.MOUSE_STOP);
-                    }
+//                if (System.currentTimeMillis() - preTime < TIMEPERCMD) {
+//                    timer.cancel();
+//                } else {
+                if (device != null) {
+                    sendMouseCmd(device.getAddress(), BluetoothLeClass.MOUSE_STOP);
                 }
+//                }
                 isDownUp = true;
 
                 break;
