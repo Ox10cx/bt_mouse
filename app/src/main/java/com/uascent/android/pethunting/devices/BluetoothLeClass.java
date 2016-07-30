@@ -38,7 +38,7 @@ import java.util.UUID;
  * given Bluetooth LE device.
  */
 public class BluetoothLeClass {
-    private final static String TAG = "BluetoothLeClass";
+    private final static String TAG = "ConnectCatActivity";
 
     /**
      * 接受数据周期
@@ -180,8 +180,10 @@ public class BluetoothLeClass {
                 mBleStatus = BLE_STATE_INIT;
                 if (mBluetoothGatt != null) {
                     mBluetoothGatt.close();
+                    Lg.i(TAG, "mBluetoothGatt.close()");
                 }
                 mBluetoothGatt = null;
+                Lg.i(TAG, "mBluetoothGatt null");
                 preConnectTime = System.currentTimeMillis();
                 Lg.i(TAG, "close from GATT server.");
             }
@@ -194,7 +196,6 @@ public class BluetoothLeClass {
                 mBleStatus = BLE_STATE_CONNECTED;
                 mOnServiceDiscoverListener.onServiceDiscover(gatt);
                 Lg.i(TAG, "onServicesDiscovered received: " + status);
-//                mBleStatus = BLE_STATE_CON_SERVICE;
             } else {
                 Lg.i(TAG, "onServicesDiscovered received: " + status);
                 mBleStatus = BLE_STATE_ERROR;
