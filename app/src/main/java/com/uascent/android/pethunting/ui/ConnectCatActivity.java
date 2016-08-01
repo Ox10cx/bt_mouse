@@ -40,7 +40,7 @@ import java.util.List;
 public class ConnectCatActivity extends BaseActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
     private static final String TAG = "ConnectCatActivity";
 
-    private static ArrayList<BtDevice> mListData = new ArrayList<>();
+    private ArrayList<BtDevice> mListData = null;
     private IService mService;
     //    private Handler mHandler;
     boolean mScanningStopped;
@@ -106,6 +106,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     }
 
     private void initViews() {
+        mListData = new ArrayList<>();
         bt_match = (Button) findViewById(R.id.bt_match);
         bt_match.setOnClickListener(this);
         iv_load_null = (ImageView) findViewById(R.id.iv_load_null);
@@ -322,9 +323,11 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     public void addDevice(final String address, final String name, final int rssi) {
         Lg.i(TAG, "addDevice called:" + address + "   " + name + "  " + rssi);
         //避免重复添加
-        for (BtDevice ele : mListData) {
-            if (ele.getAddress().equalsIgnoreCase(address)) {
-                return;
+        synchronized (this) {
+            for (BtDevice ele : mListData) {
+                if (ele.getAddress().equalsIgnoreCase(address)) {
+                    return;
+                }
             }
         }
         BtDevice device = new BtDevice();
@@ -421,9 +424,9 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
             }
         }
         getApplicationContext().unbindService(mConnection);
-        if (mListData != null && mListData.size() > 0) {
-            mListData.clear();
-        }
+//        if (mListData != null && mListData.size() > 0) {
+//            mListData.clear();
+//        }
         super.onDestroy();
     }
 
