@@ -81,7 +81,7 @@ public class FristFlashActivity extends BaseActivity {
     }
 
     private boolean checkMultiPermissions() {
-        List<String> permissionsNeeded = new ArrayList<String>();
+        List<String> permissionsNeeded = new ArrayList<>();
 
         final List<String> permissionsList = new ArrayList<String>();
         if (!addPermission(permissionsList, Manifest.permission.ACCESS_FINE_LOCATION)) {
