@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.uascent.android.pethunting.MyApplication;
@@ -56,29 +57,17 @@ public class BaseActivity extends FragmentActivity {
         toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
         toast.show();
     }
-
     public void showLoadingDialog() {
-        if (!(dialog != null && (getString(R.string.loading).equals(dialogMsg)))) {
-            dialog = LoadDialog.createLoadingDialog(this, getString(R.string.loading));
-            dialog.setCancelable(true);
-        }
-//        if (isShowLoadingDialog()) {
-//            closeLoadingDialog();
-//        }
+        dialog = DialogUtil.createLoadingDialog(this, getResources().getString(R.string.loading));
+        dialog.setCancelable(true);
         dialog.show();
-        dialogMsg = getString(R.string.loading);
     }
 
     public void showLoadingDialog(String msg) {
-        if (!(dialog != null && (dialogMsg.equals(msg)))) {
-            dialog = LoadDialog.createLoadingDialog(this, getString(R.string.loading));
-            dialog.setCancelable(true);
-        }
-//        if (isShowLoadingDialog()) {
-//            closeLoadingDialog();
-//        }
+        dialog = DialogUtil.createLoadingDialog(this, msg);
+        dialog.setCancelable(true);
         dialog.show();
-        dialogMsg = msg;
+
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 
             @Override
@@ -89,11 +78,11 @@ public class BaseActivity extends FragmentActivity {
     }
 
     protected void onDialogCancel() {
-        Lg.i(TAG, "onDialogCancel called");
+        Log.e("hjq", "onDialogCancel called");
     }
 
     public boolean closeLoadingDialog() {
-        if (isShowLoadingDialog()) {
+        if (dialog != null && dialog.isShowing()) {
             dialog.dismiss();
             return true;
         } else {
@@ -101,11 +90,4 @@ public class BaseActivity extends FragmentActivity {
         }
     }
 
-    public boolean isShowLoadingDialog() {
-        if (dialog != null && dialog.isShowing()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 }

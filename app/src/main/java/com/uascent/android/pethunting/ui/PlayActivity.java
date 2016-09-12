@@ -153,7 +153,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
      * @param cmd
      */
     void sendMouseSpeedCmd(String addr, int value, int cmd) {
-        Lg.i(TAG, "sendMouseCmd:" + value + "  " + cmd);
+        Lg.i(TAG, "sendMouseCmd:" +addr+""+ value + "  " + cmd);
         controlMouseSpeed(addr, value, cmd);
 //        getMouseRsp(addr);
     }
@@ -207,8 +207,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         }
 
         @Override
-        public void onDisconnect(String address) throws RemoteException {
-            Lg.i(TAG, "onDisconnect called");
+        public void onDisconnect(final String address) throws RemoteException {
+            Lg.i(TAG, "PlayActivity onDisconnect called");
             //蓝牙意外断开，考虑重连接
             if (!MyApplication.getInstance().isAutoBreak) {
                 mHandler.post(new Runnable() {
@@ -291,6 +291,7 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                 showShortToast(getString(R.string.check_ble_switch));
                 if (device != null) {
                     Lg.i(TAG, "relink--->device != null");
+                    //mService.disconnect();
                     relinkBleDevice();
                 }
             } else {
@@ -478,7 +479,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
         if (device != null) {
             if (dirValue != 0) {
                 sendMouseSpeedCmd(device.getAddress(), 0, dirValue);
-            } else {  //方向键先松开  dirvalue=0
+            } else {
+                //方向键先松开  dirvalue=0
                 sendMouseCmd(device.getAddress(), dirValue);
             }
         }
@@ -518,7 +520,8 @@ public class PlayActivity extends BaseActivity implements View.OnClickListener,
                     if (device != null) {
                         if (speedValue != BluetoothLeClass.MOUSE_STOP) {  //先滑动滑动条
                             sendMouseSpeedCmd(device.getAddress(), speedValue, dirValue);
-                        } else {   //先按住方向键
+                        } else {
+                            //先按住方向键
                             sendMouseCmd(device.getAddress(), dirValue);
                         }
                     }

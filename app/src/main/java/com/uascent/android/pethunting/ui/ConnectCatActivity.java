@@ -134,7 +134,27 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
     protected void onResume() {
         super.onResume();
         if (!isFirstResume) {
-            doRefreshWork();
+            showLoadingDialog(getResources().getString(R.string.close_loading));
+            dofirstRereshWork();
+        }
+    }
+
+    public void dofirstRereshWork(){
+        isRefresh = true;
+        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+        if (mService != null) {
+            Lg.e(TAG,"doRefreshWork mService != null");
+            index_checked = 0;
+            count_device = 0;
+            mListData.clear();
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    scanLeDevice(true);
+                }
+            },2000);
+        } else {
+            showShortToast(getString(R.string.bluetooth_service_break_restart));
         }
     }
 
@@ -166,27 +186,30 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
         }
     };
 
+    Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            closeLoadingDialog();
+            Lg.i(TAG, "stop scanning after 10s");
+            refreshOk();
+            mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            mScanningStopped = true;
+            if (mListData == null || mListData.size() == 0) {
+                showShortToast(getResources().getString(R.string.search_device_empty));
+                adpater.notifyDataSetChanged();
+                iv_load_null.setVisibility(View.VISIBLE);
+                Lg.i(TAG, "mListData的大小为0");
+            }
+            isRefresh = false;
+
+        }
+    };
+
 
     private void scanLeDevice(final boolean enable) {
         if (enable) {
             //搜索10s,10s后停止搜索
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    closeLoadingDialog();
-                    Lg.i(TAG, "stop scanning after 10s");
-                    refreshOk();
-                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                    mScanningStopped = true;
-                    if (mListData == null || mListData.size() == 0) {
-                        showShortToast(getResources().getString(R.string.search_device_empty));
-                        adpater.notifyDataSetChanged();
-                        iv_load_null.setVisibility(View.VISIBLE);
-                        Lg.i(TAG, "mListData的大小为0");
-                    }
-                    isRefresh = false;
-                }
-            }, 10 * 1000);
+            mHandler.postDelayed(runnable, 10 * 1000);
             mBluetoothAdapter.startLeScan(mLeScanCallback);
 //            mBluetoothAdapter.startLeScan(new UUID[]{BluetoothAntiLostDevice.MOUSE_SERVICE_UUID,
 //                    BluetoothAntiLostDevice.ALERT_SERVICE_UUID,BluetoothAntiLostDevice.LOSS_SERVICE_UUID,
@@ -234,7 +257,6 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-
                         closeLoadingDialog();
                         BluetoothLeClass.mBleStatus = BluetoothLeClass.BLE_STATE_INIT;
                         if (!isServiceeNotSupportDisconnect) {
@@ -427,6 +449,7 @@ public class ConnectCatActivity extends BaseActivity implements AdapterView.OnIt
 //        if (mListData != null && mListData.size() > 0) {
 //            mListData.clear();
 //        }
+        mHandler.removeCallbacks(runnable);
         super.onDestroy();
     }
 

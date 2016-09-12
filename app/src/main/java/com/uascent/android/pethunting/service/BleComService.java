@@ -231,7 +231,7 @@ public class BleComService extends Service {
             mActiveDevices.remove(address);
             device.disconnect();
             //lzg edit   不使用该链接之后，释放资源
-            device.close();
+            //device.close();
         } else {
             Lg.i(TAG, "device == null");
         }

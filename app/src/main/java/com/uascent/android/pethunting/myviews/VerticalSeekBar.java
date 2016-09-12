@@ -119,12 +119,12 @@ public class VerticalSeekBar extends SeekBar {
                 } else {
                     final float y = event.getY();
                     if (Math.abs(y - mTouchDownY) > mScaledTouchSlop) {
-                        setPressed(true);
+                            setPressed(true);
 
-                        invalidate();
-                        onStartTrackingTouch();
-                        trackTouchEvent(event);
-                        attemptClaimDrag();
+                            invalidate();
+                            onStartTrackingTouch();
+                            trackTouchEvent(event);
+                            attemptClaimDrag();
 
                     }
                 }

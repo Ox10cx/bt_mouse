@@ -163,6 +163,7 @@ public class BluetoothLeClass {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             Lg.i(TAG, "onConnectionStateChange");
+            Lg.i("PlayActivity","onConnectionStateChange"+">>>"+newState);
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 if (mOnConnectListener != null)
                     mOnConnectListener.onConnect(gatt);
@@ -170,10 +171,17 @@ public class BluetoothLeClass {
                 Log.i(TAG, "Connected to GATT server.");
                 // Attempts to discover services after successful connection.
                 if (mBluetoothGatt != null) {
+                    //睡眠500ms 防止底层没有这么快释放蓝牙资源
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     boolean ret = mBluetoothGatt.discoverServices();
                     Lg.i(TAG, "Attempting to start service discovery:" + ret);
                 }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                Lg.i("PlayActivity","onConnectionStateChange STATE_DISCONNECTED"+">>>"+newState);
                 if (mOnDisconnectListener != null)
                     mOnDisconnectListener.onDisconnect(gatt);
                 Lg.i(TAG, "Disconnected from GATT server.");
